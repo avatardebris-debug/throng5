@@ -91,7 +91,13 @@ class SynapseOptimizer(MetaLayer):
         
         W_recurrent = weights.get('W_recurrent', None)
         if W_recurrent is None:
-            return {'loss': self.metrics.loss, 'dW': {}}
+            return {
+                'loss': self.metrics.loss,
+                'dW': {},
+                'rpe': 0.0,
+                'active_rule': self.active_rule,
+                'metrics': self.metrics,
+            }
         
         # Compute dopamine RPE
         rpe = self.dopamine.compute_rpe(reward)
