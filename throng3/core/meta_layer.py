@@ -112,8 +112,11 @@ class MetaLayer(ABC):
         self._learning_rate = self.config.get('learning_rate', 0.01)
         self._momentum = self.config.get('momentum', 0.9)
         
-        # Accept/reject thresholds
-        self._accept_threshold = self.config.get('accept_threshold', 0.5)
+        # Accept/reject thresholds (escalate with level to prevent interference)
+        base_threshold = self.config.get('accept_threshold', 0.5)
+        # Higher levels = harder to accept suggestions from above
+        # Meta^0: 0.5, Meta^1: 0.6, Meta^2: 0.7, ..., Meta^5: 1.0
+        self._accept_threshold = base_threshold + (0.1 * self.level)
         self._reject_cost_limit = self.config.get('reject_cost_limit', 0.1)
         
         # Holographic encoding

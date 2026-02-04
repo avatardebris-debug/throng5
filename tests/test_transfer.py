@@ -60,7 +60,8 @@ def test_task_transfer():
     losses_A = evaluate_on_task(pipeline_transfer, W_A, b_A, n_steps=100)
     print(f"  Task A final loss: {np.mean(losses_A[-20:]):.4f}")
     
-    # 2. Transfer to Task B (keep meta-learning, reset lower layers)
+    # 2. Transfer to Task B: reset task-specific state, keep meta-knowledge
+    pipeline_transfer.reset_task_state()
     losses_B_transfer = evaluate_on_task(pipeline_transfer, W_B, b_B, n_steps=50)
     
     # 3. Baseline: fresh pipeline on Task B

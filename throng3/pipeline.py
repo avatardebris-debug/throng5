@@ -187,6 +187,50 @@ class MetaNPipeline:
         self._step_count += 1
         return step_result
     
+    def reset_task_state(self):
+        """
+        Reset task-specific state while preserving meta-learned knowledge.
+        
+        This enables transfer learning:
+        - Meta^0 weights are reset (task-specific)
+        - Meta^1 learning rule parameters persist (meta-knowledge)
+        - Meta^2 bandit statistics persist (meta-knowledge)
+        - Meta^3-5 hyperparameters persist (meta-knowledge)
+        """
+        # Reset Meta^0 neural state
+        neuron_layer = self.stack.get_layer(0)
+        if neuron_layer:
+            # Reinitialize weights
+            neuron_layer._init_weights()
+            # Reset dynamic state
+            neuron_layer.membrane_potential[:] = 0
+            neuron_layer.activations[:] = 0
+            neuron_layer.spikes[:] = False
+            neuron_layer.refractory_timer[:] = 0
+            neuron_layer._spike_history.clear()
+            neuron_layer._activity_history.clear()
+            neuron_layer._time = 0.0
+        
+        # Reset Meta^1 pending changes but keep learned parameters
+        synapse_layer = self.stack.get_layer(1)
+        if synapse_layer:
+            synapse_layer._pending_dW = {}
+            # Reset spike history for STDP
+            synapse_layer._prev_spikes = None
+            synapse_layer._prev_activations = None
+            # Keep dopamine system state (it's meta-knowledge about reward dynamics)
+            # Keep STDP/Hebbian parameters (tuned by Meta^2)
+        
+        # Meta^2 and higher: keep everything (this IS the meta-knowledge)
+        # Their bandit statistics, hyperparameters, etc. are what transfer
+        
+        # Reset step counter for new task
+        self._step_count = 0
+        # Keep history for meta-analysis but mark boundary
+        if self._history:
+            self._history.append({'task_boundary': True})
+
+    
     def get_report(self) -> str:
         """Get a human-readable system report."""
         state = self.stack.get_system_state()

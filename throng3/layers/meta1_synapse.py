@@ -70,6 +70,10 @@ class SynapseOptimizer(MetaLayer):
         
         # Reference to Meta^0's state (populated during optimize)
         self._neuron_state: Optional[Dict] = None
+        
+        # Spike history for STDP temporal offset
+        self._prev_spikes: Optional[np.ndarray] = None
+        self._prev_activations: Optional[np.ndarray] = None
     
     def optimize(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -186,21 +190,26 @@ class SynapseOptimizer(MetaLayer):
         }
     
     def _apply_stdp(self, weights: np.ndarray, spikes: np.ndarray) -> np.ndarray:
-        """Apply STDP learning rule."""
+        """Apply STDP learning rule with proper temporal offset."""
         if len(spikes) == 0:
             return np.zeros_like(weights)
         
         N = weights.shape[0]
         n_spikes = min(len(spikes), N)
         
-        pre_spikes = spikes[:n_spikes]
-        post_spikes = spikes[:n_spikes]
+        # Current spikes are post-synaptic
+        post_spikes = np.zeros(N)
+        post_spikes[:n_spikes] = spikes[:n_spikes]
         
-        # Pad if needed
-        if n_spikes < N:
+        # Previous spikes are pre-synaptic (temporal offset)
+        if self._prev_spikes is None:
+            # First call: no temporal offset yet
             pre_spikes = np.zeros(N)
-            pre_spikes[:n_spikes] = spikes[:n_spikes]
-            post_spikes = pre_spikes.copy()
+        else:
+            pre_spikes = self._prev_spikes.copy()
+        
+        # Store current spikes for next iteration
+        self._prev_spikes = post_spikes.copy()
         
         return self.stdp.batch_update(weights, pre_spikes, post_spikes)
     

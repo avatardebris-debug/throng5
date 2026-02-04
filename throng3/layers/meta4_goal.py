@@ -123,9 +123,12 @@ class GoalHierarchy(MetaLayer):
         3. Update goal progress
         4. Compute intrinsic motivation (curiosity)
         5. Set exploration rate
-        6. Signal reward/guidance DOWN
+        6. Signal reward/guidance DOWN (every 10 steps to reduce noise)
         """
         self.process_inbox()
+        
+        # Only send suggestions every 10 steps to reduce signal noise
+        should_send_suggestions = (self._optimization_step % 10 == 0)
         
         # Get reward info
         extrinsic_reward = context.get('reward', 0.0)
@@ -160,33 +163,34 @@ class GoalHierarchy(MetaLayer):
         # Compute optimal exploration rate
         self._update_exploration()
         
-        # Signal reward DOWN to lower layers
-        self.signal(
-            direction=SignalDirection.DOWN,
-            signal_type=SignalType.REWARD,
-            payload={
-                'total_reward': total_reward,
-                'extrinsic': extrinsic_reward,
-                'intrinsic': intrinsic_reward,
-                'timescale_rewards': timescale_rewards,
-                'exploration_rate': self.exploration_rate,
-                'active_goals': self._get_active_goals(),
-            },
-            target_level=None,  # Broadcast to all lower layers
-        )
-        
-        # Signal UP about goal status
-        self.signal(
-            direction=SignalDirection.UP,
-            signal_type=SignalType.PERFORMANCE,
-            payload={
-                'value_estimates': list(self.value_estimates),
-                'exploration_rate': self.exploration_rate,
-                'n_active_goals': sum(1 for g in self.goals.values() if g.active),
-                'n_achieved_goals': sum(1 for g in self.goals.values() if g.achieved),
-                'intrinsic_reward': intrinsic_reward,
-            },
-        )
+        # Signal reward DOWN to lower layers (only every 10 steps)
+        if should_send_suggestions:
+            self.signal(
+                direction=SignalDirection.DOWN,
+                signal_type=SignalType.REWARD,
+                payload={
+                    'total_reward': total_reward,
+                    'extrinsic': extrinsic_reward,
+                    'intrinsic': intrinsic_reward,
+                    'timescale_rewards': timescale_rewards,
+                    'exploration_rate': self.exploration_rate,
+                    'active_goals': self._get_active_goals(),
+                },
+                target_level=None,  # Broadcast to all lower layers
+            )
+            
+            # Signal UP about goal status
+            self.signal(
+                direction=SignalDirection.UP,
+                signal_type=SignalType.PERFORMANCE,
+                payload={
+                    'value_estimates': list(self.value_estimates),
+                    'exploration_rate': self.exploration_rate,
+                    'n_active_goals': sum(1 for g in self.goals.values() if g.active),
+                    'n_achieved_goals': sum(1 for g in self.goals.values() if g.achieved),
+                    'intrinsic_reward': intrinsic_reward,
+                },
+            )
         
         # Metrics
         goal_achievement_rate = sum(
