@@ -336,3 +336,139 @@ After Phase 2 implementation:
 2. **If pilot shows no transfer:** Debug, check pipeline state preservation
 3. **If tests fail:** Fix before proceeding, document issues
 4. **If memory issues:** Refactor to use generators/streaming
+
+---
+
+## Known Issues & Watch Items
+
+> **Purpose**: Track potential issues observed during implementation for future debugging reference.
+
+### 1. Pre-existing Holographic Warnings (NOT from Phase 2)
+
+**Location**: `throng3/core/holographic.py` lines 125, 200
+
+**Symptoms**:
+```
+RuntimeWarning: invalid value encountered in dot
+RuntimeWarning: invalid value encountered in matmul
+```
+
+**Cause**: Coherence calculations with zero/NaN activations during early training steps
+
+**Impact**: Cosmetic warnings, doesn't affect functionality
+
+**Action**: Monitor in Phase 3. If warnings persist with larger N, investigate normalization in holographic projection.
+
+---
+
+### 2. Statistical NaN with Low N (EXPECTED BEHAVIOR)
+
+**Location**: `throng3/benchmarks/stats.py` - `t_test()`, `effect_size()`
+
+**Symptoms**: 
+- T-test returns `(nan, nan)` with N=2
+- Effect size returns `0.0` with identical samples
+
+**Cause**: Zero variance when both groups converge to identical values (e.g., both = 10 steps)
+
+**Why Expected**: 
+- Division by zero in pooled standard deviation
+- Scipy correctly returns NaN for undefined statistics
+
+**Action**: 
+- ✅ Already handled gracefully in code
+- Verify with N≥30 in Phase 3 that real variance produces valid statistics
+
+---
+
+### 3. Checkpoint Restoration Not Fully Implemented
+
+**Location**: `throng3/benchmarks/runner.py` - `load_checkpoint()`
+
+**Status**: Save works, load is placeholder
+
+**Reason**: `FractalStack` doesn't have `restore_state()` method yet
+
+**Current Behavior**:
+- `save_checkpoint()`: ✅ Fully functional
+- `load_checkpoint()`: Loads pickle but doesn't restore state (TODO comment added)
+- `validate_checkpoint()`: Only validates save/load pickle integrity
+
+**Impact**: Transfer learning experiments create fresh pipelines each time (no actual checkpoint restoration)
+
+**Action for Phase 3**:
+- If transfer results are poor, implement `FractalStack.restore_state()`
+- Alternative: Use pipeline state preservation via `reset_task_state()` instead
+
+---
+
+### 4. Automatic Size Inference Assumptions
+
+**Location**: `throng3/benchmarks/transfer.py` - `_train_fresh()`, `_train_with_transfer()`
+
+**Assumptions**:
+- Input size = `len(env.reset())` (works for flat observations)
+- Output size defaults to 4 if no `env.env.action_space` attribute
+- All tasks in experiment have same input/output dimensions
+
+**Potential Issues**:
+- Multi-dimensional observations (images) would fail
+- Environments without `action_space` attribute default to 4 outputs
+- Multi-task transfer with different dimensions not supported
+
+**Action**:
+- ✅ Works for current environments (GridWorld, CartPole, MountainCar)
+- Phase 5 (Atari): Will need image preprocessing before size inference
+
+---
+
+### 5. Convergence Detection Edge Cases
+
+**Location**: `throng3/benchmarks/runner.py` - `train_until_convergence()`
+
+**Watch Items**:
+- Very generous thresholds (e.g., 0.5) cause immediate convergence
+- RL tasks with sparse rewards may never converge
+- Oscillating loss might never satisfy rolling average criterion
+
+**Mitigations Already in Place**:
+- ✅ Hard `max_steps` timeout prevents infinite loops
+- ✅ Rolling window (default 10 steps) smooths noise
+- ✅ Configurable threshold per task
+
+**Action for Phase 3**:
+- Monitor convergence rates with realistic thresholds (0.1 or lower)
+- If tasks timeout frequently, adjust thresholds or add early stopping criteria
+
+---
+
+### 6. Memory Warnings During Tests (Low Priority)
+
+**Symptoms**: 
+```
+RuntimeWarning: Precision loss occurred in moment calculation
+```
+
+**Cause**: Scipy detecting catastrophic cancellation with identical samples (N=2, both = 10)
+
+**Impact**: None - this is scipy warning about numerical precision, not a bug
+
+**Action**: Ignore unless it appears with N=30 and diverse samples
+
+---
+
+## Debugging Quick Reference
+
+If issues arise in Phase 3, check these locations first:
+
+| Symptom | Likely Cause | Check Here |
+|---------|--------------|------------|
+| NaN in statistics | Low N or zero variance | `stats.py:t_test()`, verify N≥30 |
+| Transfer shows no speedup | Checkpoint not restoring | `runner.py:load_checkpoint()` - implement restore |
+| Size mismatch errors | New environment type | `transfer.py:_train_fresh()` - update size inference |
+| Convergence timeout | Threshold too strict | `runner.py:train_until_convergence()` - adjust threshold |
+| Holographic warnings | Early training NaNs | `holographic.py:125,200` - add NaN guards |
+
+---
+
+**Last Updated**: 2026-02-04 (Phase 2 completion)
