@@ -13,6 +13,7 @@ import logging
 
 from throng3.core.fractal_stack import FractalStack
 from throng3.core.signal import Signal, SignalDirection, SignalType
+from throng3.core.global_dynamics import GlobalDynamicsOptimizer, GlobalConfig
 from throng3.layers.meta0_neuron import NeuronLayer, NeuronConfig
 from throng3.layers.meta1_synapse import SynapseOptimizer, SynapseConfig
 from throng3.layers.meta2_learning_rule import LearningRuleSelector, LearningRuleSelectorConfig
@@ -36,8 +37,10 @@ class MetaNPipeline:
             print(result['system_state'])
     """
     
-    def __init__(self, stack: FractalStack):
+    def __init__(self, stack: FractalStack, 
+                 global_optimizer: Optional[GlobalDynamicsOptimizer] = None):
         self.stack = stack
+        self.global_optimizer = global_optimizer
         self._step_count = 0
         self._history: List[Dict] = []
     
@@ -112,6 +115,68 @@ class MetaNPipeline:
         
         return cls(stack)
     
+    @classmethod
+    def create_adaptive(cls,
+                        n_neurons: int = 1000,
+                        n_inputs: int = 64,
+                        n_outputs: int = 32,
+                        global_config: Optional[GlobalConfig] = None,
+                        include_llm: bool = False,
+                        llm_callback: Optional[Callable] = None) -> 'MetaNPipeline':
+        """
+        Create an adaptive Meta^N pipeline with GlobalDynamicsOptimizer.
+        
+        The global optimizer automatically gates layers based on task complexity:
+        - Simple tasks use fewer layers (faster, less interference)
+        - Complex tasks recruit higher layers when needed
+        - Layers that hurt performance get gated down
+        
+        Args:
+            n_neurons: Number of neurons in Meta^0
+            n_inputs: Input dimension
+            n_outputs: Output dimension
+            global_config: Configuration for the GlobalDynamicsOptimizer
+            include_llm: Whether to include Meta^N LLM interface
+            llm_callback: Optional callback for LLM integration
+        """
+        stack = FractalStack(config={'holographic_dim': 128})
+        
+        # Meta^0: Neural substrate
+        stack.add_layer(NeuronLayer(NeuronConfig(
+            n_neurons=n_neurons,
+            n_inputs=n_inputs,
+            n_outputs=n_outputs,
+        )))
+        
+        # Meta^1: Synapse optimization
+        stack.add_layer(SynapseOptimizer(SynapseConfig()))
+        
+        # Meta^2: Learning rule selection
+        stack.add_layer(LearningRuleSelector(LearningRuleSelectorConfig()))
+        
+        # Meta^3: Representation optimization
+        stack.add_layer(RepresentationOptimizer(RepresentationConfig()))
+        
+        # Meta^4: Goal hierarchy
+        stack.add_layer(GoalHierarchy(GoalConfig()))
+        
+        # Meta^5: Architecture search
+        stack.add_layer(ArchitectureSearch(ArchitectureConfig()))
+        
+        # Meta^N: LLM interface (optional)
+        if include_llm:
+            stack.add_layer(LLMInterface(LLMConfig(
+                callback=llm_callback,
+            )))
+        
+        # Wrap with GlobalDynamicsOptimizer
+        global_optimizer = GlobalDynamicsOptimizer(
+            stack, 
+            config=global_config or GlobalConfig()
+        )
+        
+        return cls(stack, global_optimizer=global_optimizer)
+    
     def step(self, input_data: np.ndarray, 
              target: Optional[np.ndarray] = None,
              reward: float = 0.0) -> Dict[str, Any]:
@@ -162,8 +227,13 @@ class MetaNPipeline:
                 meta1_result = last['layer_results'].get(1, {})
                 context['meta1_performance'] = meta1_result
         
-        # Run the full stack step
-        result = self.stack.step(context)
+        # Run the full stack step (through global optimizer if present)
+        if self.global_optimizer:
+            result = self.global_optimizer.step(context)
+            global_metrics = result.get('global', {})
+        else:
+            result = self.stack.step(context)
+            global_metrics = {}
         
         # Extract output from Meta^0
         meta0_result = result.get('layer_results', {}).get(0, {})
@@ -178,6 +248,7 @@ class MetaNPipeline:
             'holographic': result.get('holographic', {}),
             'step': self._step_count,
             'layer_results': result.get('layer_results', {}),
+            'global': global_metrics,  # Include global optimizer metrics
         }
         
         self._history.append(step_result)

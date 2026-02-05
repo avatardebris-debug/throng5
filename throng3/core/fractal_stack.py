@@ -249,6 +249,19 @@ class FractalStack:
         for level in optimization_order:
             layer = self.layers[level]
             
+            # Check global gate - probabilistically skip optimization for gated layers
+            global_gate = layer.config.get('global_gate', 1.0)
+            if global_gate < 1.0 and level > 1:  # Never skip Meta^0-1
+                # Probabilistic gating: low gate = likely to skip
+                if np.random.random() > global_gate:
+                    # Skip this layer's optimization this step
+                    results[level] = {
+                        'skipped': True,
+                        'gate': global_gate,
+                        'loss': layer.metrics.loss,
+                    }
+                    continue
+            
             # Enrich context with holographic view
             layer_context = {
                 **context,
@@ -256,10 +269,12 @@ class FractalStack:
                 "system_summary": self.holographic.get_system_summary(),
                 "step": self._step,
                 "stack_levels": self.levels,
+                "global_gate": global_gate,  # Pass gate so layer can use it
             }
             
             # Optimize
             result = layer.optimize(layer_context)
+            result['gate'] = global_gate
             results[level] = result
             
             # Self-optimize

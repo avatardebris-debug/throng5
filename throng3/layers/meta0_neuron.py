@@ -149,13 +149,24 @@ class NeuronLayer(MetaLayer):
         # Forward pass
         output = self.forward(input_data)
         
-        # Compute loss if target provided
+        # Compute loss
         target = context.get('target', None)
-        loss = 0.0
+        reward = context.get('reward', 0.0)
+        
         if target is not None and len(target) == self.n_outputs:
+            # Supervised learning: MSE loss
             loss = float(np.mean((output - target) ** 2))
             accuracy = float(1.0 - min(loss, 1.0))
+        elif reward != 0.0:
+            # Reinforcement learning: negative reward as loss
+            # (Lower loss = higher reward, enables convergence tracking)
+            loss = -float(reward)
+            # Normalize accuracy based on reward range
+            # Assumes reward roughly in [-1, 1] range for most RL tasks
+            accuracy = float(max(0.0, min(1.0, (reward + 1.0) / 2.0)))
         else:
+            # No signal: use activity as proxy
+            loss = 0.0
             accuracy = float(np.mean(self.activations > 0))  # Activity as proxy
         
         self.metrics.update(loss, accuracy)
