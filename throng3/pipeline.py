@@ -179,7 +179,8 @@ class MetaNPipeline:
     
     def step(self, input_data: np.ndarray, 
              target: Optional[np.ndarray] = None,
-             reward: float = 0.0) -> Dict[str, Any]:
+             reward: float = 0.0,
+             episode_return: Optional[float] = None) -> Dict[str, Any]:
         """
         Run one full pipeline step.
         
@@ -187,6 +188,7 @@ class MetaNPipeline:
             input_data: Input to the neural network
             target: Optional target output (for supervised learning)
             reward: External reward signal
+            episode_return: Optional average episode return (for RL loss calculation)
             
         Returns:
             Dict with output, metrics, and system state
@@ -212,12 +214,14 @@ class MetaNPipeline:
             'input': input_data,
             'target': target,
             'reward': reward,
+            'episode_return': episode_return,  # Add episode return to context
             'output': output,
             'weights': weights,
             'activations': activations,
             'spikes': spikes,
             'outputs': output,
             'step': self._step_count,
+            'n_outputs': neuron_layer.n_outputs if neuron_layer else 4,  # For Q-learner
         }
         
         # If we have Meta^1 results from last step, include them

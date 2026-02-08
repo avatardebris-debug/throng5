@@ -23,14 +23,42 @@ from throng3.core.meta_layer import MetaLayer
 from throng3.core.signal import SignalDirection, SignalType, SignalPriority
 from throng3.learning.stdp import STDPRule, STDPConfig
 from throng3.learning.hebbian import HebbianRule, HebbianConfig
+from throng3.learning.qlearning import QLearner, QLearningConfig
 from throng3.learning.dopamine import DopamineSystem, DopamineConfig
 from throng3.learning.pruning import NashPruner, PruningConfig
 
 
 @dataclass
 class SynapseConfig:
-    """Configuration for the synapse optimizer."""
-    default_rule: str = 'stdp'       # Default learning rule
+    """Configuration for Meta^1 synapse optimization."""
+    # Learning rules
+    default_rule: str = 'both'  # 'stdp', 'hebbian', or 'both'
+    rule_selection_mode: str = 'fixed'  # 'fixed' or 'bandit'
+    evaluation_window: int = 100
+    
+    # STDP parameters
+    stdp_a_plus: float = 0.01
+    stdp_a_minus: float = 0.01
+    stdp_tau_plus: float = 20.0
+    stdp_tau_minus: float = 20.0
+    
+    # Hebbian parameters
+    hebbian_lr: float = 0.001
+    hebbian_normalize: bool = True
+    
+    # Dopamine modulation
+    dopamine_decay: float = 0.95
+    dopamine_sensitivity: float = 0.1
+    
+    # Q-learning
+    use_qlearning: bool = True
+    q_learning_rate: float = 0.1
+    q_gamma: float = 0.95
+    q_epsilon: float = 0.1
+    q_epsilon_decay: float = 0.995
+    q_epsilon_min: float = 0.01
+    
+    # General parameters
     learning_rate: float = 0.01
     prune_interval: int = 100        # Steps between pruning
     dopamine_modulation: bool = True
@@ -74,6 +102,23 @@ class SynapseOptimizer(MetaLayer):
         # Spike history for STDP temporal offset
         self._prev_spikes: Optional[np.ndarray] = None
         self._prev_activations: Optional[np.ndarray] = None
+        
+        # Hebbian temporal history
+        self._hebbian_prev_activations: Optional[np.ndarray] = None
+        
+        # Q-learning (optional, for RL tasks)
+        self.qlearner: Optional[QLearner] = None
+        if self.synapse_config.use_qlearning:
+            # Will be initialized when we know n_states and n_actions
+            self._qlearner_config = QLearningConfig(
+                learning_rate=self.synapse_config.q_learning_rate,
+                gamma=self.synapse_config.q_gamma,
+                epsilon=self.synapse_config.q_epsilon,
+                epsilon_decay=self.synapse_config.q_epsilon_decay,
+                epsilon_min=self.synapse_config.q_epsilon_min,
+            )
+            self._q_prev_state: Optional[np.ndarray] = None
+            self._q_prev_action: Optional[int] = None
     
     def optimize(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -103,28 +148,79 @@ class SynapseOptimizer(MetaLayer):
                 'metrics': self.metrics,
             }
         
-        # Compute dopamine RPE
-        rpe = self.dopamine.compute_rpe(reward)
+        # Compute dopamine RPE (this will be updated by the new dopamine.update call)
+        rpe = self.dopamine.compute_rpe(reward) # Keep for now, but new update will handle it
         
-        # Apply learning rule
+        # Apply learning rules
         dW = np.zeros_like(W_recurrent)
         
-        if self.active_rule in ('stdp', 'both'):
-            dW_stdp = self._apply_stdp(W_recurrent, spikes)
-            dW += dW_stdp
-            self._rule_usage['stdp'] += 1
+        # Only apply bio-inspired rules if not 'none'
+        if self.active_rule != 'none':
+            if self.active_rule in ('stdp', 'both'):
+                dW_stdp = self._apply_stdp(W_recurrent, activations)
+                dW += dW_stdp
+                self._rule_usage['stdp'] += 1
+            
+            if self.active_rule in ('hebbian', 'both'):
+                dW_hebb = self._apply_hebbian(W_recurrent, activations, reward)
+                dW += dW_hebb
+                self._rule_usage['hebbian'] += 1
         
-        if self.active_rule in ('hebbian', 'both'):
-            dW_hebb = self._apply_hebbian(W_recurrent, activations)
-            dW += dW_hebb
-            self._rule_usage['hebbian'] += 1
-        
-        # Dopamine modulation (three-factor)
+        # Dopamine modulation
         if self.synapse_config.dopamine_modulation:
-            modulated_lr = self.dopamine.modulate_learning_rate(
-                self.synapse_config.learning_rate
-            )
+            dopamine_level = self.dopamine.compute_rpe(reward)
+            modulated_lr = self.dopamine.modulate_learning_rate(self.synapse_config.learning_rate)
             dW *= modulated_lr / max(self.synapse_config.learning_rate, 1e-8)
+        
+        # Q-learning update (if enabled)
+        td_error = 0.0
+        q_values = None
+        if self.synapse_config.use_qlearning:
+            # CRITICAL FIX: Use raw observations, NOT neuron activations!
+            # Q-learning needs consistent, meaningful state representation
+            raw_obs = context.get('raw_observation', None)
+            if raw_obs is None:
+                # Fallback: use input if available (pipeline provides 'input', not 'input_data')
+                raw_obs = context.get('input', activations)
+            
+            # Initialize Q-learner on first call with RAW observation dimension
+            if self.qlearner is None:
+                n_states = len(raw_obs)  # Use raw obs dim (e.g., 2 for [x,y])
+                n_actions = context.get('n_outputs', 4)
+                self.qlearner = QLearner(n_states, n_actions, self._qlearner_config)
+            
+            # Get current state (raw observation) and action
+            current_state = raw_obs
+            current_action = context.get('action', 0)  # Action taken
+            done = context.get('done', False)
+            
+            # Q-learning update (if we have previous state)
+            if self._q_prev_state is not None and self._q_prev_action is not None:
+                td_error = self.qlearner.update(
+                    self._q_prev_state,
+                    self._q_prev_action,
+                    reward,
+                    current_state,
+                    done
+                )
+                
+                # Use TD error to modulate bio-inspired learning
+                # Positive TD error = better than expected, strengthen
+                # Negative TD error = worse than expected, weaken
+                dW *= (1.0 + 0.1 * np.clip(td_error, -1, 1))
+            
+            # Store for next update (copy to avoid reference issues)
+            self._q_prev_state = np.array(current_state).copy()
+            self._q_prev_action = current_action
+            
+            # Reset on episode end
+            if done:
+                self.qlearner.reset_episode()
+                self._q_prev_state = None
+                self._q_prev_action = None
+            
+            # Get Q-values for action selection (using raw obs)
+            q_values = self.qlearner.get_q_values(current_state)
         
         # Clip weight changes
         dW = np.clip(dW, -0.1, 0.1)
@@ -187,6 +283,8 @@ class SynapseOptimizer(MetaLayer):
             'rpe': rpe,
             'active_rule': self.active_rule,
             'metrics': self.metrics,
+            'q_values': q_values,  # For action selection
+            'td_error': td_error,  # For diagnostics
         }
     
     def _apply_stdp(self, weights: np.ndarray, spikes: np.ndarray) -> np.ndarray:
@@ -213,19 +311,38 @@ class SynapseOptimizer(MetaLayer):
         
         return self.stdp.batch_update(weights, pre_spikes, post_spikes)
     
-    def _apply_hebbian(self, weights: np.ndarray, activations: np.ndarray) -> np.ndarray:
-        """Apply Hebbian learning rule."""
+    def _apply_hebbian(self, weights: np.ndarray, activations: np.ndarray, reward: float) -> np.ndarray:
+        """Apply Hebbian learning rule with temporal structure and reward modulation."""
         if len(activations) == 0:
             return np.zeros_like(weights)
         
         N = weights.shape[0]
         n_act = min(len(activations), N)
         
-        pre = np.zeros(N)
-        pre[:n_act] = activations[:n_act]
-        post = pre.copy()
+        # Current activations are post-synaptic
+        post = np.zeros(N)
+        post[:n_act] = activations[:n_act]
         
-        return self.hebbian.batch_update(weights, pre, post)
+        # Previous activations are pre-synaptic (temporal offset)
+        if self._hebbian_prev_activations is None:
+            # First call: no temporal offset yet, store and return
+            self._hebbian_prev_activations = post.copy()
+            return np.zeros_like(weights)
+        
+        pre = self._hebbian_prev_activations.copy()
+        
+        # Store current for next iteration
+        self._hebbian_prev_activations = post.copy()
+        
+        # Apply Hebbian update
+        dW = self.hebbian.batch_update(weights, pre, post)
+        
+        # Reward modulation (three-factor learning)
+        # Positive reward strengthens, negative weakens
+        reward_factor = np.clip(reward, -1.0, 1.0)
+        dW *= reward_factor
+        
+        return dW
     
     def _compute_state_vector(self) -> np.ndarray:
         """Holographic state: learning rule stats and weight change patterns."""

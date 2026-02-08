@@ -1,0 +1,92 @@
+{
+  "pretrained_steps": [
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20
+  ],
+  "fresh_steps": [
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    20
+  ],
+  "statistics": {
+    "speedup": 1.0,
+    "t_statistic": NaN,
+    "p_value": NaN,
+    "effect_size": 0.0,
+    "pretrained_mean": 20.0,
+    "fresh_mean": 20.0,
+    "pretrained_ci": [
+      20.0,
+      20.0
+    ],
+    "fresh_ci": [
+      20.0,
+      20.0
+    ],
+    "n_pretrained": 30,
+    "n_fresh": 30,
+    "significant": false
+  },
+  "config": {
+    "n_seeds": 30,
+    "pretrain_steps": 500,
+    "tasks": [
+      "gridworld"
+    ]
+  }
+}

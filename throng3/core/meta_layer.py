@@ -441,7 +441,9 @@ class MetaLayer(ABC):
         # using random projection (preserves distances approximately)
         if len(state_vector) > self._holographic_dim:
             # Use deterministic projection seeded by level
-            rng = np.random.RandomState(self.level * 42 + 7)
+            # Convert float level to int for RandomState
+            seed = int(self.level * 100) * 42 + 7
+            rng = np.random.RandomState(seed)
             projection = rng.randn(self._holographic_dim, len(state_vector))
             projection /= np.sqrt(self._holographic_dim)
             holographic = projection @ state_vector

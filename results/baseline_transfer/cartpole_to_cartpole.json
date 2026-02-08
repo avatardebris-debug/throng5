@@ -1,0 +1,50 @@
+{
+  "source_task": "cartpole",
+  "target_task": "cartpole",
+  "n_seeds": 10,
+  "pretrain_episodes": 30,
+  "fresh_steps": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "pretrained_steps": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "statistics": {
+    "speedup": 1.0,
+    "t_statistic": NaN,
+    "p_value": NaN,
+    "effect_size": 0.0,
+    "pretrained_mean": 100.0,
+    "fresh_mean": 100.0,
+    "pretrained_ci": [
+      100.0,
+      100.0
+    ],
+    "fresh_ci": [
+      100.0,
+      100.0
+    ],
+    "n_pretrained": 10,
+    "n_fresh": 10,
+    "significant": false
+  },
+  "timestamp": "2026-02-07T18:25:41.944547"
+}

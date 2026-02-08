@@ -44,14 +44,19 @@ class HolographicState:
     
     def __post_init__(self):
         """Initialize projection matrices and combined state."""
-        self._combined = np.zeros(self.dim)
+        # Use float64 for numerical stability at scale
+        self.dtype = np.float64 if self.dim > 256 else np.float32
+        self._combined = np.zeros(self.dim, dtype=self.dtype)
         self._projection_matrices = {}
         
         # Create deterministic projection matrices for each layer
         for level in range(self.n_layers + 2):  # Extra room for dynamic layers
             rng = np.random.RandomState(level * 137 + 42)
-            self._projection_matrices[level] = rng.randn(self.dim, self.dim)
-            self._projection_matrices[level] /= np.sqrt(self.dim)
+            proj = rng.randn(self.dim, self.dim).astype(self.dtype)
+            proj /= np.sqrt(self.dim)
+            # Add small identity for stability
+            proj += np.eye(self.dim, dtype=self.dtype) * 0.01
+            self._projection_matrices[level] = proj
     
     def update_layer(self, level: int, state_vector: np.ndarray):
         """
@@ -61,27 +66,44 @@ class HolographicState:
             level: Meta-level of the contributing layer
             state_vector: Layer's compressed state (from snapshot)
         """
-        # Ensure we have a projection matrix for this level
+        # Ensure level is in projection matrices (create if needed)
         if level not in self._projection_matrices:
-            rng = np.random.RandomState(level * 137 + 42)
-            self._projection_matrices[level] = rng.randn(self.dim, self.dim)
+            # Convert float level to int for RandomState seed
+            seed = int(level * 100) * 137 + 42
+            rng = np.random.RandomState(seed)
+            self._projection_matrices[level] = rng.randn(self.dim, self.dim).astype(self.dtype)
             self._projection_matrices[level] /= np.sqrt(self.dim)
+            self._projection_matrices[level] += np.eye(self.dim, dtype=self.dtype) * 0.01
         
         # Resize state vector to match dim
         if len(state_vector) < self.dim:
-            padded = np.zeros(self.dim)
+            padded = np.zeros(self.dim, dtype=self.dtype)
             padded[:len(state_vector)] = state_vector
             state_vector = padded
         elif len(state_vector) > self.dim:
             state_vector = state_vector[:self.dim]
         
+        # Sanitize input (NaN/Inf guard)
+        state_vector = np.nan_to_num(state_vector, nan=0.0, posinf=0.0, neginf=0.0)
+        
+        # Normalize to prevent explosion
+        norm = np.linalg.norm(state_vector)
+        if norm > 10.0:  # Clip large values
+            state_vector = state_vector * (10.0 / norm)
+        
         # Project into holographic space
         projected = self._projection_matrices[level] @ state_vector
+        
+        # Sanitize projection
+        projected = np.nan_to_num(projected, nan=0.0, posinf=0.0, neginf=0.0)
         
         # Decay old projection for this layer
         if level in self._projections:
             old = self._projections[level]
             self._combined -= old * self._get_weight(level)
+        
+        # Sanitize combined after subtraction
+        self._combined = np.nan_to_num(self._combined, nan=0.0, posinf=0.0, neginf=0.0)
         
         # Store new projection
         self._projections[level] = projected
@@ -89,6 +111,12 @@ class HolographicState:
         
         # Add to combined state
         self._combined += projected * self._get_weight(level)
+        
+        # Normalize combined state if too large
+        combined_norm = np.linalg.norm(self._combined)
+        if combined_norm > 100.0:
+            self._combined = self._combined * (100.0 / combined_norm)
+        
         self._version += 1
     
     def _get_weight(self, level: int) -> float:
@@ -116,13 +144,28 @@ class HolographicState:
         Returns:
             State vector from the querying layer's perspective
         """
-        if self._combined is None or np.allclose(self._combined, 0):
-            return np.zeros(self.dim)
+        if self._combined is None:
+            return np.zeros(self.dim, dtype=self.dtype)
         
-        # Inverse projection (transpose for orthogonal-ish matrices)
+        # Check for NaN/Inf in combined state
+        if np.any(~np.isfinite(self._combined)):
+            # Reset combined state if corrupted
+            self._combined = np.zeros(self.dim, dtype=self.dtype)
+            return self._combined.copy()
+        
+        # Normalize combined state if too large
+        combined_norm = np.linalg.norm(self._combined)
+        if combined_norm > 100.0:
+            self._combined = self._combined * (100.0 / combined_norm)
+        
         if from_level in self._projection_matrices:
+            # Project back through inverse (transpose for orthogonal-ish matrices)
             proj_T = self._projection_matrices[from_level].T
-            return proj_T @ self._combined
+            result = proj_T @ self._combined
+            
+            # Sanitize result
+            result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+            return result
         
         return self._combined.copy()
     
@@ -197,8 +240,14 @@ class HolographicState:
         for i in range(len(projections)):
             for j in range(i + 1, len(projections)):
                 if norms[i] > 1e-8 and norms[j] > 1e-8:
-                    cos_sim = np.dot(projections[i], projections[j]) / (norms[i] * norms[j])
-                    similarities.append(abs(cos_sim))
+                    dot_product = np.dot(projections[i], projections[j])
+                    # Guard against NaN
+                    if np.isnan(dot_product) or np.isinf(dot_product):
+                        continue
+                    cos_sim = dot_product / (norms[i] * norms[j])
+                    # Guard against NaN in result
+                    if not np.isnan(cos_sim) and not np.isinf(cos_sim):
+                        similarities.append(abs(cos_sim))
         
         if not similarities:
             return 1.0

@@ -73,6 +73,7 @@ class BenchmarkRunner:
         obs = self.env.reset()
         episode_reward = 0.0
         episode_steps = 0
+        recent_episode_returns = deque(maxlen=10)  # Track recent episodes
         
         for step in range(max_steps):
             # Get action from pipeline
@@ -87,9 +88,16 @@ class BenchmarkRunner:
             episode_reward += reward
             episode_steps += 1
             
-            # Train pipeline with reward signal
-            train_result = self.pipeline.step(next_obs, reward=reward)
-            loss = train_result.get('loss', 0.0)
+            # Compute average episode return for loss calculation
+            avg_episode_return = np.mean(recent_episode_returns) if recent_episode_returns else -100.0
+            
+            # Train pipeline with reward signal AND episode return context
+            train_result = self.pipeline.step(
+                next_obs, 
+                reward=reward,
+                episode_return=avg_episode_return
+            )
+            loss = train_result.get('loss', 1.0)
             
             # Track metrics
             result.loss_history.append(loss)
@@ -99,6 +107,7 @@ class BenchmarkRunner:
             # Handle episode end
             if done:
                 result.episode_returns.append(episode_reward)
+                recent_episode_returns.append(episode_reward)
                 obs = self.env.reset()
                 episode_reward = 0.0
                 episode_steps = 0
@@ -122,8 +131,10 @@ class BenchmarkRunner:
             # Progress logging
             if verbose and (step + 1) % 500 == 0:
                 avg_loss = np.mean(loss_window) if loss_window else float('inf')
+                avg_return = np.mean(recent_episode_returns) if recent_episode_returns else 0
                 print(f"  Step {step + 1}/{max_steps}, "
                       f"avg loss: {avg_loss:.4f}, "
+                      f"avg return: {avg_return:.2f}, "
                       f"episodes: {len(result.episode_returns)}")
         
         # If didn't converge, record final state

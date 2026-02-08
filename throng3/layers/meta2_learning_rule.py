@@ -167,7 +167,7 @@ class LearningRuleSelector(MetaLayer):
         """
         # Reward = improvement in loss + positive RPE bonus
         improvement = 0.0
-        if self.rule_rewards[self.current_rule]:
+        if self.current_rule in self.rule_rewards and self.rule_rewards[self.current_rule]:
             prev = self.rule_rewards[self.current_rule][-1]
             improvement = prev - loss  # Positive = better
         
@@ -177,12 +177,21 @@ class LearningRuleSelector(MetaLayer):
     
     def _update_bandit(self, rule: str, reward: float):
         """Update bandit estimates for a rule."""
-        self.rule_rewards[rule].append(reward)
-        self.rule_counts[rule] += 1
-        
-        # Incremental mean update
-        n = self.rule_counts[rule]
-        self.rule_values[rule] += (reward - self.rule_values[rule]) / n
+        # Skip tracking for 'none' rule (e.g., when Meta^1 is in Q-learning only mode)
+        if rule != 'none' and rule in self.rule_rewards:
+            self.rule_rewards[rule].append(reward)
+            self.rule_counts[rule] += 1
+            
+            # Incremental mean update
+            n = self.rule_counts[rule]
+            self.rule_values[rule] += (reward - self.rule_values[rule]) / n
+        elif rule == 'none':
+            # If 'none' rule is active, we still count steps but don't update values
+            # This prevents division by zero if 'none' is the only rule ever active
+            # and ensures total count for UCB is accurate.
+            if rule not in self.rule_counts:
+                self.rule_counts[rule] = 0
+            self.rule_counts[rule] += 1
     
     def _select_rule(self, context: Dict) -> str:
         """Select a rule using the configured strategy."""
