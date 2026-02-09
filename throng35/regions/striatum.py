@@ -7,6 +7,8 @@ It maintains its own action→reward→learn loop with proper RL timing.
 
 from typing import Any, Dict, Optional
 import numpy as np
+import time
+import sys
 
 from throng35.regions.region_base import RegionBase
 from throng35.learning.qlearning import QLearner, QLearningConfig
@@ -17,9 +19,9 @@ class StriatumRegion(RegionBase):
     Striatum region implementing Q-learning.
     
     Key features:
-    - Uses RAW observations (not neuron activations)
-    - Proper RL timing: action → reward → learn
-    - Independent from other regions' timing
+    - Learns from raw observations (not neuron activations)
+    - Proper RL timing (action → reward → learn)
+    - Independent Q-learning loop
     """
     
     def __init__(self, 
@@ -47,26 +49,36 @@ class StriatumRegion(RegionBase):
         self.prev_state: Optional[np.ndarray] = None
         self.prev_action: Optional[int] = None
         self.last_td_error: float = 0.0
+        
+        # Resource tracking (for future optimization)
+        self._step_times = []
+        self._update_counts = []
+        self.n_states = n_states
+        self.n_actions = n_actions
     
     def step(self, region_input: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process one step in Striatum.
         
         Expected inputs:
-            - 'raw_observation': Current environment observation
-            - 'reward': Reward from previous action (if any)
+            - 'raw_observation': Raw environment observation
+            - 'reward': Reward from previous action
             - 'done': Whether episode is complete
         
         Returns:
             - 'action': Selected action
             - 'q_values': Q-values for current state
-            - 'td_error': TD error from update (for modulating other regions)
+            - 'td_error': Temporal difference error
+            - 'epsilon': Current exploration rate
         """
+        t0 = time.time()  # Resource tracking
+        
         obs = region_input['raw_observation']
         reward = region_input.get('reward', 0.0)
         done = region_input.get('done', False)
         
         # Q-learning update (if we have previous state/action)
+        did_update = False
         if self.prev_state is not None and self.prev_action is not None:
             self.last_td_error = self.qlearner.update(
                 self.prev_state,
@@ -75,6 +87,7 @@ class StriatumRegion(RegionBase):
                 obs,
                 done
             )
+            did_update = True
         
         # Select action for current state
         action = self.qlearner.select_action(obs, explore=True)
@@ -90,6 +103,13 @@ class StriatumRegion(RegionBase):
             self.prev_state = None
             self.prev_action = None
         
+        # Resource tracking
+        self._step_times.append(time.time() - t0)
+        self._update_counts.append(1 if did_update else 0)
+        if len(self._step_times) > 100:  # Keep last 100
+            self._step_times.pop(0)
+            self._update_counts.pop(0)
+        
         return {
             'action': action,
             'q_values': q_values,
@@ -104,9 +124,64 @@ class StriatumRegion(RegionBase):
         self.prev_action = None
         self.last_td_error = 0.0
     
+    def get_state_signature(self) -> Dict[str, Any]:
+        """Return input/output signature for this region."""
+        return {
+            'inputs': {
+                'raw_observation': {
+                    'type': np.ndarray,
+                    'required': True,
+                    'shape': (self.n_states,),
+                    'description': 'Raw environment observation'
+                },
+                'reward': {
+                    'type': float,
+                    'required': False,
+                    'description': 'Reward from previous action'
+                },
+                'done': {
+                    'type': bool,
+                    'required': False,
+                    'description': 'Episode termination flag'
+                }
+            },
+            'outputs': {
+                'action': {
+                    'type': int,
+                    'description': 'Selected action index'
+                },
+                'q_values': {
+                    'type': np.ndarray,
+                    'shape': (self.n_actions,),
+                    'description': 'Q-values for all actions'
+                },
+                'td_error': {
+                    'type': float,
+                    'description': 'Temporal difference error'
+                },
+                'epsilon': {
+                    'type': float,
+                    'description': 'Current exploration rate'
+                }
+            }
+        }
+    
+    def get_resource_usage(self) -> Dict[str, float]:
+        """Return resource usage metrics (enables future optimization)."""
+        return {
+            'compute_ms': np.mean(self._step_times) * 1000 if self._step_times else 0.0,
+            'memory_mb': sys.getsizeof(self.qlearner.W) / 1024**2,
+            'updates_per_step': np.mean(self._update_counts) if self._update_counts else 0.0
+        }
+    
     def get_stats(self) -> Dict[str, Any]:
-        """Get Q-learning statistics."""
-        stats = self.qlearner.get_stats()
-        stats['region'] = 'Striatum'
-        stats['last_td_error'] = self.last_td_error
-        return stats
+        """Get Striatum statistics."""
+        return {
+            'region': 'Striatum',
+            'n_states': self.n_states,
+            'n_actions': self.n_actions,
+            'epsilon': self.qlearner.config.epsilon,
+            'n_updates': self.qlearner.n_updates,
+            'mean_q_weight': np.mean(np.abs(self.qlearner.W)),
+            'resource_usage': self.get_resource_usage()
+        }

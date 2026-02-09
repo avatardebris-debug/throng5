@@ -166,3 +166,57 @@ class MountainCarAdapter(EnvironmentAdapter):
         """Normalize observation to [0, 1]."""
         obs_clipped = np.clip(obs, self.obs_low, self.obs_high)
         return self.normalize(obs_clipped, self.obs_low, self.obs_high)
+
+
+class FrozenLakeAdapter(EnvironmentAdapter):
+    """
+    Adapter for FrozenLake-v1 environment.
+    
+    Stochastic environment with sparse rewards:
+    - 4x4 grid with holes
+    - Actions: 0=left, 1=down, 2=right, 3=up
+    - Slippery: actions have 33% chance of going sideways
+    - Reward: +1 only at goal, 0 elsewhere
+    - Episode ends if fall in hole or reach goal
+    """
+    
+    def __init__(self, is_slippery: bool = True):
+        super().__init__()
+        try:
+            import gymnasium as gym
+            self.env = gym.make('FrozenLake-v1', is_slippery=is_slippery)
+        except ImportError:
+            raise ImportError("gymnasium not installed. Run: pip install gymnasium")
+        
+        self.is_slippery = is_slippery
+        self.n_states = 16  # 4x4 grid
+        
+    def reset(self) -> np.ndarray:
+        """Reset environment."""
+        obs, _ = self.env.reset()
+        self.episode_steps = 0
+        self.episode_reward = 0.0
+        return self.preprocess_obs(obs)
+    
+    def step(self, action: int) -> Tuple[np.ndarray, float, bool, Dict[str, Any]]:
+        """Take action."""
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        done = terminated or truncated
+        
+        self.episode_steps += 1
+        self.episode_reward += reward
+        
+        if done:
+            self.total_episodes += 1
+        
+        info['success'] = (reward > 0)  # Goal reached
+        
+        return self.preprocess_obs(obs), reward, done, info
+    
+    def preprocess_obs(self, obs: int) -> np.ndarray:
+        """Convert discrete state to normalized 2D position."""
+        # Convert state index to (x, y) position
+        x = obs % 4
+        y = obs // 4
+        return np.array([x / 3.0, y / 3.0], dtype=np.float32)
+
