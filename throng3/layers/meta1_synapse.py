@@ -26,11 +26,15 @@ from throng3.learning.hebbian import HebbianRule, HebbianConfig
 from throng3.learning.qlearning import QLearner, QLearningConfig
 from throng3.learning.dopamine import DopamineSystem, DopamineConfig
 from throng3.learning.pruning import NashPruner, PruningConfig
+from throng3.learning.gradient import GradientLearner, GradientConfig
 
 
 @dataclass
 class SynapseConfig:
     """Configuration for Meta^1 synapse optimization."""
+    # Learning mechanism selection
+    learning_mode: str = 'auto'  # 'auto', 'gradient', 'rl', 'hybrid'
+    
     # Learning rules
     default_rule: str = 'both'  # 'stdp', 'hebbian', or 'both'
     rule_selection_mode: str = 'fixed'  # 'fixed' or 'bandit'
@@ -84,9 +88,13 @@ class SynapseOptimizer(MetaLayer):
         self.hebbian = HebbianRule()
         self.dopamine = DopamineSystem()
         self.pruner = NashPruner()
+        self.gradient = GradientLearner(GradientConfig())
         
         # Current active rule
         self.active_rule = cfg.default_rule  # 'stdp', 'hebbian', 'both'
+        
+        # Learning mode (gradient vs RL vs hybrid)
+        self.learning_mode = cfg.learning_mode
         
         # Weight change accumulator (applied to Meta^0)
         self._pending_dW: Dict[str, np.ndarray] = {}
@@ -151,20 +159,81 @@ class SynapseOptimizer(MetaLayer):
         # Compute dopamine RPE (this will be updated by the new dopamine.update call)
         rpe = self.dopamine.compute_rpe(reward) # Keep for now, but new update will handle it
         
-        # Apply learning rules
+        # Apply learning based on mode
         dW = np.zeros_like(W_recurrent)
         
-        # Only apply bio-inspired rules if not 'none'
-        if self.active_rule != 'none':
-            if self.active_rule in ('stdp', 'both'):
-                dW_stdp = self._apply_stdp(W_recurrent, activations)
-                dW += dW_stdp
-                self._rule_usage['stdp'] += 1
+        if self.learning_mode == 'gradient':
+            # Gradient-based learning for supervised tasks
+            target = context.get('target')
+            output = context.get('output')
             
-            if self.active_rule in ('hebbian', 'both'):
-                dW_hebb = self._apply_hebbian(W_recurrent, activations, reward)
-                dW += dW_hebb
-                self._rule_usage['hebbian'] += 1
+            if target is not None and output is not None:
+                # Get LR multipliers from Meta^3 (Fisher boosting)
+                lr_multipliers = context.get('lr_multipliers', {})
+                
+                dW_dict = self.gradient.compute_weight_update(
+                    weights, output, target, activations,
+                    lr_multipliers=lr_multipliers
+                )
+                # Extract recurrent weight updates
+                if 'W_recurrent' in dW_dict:
+                    dW = dW_dict['W_recurrent']
+                # Store output weight updates separately
+                if 'W_out' in dW_dict:
+                    self._pending_dW['W_out'] = dW_dict['W_out']
+        
+        elif self.learning_mode == 'rl':
+            # Bio-inspired learning for RL tasks
+            if self.active_rule != 'none':
+                if self.active_rule in ('stdp', 'both'):
+                    dW_stdp = self._apply_stdp(W_recurrent, activations)
+                    dW += dW_stdp
+                    self._rule_usage['stdp'] += 1
+                
+                if self.active_rule in ('hebbian', 'both'):
+                    dW_hebb = self._apply_hebbian(W_recurrent, activations, reward)
+                    dW += dW_hebb
+                    self._rule_usage['hebbian'] += 1
+        
+        elif self.learning_mode == 'hybrid':
+            # Hybrid: gradient + bio-inspired
+            target = context.get('target')
+            output = context.get('output')
+            
+            # Gradient component
+            if target is not None and output is not None:
+                dW_dict = self.gradient.compute_weight_update(
+                    weights, output, target, activations
+                )
+                if 'W_recurrent' in dW_dict:
+                    dW += 0.7 * dW_dict['W_recurrent']  # 70% gradient
+                if 'W_out' in dW_dict:
+                    self._pending_dW['W_out'] = dW_dict['W_out']
+            
+            # Bio-inspired component
+            if self.active_rule != 'none':
+                if self.active_rule in ('stdp', 'both'):
+                    dW_stdp = self._apply_stdp(W_recurrent, activations)
+                    dW += 0.3 * dW_stdp  # 30% bio-inspired
+                    self._rule_usage['stdp'] += 1
+                
+                if self.active_rule in ('hebbian', 'both'):
+                    dW_hebb = self._apply_hebbian(W_recurrent, activations, reward)
+                    dW += 0.3 * dW_hebb
+                    self._rule_usage['hebbian'] += 1
+        
+        else:  # 'auto' or unknown - default to bio-inspired for now
+            # Only apply bio-inspired rules if not 'none'
+            if self.active_rule != 'none':
+                if self.active_rule in ('stdp', 'both'):
+                    dW_stdp = self._apply_stdp(W_recurrent, activations)
+                    dW += dW_stdp
+                    self._rule_usage['stdp'] += 1
+                
+                if self.active_rule in ('hebbian', 'both'):
+                    dW_hebb = self._apply_hebbian(W_recurrent, activations, reward)
+                    dW += dW_hebb
+                    self._rule_usage['hebbian'] += 1
         
         # Dopamine modulation
         if self.synapse_config.dopamine_modulation:
@@ -254,10 +323,16 @@ class SynapseOptimizer(MetaLayer):
         self._total_weight_updates += 1
         
         # Send suggestion DOWN to Meta^0 to apply weight changes
+        weight_deltas = {'W_recurrent_delta': dW}
+        
+        # Include W_out delta if we have it (from gradient learning)
+        if 'W_out' in self._pending_dW:
+            weight_deltas['W_out_delta'] = self._pending_dW['W_out']
+        
         self.signal(
             direction=SignalDirection.DOWN,
             signal_type=SignalType.SUGGESTION,
-            payload={'W_recurrent_delta': dW},
+            payload=weight_deltas,
             target_level=0,
             requires_response=True,
         )
@@ -372,6 +447,12 @@ class SynapseOptimizer(MetaLayer):
     def _apply_suggestion(self, suggestion: Dict[str, Any]) -> bool:
         """Apply a suggestion (usually from Meta^2 about which rule to use)."""
         applied = False
+        
+        if 'learning_mode' in suggestion:
+            new_mode = suggestion['learning_mode']
+            if new_mode in ('gradient', 'rl', 'hybrid', 'auto'):
+                self.learning_mode = new_mode
+                applied = True
         
         if 'active_rule' in suggestion:
             new_rule = suggestion['active_rule']

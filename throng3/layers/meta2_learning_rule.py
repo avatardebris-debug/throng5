@@ -21,6 +21,7 @@ from collections import deque
 
 from throng3.core.meta_layer import MetaLayer
 from throng3.core.signal import SignalDirection, SignalType, SignalPriority
+from throng3.core.task_detector import TaskDetector
 
 
 @dataclass
@@ -62,6 +63,17 @@ class LearningRuleSelector(MetaLayer):
         self.current_rule = self.rules[0]
         self._steps_on_current_rule = 0
         
+        # Task detector for automatic mechanism selection
+        self.task_detector = TaskDetector(window=100)
+        
+        # Mechanism selection bandit (gradient vs RL vs hybrid)
+        self.mechanisms = ['gradient', 'rl', 'hybrid']
+        self.mechanism_rewards: Dict[str, List[float]] = {m: [] for m in self.mechanisms}
+        self.mechanism_counts: Dict[str, int] = {m: 0 for m in self.mechanisms}
+        self.mechanism_values: Dict[str, float] = {m: 0.0 for m in self.mechanisms}
+        self.current_mechanism = 'auto'  # Start in auto mode
+        self._steps_on_current_mechanism = 0
+        
         # Context features for contextual bandit
         self._context_features: deque = deque(maxlen=1000)
         self._context_rule_pairs: List[Tuple[np.ndarray, str, float]] = []
@@ -86,11 +98,39 @@ class LearningRuleSelector(MetaLayer):
         """
         self.process_inbox()
         
+        # Update task detector with current context
+        self.task_detector.update(context)
+        
         # Get Meta^1's performance from context
         meta1_perf = context.get('meta1_performance', {})
         current_loss = meta1_perf.get('loss', self.metrics.loss)
         current_rpe = meta1_perf.get('rpe', 0.0)
         active_rule = meta1_perf.get('active_rule', self.current_rule)
+        
+        # Detect task type and select mechanism
+        task_chars = self.task_detector.get_characteristics()
+        if task_chars is not None and task_chars.confidence > 0.6:
+            # We have enough data to classify the task
+            recommended_mechanism = self.task_detector.get_recommended_mechanism()
+            
+            # If recommendation is different from current, consider switching
+            if recommended_mechanism != 'explore' and recommended_mechanism != self.current_mechanism:
+                # Compute reward for current mechanism
+                mechanism_reward = self._compute_rule_reward(current_loss, current_rpe)
+                self._update_mechanism_bandit(self.current_mechanism, mechanism_reward)
+                
+                # Switch to recommended mechanism
+                self.current_mechanism = recommended_mechanism
+                self._steps_on_current_mechanism = 0
+                
+                # Signal DOWN to Meta^1 to change learning mode
+                self.signal(
+                    direction=SignalDirection.DOWN,
+                    signal_type=SignalType.SUGGESTION,
+                    payload={'learning_mode': recommended_mechanism},
+                    target_level=1,
+                    requires_response=True,
+                )
         
         # Compute reward for current rule
         reward = self._compute_rule_reward(current_loss, current_rpe)
@@ -98,6 +138,7 @@ class LearningRuleSelector(MetaLayer):
         # Update bandit
         self._update_bandit(active_rule, reward)
         self._steps_on_current_rule += 1
+        self._steps_on_current_mechanism += 1
         
         # Select rule (only consider switching after evaluation window)
         if self._steps_on_current_rule >= self.selector_config.evaluation_window:
@@ -152,6 +193,21 @@ class LearningRuleSelector(MetaLayer):
             },
         )
         
+        # Signal task type UP to Meta^3 (MAML) for task conditioning
+        task_chars = self.task_detector.get_characteristics()
+        if task_chars is not None:
+            self.signal(
+                direction=SignalDirection.UP,
+                signal_type=SignalType.PERFORMANCE,
+                payload={
+                    'task_type': task_chars.signal_type,
+                    'task_confidence': task_chars.confidence,
+                    'target_freq': task_chars.target_frequency,
+                    'reward_freq': task_chars.reward_frequency,
+                },
+                target_level=3,
+            )
+        
         return {
             'current_rule': self.current_rule,
             'rule_values': dict(self.rule_values),
@@ -192,6 +248,16 @@ class LearningRuleSelector(MetaLayer):
             if rule not in self.rule_counts:
                 self.rule_counts[rule] = 0
             self.rule_counts[rule] += 1
+    
+    def _update_mechanism_bandit(self, mechanism: str, reward: float):
+        """Update bandit estimates for a learning mechanism."""
+        if mechanism in self.mechanism_rewards:
+            self.mechanism_rewards[mechanism].append(reward)
+            self.mechanism_counts[mechanism] += 1
+            
+            # Incremental mean update
+            n = self.mechanism_counts[mechanism]
+            self.mechanism_values[mechanism] += (reward - self.mechanism_values[mechanism]) / n
     
     def _select_rule(self, context: Dict) -> str:
         """Select a rule using the configured strategy."""

@@ -18,6 +18,7 @@ from throng3.layers.meta0_neuron import NeuronLayer, NeuronConfig
 from throng3.layers.meta1_synapse import SynapseOptimizer, SynapseConfig
 from throng3.layers.meta2_learning_rule import LearningRuleSelector, LearningRuleSelectorConfig
 from throng3.layers.meta3_representation import RepresentationOptimizer, RepresentationConfig
+from throng3.layers.meta3_consolidation import WeightConsolidation, ConsolidationConfig
 from throng3.layers.meta4_goal import GoalHierarchy, GoalConfig
 from throng3.layers.meta5_architecture import ArchitectureSearch, ArchitectureConfig
 from throng3.layers.meta_n_llm import LLMInterface, LLMConfig
@@ -43,6 +44,7 @@ class MetaNPipeline:
         self.global_optimizer = global_optimizer
         self._step_count = 0
         self._history: List[Dict] = []
+        self._experience_buffer: List[Dict] = []  # For MAML meta-updates
     
     @classmethod
     def create_default(cls, 
@@ -90,6 +92,61 @@ class MetaNPipeline:
             stack.add_layer(LLMInterface(LLMConfig(
                 callback=llm_callback,
             )))
+        
+        return cls(stack)
+    
+    @classmethod
+    def create_with_ewc(cls,
+                        n_neurons: int = 100,
+                        n_inputs: int = 16,
+                        n_outputs: int = 8,
+                        ewc_lambda: float = 1000.0) -> 'MetaNPipeline':
+        """
+        Create pipeline with EWC (Elastic Weight Consolidation) for compound transfer.
+        
+        This uses Meta^3 consolidation to prevent catastrophic interference.
+        """
+        stack = FractalStack(config={'holographic_dim': 64})
+        
+        stack.add_layer(NeuronLayer(NeuronConfig(
+            n_neurons=n_neurons,
+            n_inputs=n_inputs,
+            n_outputs=n_outputs,
+        )))
+        stack.add_layer(SynapseOptimizer(SynapseConfig()))
+        stack.add_layer(LearningRuleSelector(LearningRuleSelectorConfig()))
+        stack.add_layer(WeightConsolidation(ConsolidationConfig(
+            ewc_lambda=ewc_lambda,
+        )))
+        
+        return cls(stack)
+    
+    @classmethod
+    def create_with_maml(cls,
+                        n_neurons: int = 100,
+                        n_inputs: int = 16,
+                        n_outputs: int = 8,
+                        meta_lr: float = 0.001) -> 'MetaNPipeline':
+        """
+        Create pipeline with task-conditioned MAML for meta-learning.
+        
+        This uses Meta^3 MAML to learn task-type-specific optimization strategies.
+        """
+        from throng3.layers.meta3_maml import TaskConditionedMAML
+        from throng3.config.maml_config import MAMLConfig
+        
+        stack = FractalStack(config={'holographic_dim': 64})
+        
+        stack.add_layer(NeuronLayer(NeuronConfig(
+            n_neurons=n_neurons,
+            n_inputs=n_inputs,
+            n_outputs=n_outputs,
+        )))
+        stack.add_layer(SynapseOptimizer(SynapseConfig()))
+        stack.add_layer(LearningRuleSelector(LearningRuleSelectorConfig()))
+        stack.add_layer(TaskConditionedMAML(MAMLConfig(
+            meta_lr=meta_lr,
+        )))
         
         return cls(stack)
     
@@ -259,6 +316,118 @@ class MetaNPipeline:
         if len(self._history) > 100:
             self._history = self._history[-50:]
         
+        # Collect experience for MAML meta-updates
+        self._experience_buffer.append({
+            'state': input_data.copy(),
+            'output': final_output.copy(),
+            'reward': reward,
+            'weights': {k: v.copy() for k, v in weights.items()},
+        })
+        
+        self._step_count += 1
+        return step_result
+    
+    def step_rl(self, state: np.ndarray, 
+                reward: float = 0.0,
+                done: bool = False,
+                prev_action: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Single-step RL API: get Q-values AND learn from previous transition.
+        
+        Unlike step() which requires two calls per env step, step_rl() handles
+        both inference and learning in one call:
+        - Forward pass through Meta^0 to get Q-values
+        - Pass (prev_action, reward, done) to Meta^1 Q-learner for TD update
+        
+        Args:
+            state: Current environment observation
+            reward: Reward received from the previous action
+            done: Whether the episode is over
+            prev_action: The action taken in the previous step (for Q-learning)
+            
+        Returns:
+            Dict with output (Q-values), metrics, and system state
+        """
+        neuron_layer = self.stack.get_layer(0)
+        
+        if neuron_layer:
+            output = neuron_layer.forward(state)
+            weights = neuron_layer.get_weights()
+            activations = neuron_layer.activations.copy()
+            spikes = neuron_layer.spikes.copy()
+        else:
+            output = np.zeros(1)
+            weights = {}
+            activations = np.array([])
+            spikes = np.array([])
+        
+        # Build context with RL-specific fields
+        context = {
+            'input': state,
+            'raw_observation': state,  # Q-learner uses this for state
+            'target': None,
+            'reward': reward,
+            'output': output,
+            'weights': weights,
+            'activations': activations,
+            'spikes': spikes,
+            'outputs': output,
+            'step': self._step_count,
+            'n_outputs': neuron_layer.n_outputs if neuron_layer else 4,
+            # RL-specific: pass action and done to Q-learner
+            'action': prev_action if prev_action is not None else 0,
+            'done': done,
+        }
+        
+        # Include previous meta1 results
+        if self._history:
+            last = self._history[-1]
+            if 'layer_results' in last:
+                meta1_result = last['layer_results'].get(1, {})
+                context['meta1_performance'] = meta1_result
+        
+        # Run the full stack 
+        if self.global_optimizer:
+            result = self.global_optimizer.step(context)
+            global_metrics = result.get('global', {})
+        else:
+            result = self.stack.step(context)
+            global_metrics = {}
+        
+        # Extract output
+        meta0_result = result.get('layer_results', {}).get(0, {})
+        final_output = meta0_result.get('output', output)
+        
+        # Use Q-values from Meta^1 if available (better than raw neuron output)
+        meta1_result = result.get('layer_results', {}).get(1, {})
+        q_values = meta1_result.get('q_values', None)
+        if q_values is not None:
+            final_output = q_values  # Use Q-table values for action selection
+        
+        step_result = {
+            'output': final_output,
+            'loss': meta0_result.get('loss', float('inf')),
+            'reward': reward,
+            'q_values': q_values,
+            'td_error': meta1_result.get('td_error', 0.0),
+            'system_state': self.stack.get_system_state(),
+            'step': self._step_count,
+            'layer_results': result.get('layer_results', {}),
+            'global': global_metrics,
+        }
+        
+        self._history.append(step_result)
+        if len(self._history) > 100:
+            self._history = self._history[-50:]
+        
+        # Collect experience for MAML meta-updates
+        self._experience_buffer.append({
+            'state': state.copy(),
+            'output': final_output.copy(),
+            'reward': reward,
+            'weights': {k: v.copy() for k, v in weights.items()},
+        })
+        
         self._step_count += 1
         return step_result
     
@@ -304,6 +473,9 @@ class MetaNPipeline:
         # Keep history for meta-analysis but mark boundary
         if self._history:
             self._history.append({'task_boundary': True})
+        
+        # Clear experience buffer for new task
+        self._experience_buffer = []
 
     
     def get_report(self) -> str:
@@ -348,3 +520,116 @@ class MetaNPipeline:
     
     def __repr__(self) -> str:
         return f"MetaNPipeline(step={self._step_count}, {self.stack})"
+    
+    def consolidate_task(self):
+        """
+        Consolidate the current task's knowledge using EWC.
+        
+        Call this after a task completes to:
+        1. Compute Fisher information (weight importance)
+        2. Store optimal weights
+        3. Protect important weights from future changes
+        """
+        meta0 = self.stack.get_layer(0)
+        if not meta0:
+            return
+        
+        weights = meta0.get_weights()
+        
+        meta1 = self.stack.get_layer(1)
+        if not meta1 or not hasattr(meta1, 'gradient'):
+            return
+        
+        fisher = meta1.gradient.get_fisher_information()
+        
+        if not fisher:
+            return
+        
+        meta3 = self.stack.get_layer(3)
+        if meta3 and hasattr(meta3, 'consolidate_task'):
+            meta3.consolidate_task(weights, fisher)
+    
+    def consolidate_maml_task(self, gamma: float = 0.95):
+        """
+        Consolidate MAML meta-learning from collected RL experience.
+        
+        Converts experience buffer to support/query sets using TD targets
+        and triggers MAML meta-update.
+        
+        Args:
+            gamma: Discount factor for TD targets
+        """
+        if not self._experience_buffer:
+            return
+        
+        maml_layer = self.stack.get_layer(3)
+        if not maml_layer or not hasattr(maml_layer, 'meta_update'):
+            return
+        
+        # Convert RL experience to MAML-compatible (state, target) pairs
+        # Target = reward + gamma * max(Q(next_state))
+        support_set = []
+        query_set = []
+        
+        # Get task type from MAML layer
+        task_type = getattr(maml_layer, '_detected_task_type', 'rl')
+        
+        # Use first experience's weights as initial params
+        if not self._experience_buffer:
+            return
+        raw_weights = self._experience_buffer[0]['weights']
+        
+        # Create combined weight matrix: W_combined = W_out @ W_in
+        # This maps state (n_inputs) → output (n_outputs) directly
+        # so MAML's _forward can do W_combined @ state
+        if 'W_out' in raw_weights and 'W_in' in raw_weights:
+            W_combined = raw_weights['W_out'] @ raw_weights['W_in']
+            weights = {'W_out': W_combined}
+        else:
+            # Fallback if weights don't have expected structure
+            return
+        
+        # Convert each transition to (state, TD-target)
+        for i, exp in enumerate(self._experience_buffer[:-1]):
+            state = exp['state']
+            output = exp['output']  # Q-values
+            reward = exp['reward']
+            next_exp = self._experience_buffer[i + 1]
+            next_output = next_exp['output']
+            
+            # TD target: r + gamma * max(Q(s'))
+            # For each action, target is current Q-value except for the chosen action
+            # which gets the TD update
+            action = np.argmax(output)  # Greedy action
+            td_target = output.copy()
+            td_target[action] = reward + gamma * np.max(next_output)
+            
+            # Split 60/40 into support/query
+            if i < len(self._experience_buffer) * 0.6:
+                support_set.append((state, td_target))
+            else:
+                query_set.append((state, td_target))
+        
+        # Create task dict for MAML
+        task = {
+            'task_type': task_type,
+            'support_set': support_set,
+            'query_set': query_set,
+            'weights': weights,
+        }
+        
+        # Trigger meta-update
+        if support_set and query_set:
+            maml_layer.meta_update([task])
+        
+        # Clear buffer
+        self._experience_buffer = []
+
+    
+    def reset_task_state(self):
+        """Reset task-specific state (for task boundaries)."""
+        meta0 = self.stack.get_layer(0)
+        if meta0:
+            meta0.membrane_potential[:] = 0
+            meta0.activations[:] = 0
+
