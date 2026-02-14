@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tetris Arena — Heuristic vs Neural Network</title>
+    <style>
+        :root {
+            --bg: #0b0b1e;
+            --bg2: #0d0d24;
+            --card: #12122a;
+            --border: #1e1e3a;
+            --dim: #666;
+            --cyan: #22d3ee;
+            --yellow: #fbbf24;
+            --purple: #a855f7;
+            --green: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            color: var(--dim);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-label {
+            color: var(--dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-right: 6px;
+        }
+
+        select,
+        .btn {
+            background: var(--card);
+            color: #e0e0e0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .btn.go {
+            background: var(--cyan);
+            color: #000;
+            font-weight: 700;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .speed-slider {
+            width: 80px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--cyan);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Arena layout */
+        .arena {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .player {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            width: 340px;
+            transition: border-color 0.3s;
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .player-badge {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-h {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--yellow);
+        }
+
+        .badge-nn {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--purple);
+        }
+
+        .board-wrap {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-k {
+            color: var(--dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .stat-v {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .yellow {
+            color: var(--yellow);
+        }
+
+        .purple {
+            color: var(--purple);
+        }
+
+        .green {
+            color: var(--green);
+        }
+
+        .section-label {
+            color: var(--dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 12px 0 6px;
+        }
+
+        .scoreboard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            min-width: 160px;
+        }
+
+        .vs-badge {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--yellow), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-big {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            color: var(--dim);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .score-divider {
+            border-top: 1px solid var(--border);
+            margin: 12px 0;
+        }
+
+        @media (max-width: 900px) {
+            .arena {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .scoreboard {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🧠 Heuristic vs Neural Network</h1>
+        <p>4 fixed weights vs a learning neural network — same game, same pieces</p>
+    </div>
+
+    <div class="controls-bar">
+        <div>
+            <span class="ctrl-label">Level</span>
+            <select id="sel-level">
+                <option value="1" selected>1 — O-block only (6×10)</option>
+                <option value="2">2 — O + I (6×12)</option>
+                <option value="3">3 — O + I + T (6×12)</option>
+                <option value="4">4 — O I T S Z (8×14)</option>
+                <option value="5">5 — All 7 (8×16)</option>
+                <option value="6">6 — All 7 (10×18)</option>
+                <option value="7">7 — Full Tetris (10×20)</option>
+            </select>
+        </div>
+        <div>
+            <span class="ctrl-label">Speed</span>
+            <input type="range" class="speed-slider" id="spd" min="1" max="200" value="30">
+            <span class="stat-v" id="spd-val">30</span>
+        </div>
+        <button class="btn go" id="btn-start">▶ Start</button>
+        <button class="btn" id="btn-reset">↺ Reset</button>
+    </div>
+
+    <div class="arena">
+        <!-- Heuristic -->
+        <div class="player" id="panel-h">
+            <div class="player-header">
+                <span class="player-name">🎯 Heuristic</span>
+                <span class="player-badge badge-h">4 weights</span>
+            </div>
+            <div class="board-wrap"><canvas id="cv-h"></canvas></div>
+            <div class="stats-grid">
+                <div class="stat"><span class="stat-k">Lines</span><span class="stat-v yellow" id="s-h-lines">0</span>
+                </div>
+                <div class="stat"><span class="stat-k">Pieces</span><span class="stat-v" id="s-h-pieces">0</span></div>
+                <div class="stat"><span class="stat-k">Episode</span><span class="stat-v" id="s-h-ep">0</span></div>
+                <div class="stat"><span class="stat-k">Avg Lines</span><span class="stat-v green" id="s-h-avg">0</span>
+                </div>
+                <div class="stat"><span class="stat-k">Best</span><span class="stat-v" id="s-h-best">0</span></div>
+            </div>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="scoreboard">
+            <div class="vs-badge">VS</div>
+            <div class="score-big yellow" id="wins-h">0</div>
+            <div class="score-label">Heuristic Wins</div>
+            <div class="score-divider"></div>
+            <div class="score-big purple" id="wins-nn">0</div>
+            <div class="score-label">Neural Net Wins</div>
+            <div class="score-divider"></div>
+            <div class="score-big" style="color:var(--dim)" id="wins-tie">0</div>
+            <div class="score-label">Ties</div>
+            <div class="score-divider"></div>
+            <div class="section-label">Total Lines</div>
+            <div class="stat"><span class="stat-k">Heuristic</span><span class="stat-v yellow" id="total-h">0</span>
+            </div>
+            <div class="stat"><span class="stat-k">Neural Net</span><span class="stat-v purple" id="total-nn">0</span>
+            </div>
+        </div>
+
+        <!-- Neural Network -->
+        <div class="player" id="panel-nn">
+            <div class="player-header">
+                <span class="player-name">🧠 Neural Network</span>
+                <span class="player-badge badge-nn" id="nn-params">449 params</span>
+            </div>
+            <div class="board-wrap"><canvas id="cv-nn"></canvas></div>
+            <div class="stats-grid">
+                <div class="stat"><span class="stat-k">Lines</span><span class="stat-v purple" id="s-nn-lines">0</span>
+                </div>
+                <div class="stat"><span class="stat-k">Pieces</span><span class="stat-v" id="s-nn-pieces">0</span></div>
+                <div class="stat"><span class="stat-k">Episode</span><span class="stat-v" id="s-nn-ep">0</span></div>
+                <div class="stat"><span class="stat-k">Avg Lines</span><span class="stat-v green" id="s-nn-avg">0</span>
+                </div>
+                <div class="stat"><span class="stat-k">Best</span><span class="stat-v" id="s-nn-best">0</span></div>
+            </div>
+            <div class="section-label">Network (Learning)</div>
+            <div class="stats-grid">
+                <div class="stat"><span class="stat-k">Epsilon</span><span class="stat-v" id="s-nn-eps">0.20</span>
+                </div>
+                <div class="stat"><span class="stat-k">Loss</span><span class="stat-v" id="s-nn-loss">0</span></div>
+                <div class="stat"><span class="stat-k">Updates</span><span class="stat-v" id="s-nn-upd">0</span></div>
+            </div>
+            <canvas id="cv-nn-vis" width="300" height="60"
+                style="margin-top:8px;border-radius:6px;display:block;"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // SHAPES & LEVELS
+        // ═══════════════════════════════════════════════════════════
+        const SHAPES = {
+            I: [[[0, 0], [0, 1], [0, 2], [0, 3]], [[0, 0], [1, 0], [2, 0], [3, 0]]],
+            O: [[[0, 0], [0, 1], [1, 0], [1, 1]]],
+            T: [[[0, 0], [0, 1], [0, 2], [1, 1]], [[0, 0], [1, 0], [2, 0], [1, 1]],
+            [[1, 0], [1, 1], [1, 2], [0, 1]], [[0, 0], [1, 0], [2, 0], [1, -1]]],
+            S: [[[0, 1], [0, 2], [1, 0], [1, 1]], [[0, 0], [1, 0], [1, 1], [2, 1]]],
+            Z: [[[0, 0], [0, 1], [1, 1], [1, 2]], [[0, 1], [1, 0], [1, 1], [2, 0]]],
+            L: [[[0, 0], [0, 1], [0, 2], [1, 0]], [[0, 0], [1, 0], [2, 0], [2, 1]],
+            [[1, 0], [1, 1], [1, 2], [0, 2]], [[0, 0], [0, 1], [1, 1], [2, 1]]],
+            J: [[[0, 0], [0, 1], [0, 2], [1, 2]], [[0, 0], [1, 0], [2, 0], [0, 1]],
+            [[1, 0], [1, 1], [1, 2], [0, 0]], [[0, 0], [1, 0], [2, 0], [2, -1]]]
+        };
+
+        const COLORS = { I: '#00e5ff', O: '#fbbf24', T: '#a855f7', S: '#34d399', Z: '#fb7185', L: '#fb923c', J: '#60a5fa' };
+
+        const LEVELS = {
+            1: { pieces: ['O'], rots: 1, w: 6, h: 10 },
+            2: { pieces: ['O', 'I'], rots: 2, w: 6, h: 12 },
+            3: { pieces: ['O', 'I', 'T'], rots: 4, w: 6, h: 12 },
+            4: { pieces: ['O', 'I', 'T', 'S', 'Z'], rots: 4, w: 8, h: 14 },
+            5: { pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J'], rots: 4, w: 8, h: 16 },
+            6: { pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J'], rots: 4, w: 10, h: 18 },
+            7: { pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J'], rots: 4, w: 10, h: 20 }
+        };
+
+        const CELL = 20, GAP = 1;
+
+        // ═══════════════════════════════════════════════════════════
+        // GAME ENGINE
+        // ═══════════════════════════════════════════════════════════
+        class Game {
+            constructor(levelNum, seed) {
+                const L = LEVELS[levelNum];
+                this.w = L.w;
+                this.h = L.h;
+                this.pieces = L.pieces;
+                this.rots = L.rots;
+                this.board = [];
+                for (let r = 0; r < this.h; r++) {
+                    this.board.push(new Array(this.w).fill(null));
+                }
+                this.score = 0;
+                this.lines = 0;
+                this.placed = 0;
+                this.over = false;
+                this.seed = seed;
+                this.rng = this._makeRng(seed);
+                this.piece = null;
+                this.next = this._randPiece();
+                this.spawn();
+            }
+
+            _makeRng(s) {
+                return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+            }
+
+            _randPiece() {
+                return this.pieces[Math.floor(this.rng() * this.pieces.length)];
+            }
+
+            spawn() {
+                this.piece = this.next;
+                this.next = this._randPiece();
+            }
+
+            getCells(p, rot) {
+                return SHAPES[p][rot % SHAPES[p].length];
+            }
+
+            canPlace(p, row, col, rot) {
+                for (const [dr, dc] of this.getCells(p, rot)) {
+                    const r = row + dr, c = col + dc;
+                    if (r < 0 || r >= this.h || c < 0 || c >= this.w) return false;
+                    if (this.board[r][c] !== null) return false;
+                }
+                return true;
+            }
+
+            enumeratePlacements() {
+                const out = [];
+                for (let rot = 0; rot < this.rots; rot++) {
+                    const cells = this.getCells(this.piece, rot);
+                    const minC = Math.min(...cells.map(([, c]) => c));
+                    const maxC = Math.max(...cells.map(([, c]) => c));
+                    for (let col = -minC; col <= this.w - 1 - maxC; col++) {
+                        let row = 0;
+                        while (this.canPlace(this.piece, row + 1, col, rot)) row++;
+                        if (this.canPlace(this.piece, row, col, rot)) {
+                            out.push({ rot, col, row });
+                        }
+                    }
+                }
+                return out;
+            }
+
+            execute(p) {
+                const cells = this.getCells(this.piece, p.rot);
+                for (const [dr, dc] of cells) {
+                    const r = p.row + dr, c = p.col + dc;
+                    if (r >= 0 && r < this.h && c >= 0 && c < this.w) {
+                        this.board[r][c] = this.piece;
+                    }
+                }
+                this.placed++;
+                this.score += 10;
+
+                // Clear full lines
+                let cleared = 0;
+                for (let r = this.h - 1; r >= 0; r--) {
+                    if (this.board[r].every(c => c !== null)) {
+                        this.board.splice(r, 1);
+                        this.board.unshift(new Array(this.w).fill(null));
+                        cleared++;
+                        r++; // re-check this row
+                    }
+                }
+                this.lines += cleared;
+                this.score += cleared * cleared * 100;
+
+                // Game over check
+                if (this.board[0].some(c => c !== null) || this.board[1].some(c => c !== null)) {
+                    this.over = true;
+                }
+                if (!this.over) {
+                    this.spawn();
+                    if (this.enumeratePlacements().length === 0) this.over = true;
+                }
+                return cleared;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // BOARD FEATURES
+        // ═══════════════════════════════════════════════════════════
+        function boardFeatures(board, w, h) {
+            const heights = new Array(w).fill(0);
+            for (let c = 0; c < w; c++) {
+                for (let r = 0; r < h; r++) {
+                    if (board[r][c] !== null) { heights[c] = h - r; break; }
+                }
+            }
+            const aggH = heights.reduce((a, b) => a + b, 0);
+            let holes = 0;
+            for (let c = 0; c < w; c++) {
+                let found = false;
+                for (let r = 0; r < h; r++) {
+                    if (board[r][c] !== null) found = true;
+                    else if (found) holes++;
+                }
+            }
+            let bump = 0;
+            for (let c = 0; c < w - 1; c++) bump += Math.abs(heights[c] - heights[c + 1]);
+            return { aggH, holes, bump, maxH: Math.max(...heights), heights };
+        }
+
+        function simPlacement(game, p) {
+            const tb = game.board.map(r => [...r]);
+            const cells = game.getCells(game.piece, p.rot);
+            for (const [dr, dc] of cells) {
+                const r = p.row + dr, c = p.col + dc;
+                if (r >= 0 && r < game.h && c >= 0 && c < game.w) tb[r][c] = game.piece;
+            }
+            let cleared = 0;
+            for (let r = game.h - 1; r >= 0; r--) {
+                if (tb[r].every(c => c !== null)) {
+                    tb.splice(r, 1);
+                    tb.unshift(new Array(game.w).fill(null));
+                    cleared++; r++;
+                }
+            }
+            return { board: tb, cleared };
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // HEURISTIC AI
+        // ═══════════════════════════════════════════════════════════
+        function heuristicScore(game, p) {
+            const { board: tb, cleared } = simPlacement(game, p);
+            const f = boardFeatures(tb, game.w, game.h);
+            return 0.76 * cleared - 0.51 * f.aggH - 0.36 * f.holes - 0.18 * f.bump;
+        }
+
+        function heuristicPick(game) {
+            const placements = game.enumeratePlacements();
+            if (placements.length === 0) return null;
+            let best = placements[0], bestS = -Infinity;
+            for (const p of placements) {
+                const s = heuristicScore(game, p);
+                if (s > bestS) { bestS = s; best = p; }
+            }
+            return best;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // NEURAL NETWORK
+        // ═══════════════════════════════════════════════════════════
+        class NeuralNet {
+            constructor(nIn, nHid) {
+                this.nIn = nIn;
+                this.nHid = nHid;
+                this.nParams = (nIn + 1) * nHid + (nHid + 1);
+                const s1 = Math.sqrt(2 / nIn);
+                this.W1 = [];
+                for (let i = 0; i < nHid; i++) {
+                    const row = [];
+                    for (let j = 0; j < nIn; j++) row.push((Math.random() * 2 - 1) * s1);
+                    this.W1.push(row);
+                }
+                this.b1 = new Array(nHid).fill(0);
+                this.W2 = [];
+                const s2 = Math.sqrt(2 / nHid);
+                const outRow = [];
+                for (let i = 0; i < nHid; i++) outRow.push((Math.random() * 2 - 1) * s2);
+                this.W2.push(outRow);
+                this.b2 = [0];
+                this.lr = 0.01;
+                this.updates = 0;
+                this.recentLoss = [];
+            }
+
+            forward(x) {
+                this._lastX = x;
+                this._h = [];
+                for (let i = 0; i < this.nHid; i++) {
+                    let s = this.b1[i];
+                    for (let j = 0; j < this.nIn; j++) s += this.W1[i][j] * x[j];
+                    this._h.push(Math.max(0, s)); // ReLU
+                }
+                let out = this.b2[0];
+                for (let i = 0; i < this.nHid; i++) out += this.W2[0][i] * this._h[i];
+                return out;
+            }
+
+            train(samples) {
+                if (samples.length === 0) return;
+                let totalLoss = 0;
+                for (const { x, target } of samples) {
+                    const pred = this.forward(x);
+                    const err = pred - target;
+                    totalLoss += err * err;
+                    const dOut = err;
+                    for (let i = 0; i < this.nHid; i++) {
+                        this.W2[0][i] -= this.lr * dOut * this._h[i];
+                    }
+                    this.b2[0] -= this.lr * dOut;
+                    for (let i = 0; i < this.nHid; i++) {
+                        if (this._h[i] <= 0) continue;
+                        const dh = dOut * this.W2[0][i];
+                        for (let j = 0; j < this.nIn; j++) {
+                            this.W1[i][j] -= this.lr * dh * this._lastX[j];
+                        }
+                        this.b1[i] -= this.lr * dh;
+                    }
+                }
+                this.updates++;
+                const avgL = totalLoss / samples.length;
+                this.recentLoss.push(avgL);
+                if (this.recentLoss.length > 50) this.recentLoss.shift();
+            }
+
+            avgLoss() {
+                if (this.recentLoss.length === 0) return 0;
+                return this.recentLoss.reduce((a, b) => a + b, 0) / this.recentLoss.length;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // NN AGENT
+        // ═══════════════════════════════════════════════════════════
+        class NNAgent {
+            constructor() {
+                this.nFeatures = 12;
+                this.net = new NeuralNet(this.nFeatures, 32);
+                this.epsilon = 0.20;
+                this.epsilonDecay = 0.99;
+                this.epsilonMin = 0.02;
+                this.episode = 0;
+                this.bestLines = 0;
+                this.recentLines = [];
+                this.buffer = [];
+                this.replayBuffer = [];
+                this.gamma = 0.95;
+            }
+
+            makeFeatures(game, placement) {
+                const { board: tb, cleared } = simPlacement(game, placement);
+                const f = boardFeatures(tb, game.w, game.h);
+                const pieceIdx = ['I', 'O', 'T', 'S', 'Z', 'L', 'J'].indexOf(game.piece);
+                return [
+                    f.aggH / (game.w * game.h),
+                    f.holes / (game.w * game.h * 0.5),
+                    f.bump / (game.h * (game.w - 1)),
+                    f.maxH / game.h,
+                    cleared / 4,
+                    placement.row / game.h,
+                    placement.col / game.w,
+                    placement.rot / 4,
+                    pieceIdx === 0 ? 1 : 0,
+                    pieceIdx === 1 ? 1 : 0,
+                    (pieceIdx >= 2 && pieceIdx <= 4) ? 1 : 0,
+                    (pieceIdx >= 5) ? 1 : 0
+                ];
+            }
+
+            selectPlacement(game) {
+                const placements = game.enumeratePlacements();
+                if (placements.length === 0) return null;
+                if (Math.random() < this.epsilon) {
+                    return placements[Math.floor(Math.random() * placements.length)];
+                }
+                let best = placements[0], bestV = -Infinity;
+                for (const p of placements) {
+                    const v = this.net.forward(this.makeFeatures(game, p));
+                    if (v > bestV) { bestV = v; best = p; }
+                }
+                return best;
+            }
+
+            recordStep(game, placement, reward) {
+                this.buffer.push({ x: this.makeFeatures(game, placement), reward });
+            }
+
+            endEpisode(totalLines) {
+                this.episode++;
+                this.recentLines.push(totalLines);
+                if (this.recentLines.length > 20) this.recentLines.shift();
+                if (totalLines > this.bestLines) this.bestLines = totalLines;
+
+                if (this.buffer.length > 0) {
+                    let G = 0;
+                    for (let i = this.buffer.length - 1; i >= 0; i--) {
+                        G = this.buffer[i].reward + this.gamma * G;
+                        this.replayBuffer.push({ x: this.buffer[i].x, target: G });
+                    }
+                    // Keep replay buffer bounded
+                    if (this.replayBuffer.length > 3000) {
+                        this.replayBuffer = this.replayBuffer.slice(-3000);
+                    }
+                    // Train on random batch
+                    const batchSize = Math.min(128, this.replayBuffer.length);
+                    const batch = [];
+                    for (let i = 0; i < batchSize; i++) {
+                        batch.push(this.replayBuffer[Math.floor(Math.random() * this.replayBuffer.length)]);
+                    }
+                    this.net.train(batch);
+                }
+                this.buffer = [];
+                this.epsilon = Math.max(this.epsilonMin, this.epsilon * this.epsilonDecay);
+            }
+
+            avgLines() {
+                if (this.recentLines.length === 0) return 0;
+                return this.recentLines.reduce((a, b) => a + b, 0) / this.recentLines.length;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // RENDERING — both canvases sized identically
+        // ═══════════════════════════════════════════════════════════
+        function sizeCanvases(w, h) {
+            const pw = w * (CELL + GAP) + GAP;
+            const ph = h * (CELL + GAP) + GAP;
+            const cvH = document.getElementById('cv-h');
+            const cvNN = document.getElementById('cv-nn');
+            // Set BOTH canvases to exactly the same pixel dimensions
+            cvH.width = pw; cvH.height = ph;
+            cvNN.width = pw; cvNN.height = ph;
+            // Force CSS to match so browser never scales
+            cvH.style.width = pw + 'px'; cvH.style.height = ph + 'px';
+            cvNN.style.width = pw + 'px'; cvNN.style.height = ph + 'px';
+        }
+
+        function drawBoard(cv, game) {
+            const ctx = cv.getContext('2d');
+            ctx.clearRect(0, 0, cv.width, cv.height);
+            ctx.fillStyle = '#0d0d24';
+            ctx.fillRect(0, 0, cv.width, cv.height);
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            for (let r = 0; r <= game.h; r++) {
+                const y = r * (CELL + GAP);
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cv.width, y); ctx.stroke();
+            }
+            for (let c = 0; c <= game.w; c++) {
+                const x = c * (CELL + GAP);
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, cv.height); ctx.stroke();
+            }
+
+            // Blocks
+            for (let r = 0; r < game.h; r++) {
+                for (let c = 0; c < game.w; c++) {
+                    if (game.board[r][c]) {
+                        const x = c * (CELL + GAP) + GAP;
+                        const y = r * (CELL + GAP) + GAP;
+                        ctx.fillStyle = COLORS[game.board[r][c]];
+                        ctx.fillRect(x, y, CELL, CELL);
+                        // Highlight
+                        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                        ctx.fillRect(x, y, CELL, 2);
+                        ctx.fillRect(x, y, 2, CELL);
+                        // Shadow
+                        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                        ctx.fillRect(x, y + CELL - 2, CELL, 2);
+                        ctx.fillRect(x + CELL - 2, y, 2, CELL);
+                    }
+                }
+            }
+        }
+
+        function drawNNVis(nn) {
+            const cv = document.getElementById('cv-nn-vis');
+            const ctx = cv.getContext('2d');
+            ctx.fillStyle = '#0d0d24';
+            ctx.fillRect(0, 0, cv.width, cv.height);
+            const cw = Math.max(1, Math.floor(cv.width / nn.nIn));
+            const ch = Math.max(1, Math.floor(cv.height / nn.nHid));
+            for (let i = 0; i < nn.nHid; i++) {
+                for (let j = 0; j < nn.nIn; j++) {
+                    const v = Math.tanh(nn.W1[i][j] * 3);
+                    const red = v > 0 ? 0 : Math.floor(-v * 200);
+                    const grn = v > 0 ? Math.floor(v * 200) : 0;
+                    const blu = Math.floor(Math.abs(v) * 100);
+                    ctx.fillStyle = `rgb(${red},${grn},${blu + 50})`;
+                    ctx.fillRect(j * cw, i * ch, cw - 1, ch - 1);
+                }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════
+        let level = 1;
+        let running = false;
+        let loopId = null;
+        let gameH = null, gameNN = null;
+        let agent = null;
+        let hStats = { ep: 0, best: 0, recent: [], totalLines: 0 };
+        let nnTotalLines = 0;
+        let winsH = 0, winsNN = 0, ties = 0;
+
+        // ═══════════════════════════════════════════════════════════
+        // GAME MANAGEMENT
+        // ═══════════════════════════════════════════════════════════
+        function newGames() {
+            const seed = Math.random();
+            gameH = new Game(level, seed);
+            gameNN = new Game(level, seed);
+            // Both games MUST have identical dimensions
+            console.assert(gameH.w === gameNN.w && gameH.h === gameNN.h,
+                `Board size mismatch: H=${gameH.w}x${gameH.h} NN=${gameNN.w}x${gameNN.h}`);
+            sizeCanvases(gameH.w, gameH.h);
+            if (!agent) agent = new NNAgent();
+            document.getElementById('nn-params').textContent = agent.net.nParams + ' params';
+        }
+
+        function resetAll() {
+            running = false;
+            if (loopId) clearInterval(loopId);
+            loopId = null;
+            hStats = { ep: 0, best: 0, recent: [], totalLines: 0 };
+            nnTotalLines = 0;
+            winsH = 0; winsNN = 0; ties = 0;
+            agent = null;
+            level = parseInt(document.getElementById('sel-level').value);
+            newGames();
+            render();
+            updateStats();
+            document.getElementById('btn-start').textContent = '▶ Start';
+            document.getElementById('btn-start').className = 'btn go';
+        }
+
+        function startLoop(ms) {
+            if (loopId) clearInterval(loopId);
+            loopId = setInterval(tick, ms);
+        }
+
+        function toggleRun() {
+            if (running) {
+                running = false;
+                if (loopId) clearInterval(loopId);
+                loopId = null;
+                document.getElementById('btn-start').textContent = '▶ Start';
+                document.getElementById('btn-start').className = 'btn go';
+            } else {
+                running = true;
+                level = parseInt(document.getElementById('sel-level').value);
+                if (!gameH || gameH.over) newGames();
+                startLoop(parseInt(document.getElementById('spd').value));
+                document.getElementById('btn-start').textContent = '⏸ Pause';
+                document.getElementById('btn-start').className = 'btn';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // MAIN TICK — both players take one turn
+        // ═══════════════════════════════════════════════════════════
+        function tick() {
+            if (!running) return;
+
+            // Heuristic turn
+            if (!gameH.over) {
+                const p = heuristicPick(gameH);
+                if (p) gameH.execute(p);
+                else gameH.over = true;
+            }
+
+            // NN turn
+            if (!gameNN.over) {
+                const fBefore = boardFeatures(gameNN.board, gameNN.w, gameNN.h);
+                const p = agent.selectPlacement(gameNN);
+                if (p) {
+                    const cleared = gameNN.execute(p);
+                    const fAfter = boardFeatures(gameNN.board, gameNN.w, gameNN.h);
+                    const reward = 0.76 * cleared
+                        - 0.51 * (fAfter.aggH - fBefore.aggH)
+                        - 0.36 * (fAfter.holes - fBefore.holes)
+                        - 0.18 * (fAfter.bump - fBefore.bump);
+                    agent.recordStep(gameNN, p, reward);
+                } else {
+                    gameNN.over = true;
+                }
+            }
+
+            render();
+
+            // Both dead → score round, restart both together
+            if (gameH.over && gameNN.over) {
+                // Record heuristic
+                hStats.ep++;
+                hStats.recent.push(gameH.lines);
+                if (hStats.recent.length > 20) hStats.recent.shift();
+                if (gameH.lines > hStats.best) hStats.best = gameH.lines;
+                hStats.totalLines += gameH.lines;
+
+                // Record NN
+                agent.endEpisode(gameNN.lines);
+                nnTotalLines += gameNN.lines;
+
+                // Winner
+                if (gameH.lines > gameNN.lines) winsH++;
+                else if (gameNN.lines > gameH.lines) winsNN++;
+                else ties++;
+
+                updateStats();
+                newGames();
+            }
+
+            updateStats();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // UI UPDATES
+        // ═══════════════════════════════════════════════════════════
+        function render() {
+            if (gameH) drawBoard(document.getElementById('cv-h'), gameH);
+            if (gameNN) drawBoard(document.getElementById('cv-nn'), gameNN);
+            if (agent) drawNNVis(agent.net);
+        }
+
+        function updateStats() {
+            const hAvg = hStats.recent.length > 0
+                ? (hStats.recent.reduce((a, b) => a + b, 0) / hStats.recent.length) : 0;
+
+            // Heuristic
+            document.getElementById('s-h-lines').textContent = gameH ? gameH.lines : 0;
+            document.getElementById('s-h-pieces').textContent = gameH ? gameH.placed : 0;
+            document.getElementById('s-h-ep').textContent = hStats.ep;
+            document.getElementById('s-h-avg').textContent = hAvg.toFixed(1);
+            document.getElementById('s-h-best').textContent = hStats.best;
+
+            // NN
+            if (agent) {
+                document.getElementById('s-nn-lines').textContent = gameNN ? gameNN.lines : 0;
+                document.getElementById('s-nn-pieces').textContent = gameNN ? gameNN.placed : 0;
+                document.getElementById('s-nn-ep').textContent = agent.episode;
+                document.getElementById('s-nn-avg').textContent = agent.avgLines().toFixed(1);
+                document.getElementById('s-nn-best').textContent = agent.bestLines;
+                document.getElementById('s-nn-eps').textContent = agent.epsilon.toFixed(3);
+                document.getElementById('s-nn-loss').textContent = agent.net.avgLoss().toFixed(2);
+                document.getElementById('s-nn-upd').textContent = agent.net.updates;
+            }
+
+            // Scoreboard
+            document.getElementById('wins-h').textContent = winsH;
+            document.getElementById('wins-nn').textContent = winsNN;
+            document.getElementById('wins-tie').textContent = ties;
+            document.getElementById('total-h').textContent = hStats.totalLines;
+            document.getElementById('total-nn').textContent = nnTotalLines;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // EVENT HANDLERS
+        // ═══════════════════════════════════════════════════════════
+        document.getElementById('btn-start').addEventListener('click', toggleRun);
+        document.getElementById('btn-reset').addEventListener('click', resetAll);
+
+        document.getElementById('spd').addEventListener('input', e => {
+            document.getElementById('spd-val').textContent = e.target.value;
+            if (running) startLoop(parseInt(e.target.value));
+        });
+
+        document.getElementById('sel-level').addEventListener('change', () => {
+            if (!running) resetAll();
+        });
+
+        // Init
+        newGames();
+        render();
+        updateStats();
+    </script>
+</body>
+
+</html>

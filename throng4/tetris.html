@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throng4 Tetris — Curriculum Trainer</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3e;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #a855f7;
+            --accent-pink: #f472b6;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --accent-red: #ef4444;
+            --accent-yellow: #fbbf24;
+            --text-primary: #e2e8f0;
+            --text-dim: #64748b;
+            --border: #2d2d5e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(244, 114, 182, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .mode-btn {
+            padding: 10px 24px;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-dim);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.15));
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .game-layout {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            min-width: 200px;
+        }
+
+        .panel h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-purple);
+            margin-bottom: 12px;
+        }
+
+        .game-container {
+            position: relative;
+        }
+
+        .game-board {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.05), inset 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--accent-cyan);
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .level-btn {
+            width: 38px;
+            height: 38px;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-btn:hover {
+            border-color: var(--accent-purple);
+            color: var(--text-primary);
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            border-color: var(--accent-purple);
+            color: white;
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+        }
+
+        .level-name {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .next-piece-canvas {
+            width: 100%;
+            height: 80px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .controls {
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .key {
+            display: inline-block;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .speed-control label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .speed-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .game-over.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-over h2 {
+            font-size: 2rem;
+            color: var(--accent-pink);
+            margin-bottom: 8px;
+        }
+
+        .game-over p {
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .restart-btn {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .heuristic-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .heuristic-bar .bar-bg {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .heuristic-bar .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 900px) {
+            .game-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .panel {
+                min-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧩 Throng4 Tetris</h1>
+            <p>Curriculum-based learning — Watch the AI learn or play yourself</p>
+        </div>
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('human')" id="btn-human">🎮 Play</button>
+            <button class="mode-btn" onclick="setMode('ai')" id="btn-ai">🤖 Watch AI Learn</button>
+        </div>
+        <div class="game-layout">
+            <!-- Left Panel -->
+            <div class="panel" style="width: 210px;">
+                <h3>Curriculum Level</h3>
+                <div class="level-grid" id="level-grid"></div>
+                <div class="level-name" id="level-name">I-block, no rotation</div>
+                <h3 style="margin-top: 20px;">Next Piece</h3>
+                <canvas class="next-piece-canvas" id="next-canvas" width="160" height="80"></canvas>
+                <h3 style="margin-top: 20px;">Controls</h3>
+                <div class="controls">
+                    <span class="key">←</span> <span class="key">→</span> Move<br>
+                    <span class="key">↑</span> Rotate<br>
+                    <span class="key">↓</span> Soft drop<br>
+                    <span class="key">Space</span> Hard drop<br>
+                    <span class="key">R</span> Restart
+                </div>
+            </div>
+            <!-- Game Board -->
+            <div class="game-container">
+                <div class="game-board">
+                    <canvas id="game-canvas"></canvas>
+                </div>
+                <div class="game-over" id="game-over">
+                    <h2>Game Over</h2>
+                    <p id="game-over-msg">Lines cleared: 0</p>
+                    <button class="restart-btn" onclick="startGame()">Play Again</button>
+                </div>
+            </div>
+            <!-- Right Panel -->
+            <div class="panel" style="width: 230px;">
+                <h3>Score</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Lines</span>
+                    <span class="stat-value" id="stat-lines">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Pieces</span>
+                    <span class="stat-value" id="stat-pieces">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="stat-score">0</span>
+                </div>
+
+                <h3 style="margin-top:16px;">Board Heuristics</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Agg Height</span>
+                    <span class="stat-value" id="stat-height">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Holes</span>
+                    <span class="stat-value" id="stat-holes">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Bumpiness</span>
+                    <span class="stat-value" id="stat-bump">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Heuristic</span>
+                    <span class="stat-value" id="stat-heuristic" style="color:var(--accent-green)">0.00</span>
+                </div>
+
+                <div id="ai-panel" style="display: none;">
+                    <h3 style="margin-top:20px;">AI Training</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Episode</span>
+                        <span class="stat-value" id="ai-episode">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Epsilon (ε)</span>
+                        <span class="stat-value" id="ai-epsilon">0.30</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Best Lines</span>
+                        <span class="stat-value" id="ai-best">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Avg Lines (20)</span>
+                        <span class="stat-value" id="ai-avg">0.0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Avg Reward</span>
+                        <span class="stat-value" id="ai-reward" style="color:var(--accent-green)">0.0</span>
+                    </div>
+                    <div class="speed-control">
+                        <label>Speed</label>
+                        <input type="range" class="speed-slider" id="speed-slider" min="1" max="100" value="30">
+                        <span class="stat-value" id="speed-val" style="font-size:0.75rem">30</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // TETROMINO DATA
+        // ═══════════════════════════════════════════════════════════════
+
+        const TETROMINOES = {
+            I: [
+                [[0, 0], [0, 1], [0, 2], [0, 3]],
+                [[0, 0], [1, 0], [2, 0], [3, 0]],
+                [[0, 0], [0, 1], [0, 2], [0, 3]],
+                [[0, 0], [1, 0], [2, 0], [3, 0]],
+            ],
+            O: [
+                [[0, 0], [0, 1], [1, 0], [1, 1]],
+                [[0, 0], [0, 1], [1, 0], [1, 1]],
+                [[0, 0], [0, 1], [1, 0], [1, 1]],
+                [[0, 0], [0, 1], [1, 0], [1, 1]],
+            ],
+            T: [
+                [[0, 0], [0, 1], [0, 2], [1, 1]],
+                [[0, 0], [1, 0], [2, 0], [1, 1]],
+                [[1, 0], [1, 1], [1, 2], [0, 1]],
+                [[0, 1], [1, 0], [1, 1], [2, 1]],
+            ],
+            S: [
+                [[0, 1], [0, 2], [1, 0], [1, 1]],
+                [[0, 0], [1, 0], [1, 1], [2, 1]],
+                [[0, 1], [0, 2], [1, 0], [1, 1]],
+                [[0, 0], [1, 0], [1, 1], [2, 1]],
+            ],
+            Z: [
+                [[0, 0], [0, 1], [1, 1], [1, 2]],
+                [[0, 1], [1, 0], [1, 1], [2, 0]],
+                [[0, 0], [0, 1], [1, 1], [1, 2]],
+                [[0, 1], [1, 0], [1, 1], [2, 0]],
+            ],
+            L: [
+                [[0, 0], [0, 1], [0, 2], [1, 0]],
+                [[0, 0], [1, 0], [2, 0], [2, 1]],
+                [[0, 2], [1, 0], [1, 1], [1, 2]],
+                [[0, 0], [0, 1], [1, 1], [2, 1]],
+            ],
+            J: [
+                [[0, 0], [0, 1], [0, 2], [1, 2]],
+                [[0, 0], [0, 1], [1, 0], [2, 0]],
+                [[0, 0], [1, 0], [1, 1], [1, 2]],
+                [[0, 1], [1, 1], [2, 0], [2, 1]],
+            ],
+        };
+
+        const PIECE_COLORS = {
+            I: '#00f0ff', O: '#fbbf24', T: '#a855f7',
+            S: '#34d399', Z: '#ef4444', L: '#fb923c', J: '#6366f1',
+        };
+
+        const LEVELS = {
+            1: { name: 'O-block only', pieces: ['O'], rotations: 1, width: 6, height: 10 },
+            2: { name: 'O + I blocks', pieces: ['O', 'I'], rotations: 2, width: 6, height: 12 },
+            3: { name: 'O + I + T blocks', pieces: ['O', 'I', 'T'], rotations: 4, width: 6, height: 12 },
+            4: { name: '+ S, Z blocks', pieces: ['O', 'I', 'T', 'S', 'Z'], rotations: 4, width: 8, height: 14 },
+            5: { name: 'All blocks, 8-wide', pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J'], rotations: 4, width: 8, height: 16 },
+            6: { name: 'All blocks, 10-wide', pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J'], rotations: 4, width: 10, height: 18 },
+            7: { name: 'Standard Tetris', pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J'], rotations: 4, width: 10, height: 20 },
+        };
+
+        const CELL_SIZE = 26;
+        const CELL_GAP = 1;
+
+        // Dellacherie heuristic weights
+        const HEURISTIC = { lines: 0.76, aggHeight: -0.51, holes: -0.36, bumpiness: -0.18 };
+
+        let currentMode = 'human';
+        let currentLevel = 1;
+        let game = null;
+        let aiLoop = null;
+        let gravityTimer = null;
+
+        // ═══════════════════════════════════════════════════════════════
+        // TETRIS GAME — All levels use gravity (pieces drop)
+        // ═══════════════════════════════════════════════════════════════
+
+        class TetrisGame {
+            constructor(level) {
+                const config = LEVELS[level];
+                this.level = level;
+                this.config = config;
+                this.width = config.width;
+                this.height = config.height;
+                this.board = Array.from({ length: this.height }, () => Array(this.width).fill(null));
+                this.score = 0;
+                this.linesCleared = 0;
+                this.piecesPlaced = 0;
+                this.gameOver = false;
+                this.currentPiece = null;
+                this.currentRotation = 0;
+                this.pieceRow = 0;
+                this.pieceCol = 0;
+                this.nextPiece = this.randomPiece();
+                this.spawnPiece();
+            }
+
+            randomPiece() {
+                const p = this.config.pieces;
+                return p[Math.floor(Math.random() * p.length)];
+            }
+
+            spawnPiece() {
+                this.currentPiece = this.nextPiece;
+                this.nextPiece = this.randomPiece();
+                this.currentRotation = 0;
+                this.pieceRow = 0;
+                // Find a valid spawn column, starting from center
+                const center = Math.floor(this.width / 2) - 1;
+                this.pieceCol = center;
+                if (!this.canPlace(0, center, 0)) {
+                    // Search outward for valid column
+                    let found = false;
+                    for (let offset = 0; offset <= this.width; offset++) {
+                        for (const col of [center - offset, center + offset]) {
+                            if (col >= -2 && col < this.width + 2 && this.canPlace(0, col, 0)) {
+                                this.pieceCol = col;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                    if (!found) this.gameOver = true;
+                }
+            }
+
+            getCells(piece, rotation) {
+                return TETROMINOES[piece][rotation % TETROMINOES[piece].length];
+            }
+
+            canPlace(row, col, rotation) {
+                const cells = this.getCells(this.currentPiece, rotation);
+                for (const [dr, dc] of cells) {
+                    const r = row + dr, c = col + dc;
+                    if (r < 0 || r >= this.height || c < 0 || c >= this.width) return false;
+                    if (this.board[r][c] !== null) return false;
+                }
+                return true;
+            }
+
+            canPlacePiece(piece, row, col, rotation) {
+                const cells = this.getCells(piece, rotation);
+                for (const [dr, dc] of cells) {
+                    const r = row + dr, c = col + dc;
+                    if (r < 0 || r >= this.height || c < 0 || c >= this.width) return false;
+                    if (this.board[r][c] !== null) return false;
+                }
+                return true;
+            }
+
+            moveLeft() { if (!this.gameOver && this.canPlace(this.pieceRow, this.pieceCol - 1, this.currentRotation)) { this.pieceCol--; return true; } return false; }
+            moveRight() { if (!this.gameOver && this.canPlace(this.pieceRow, this.pieceCol + 1, this.currentRotation)) { this.pieceCol++; return true; } return false; }
+
+            rotate() {
+                if (this.gameOver) return false;
+                const newRot = (this.currentRotation + 1) % this.config.rotations;
+                // Try direct rotation
+                if (this.canPlace(this.pieceRow, this.pieceCol, newRot)) {
+                    this.currentRotation = newRot; return true;
+                }
+                // Wall kick: try shifting left/right
+                if (this.canPlace(this.pieceRow, this.pieceCol - 1, newRot)) {
+                    this.pieceCol--; this.currentRotation = newRot; return true;
+                }
+                if (this.canPlace(this.pieceRow, this.pieceCol + 1, newRot)) {
+                    this.pieceCol++; this.currentRotation = newRot; return true;
+                }
+                return false;
+            }
+
+            softDrop() {
+                if (this.gameOver) return false;
+                if (this.canPlace(this.pieceRow + 1, this.pieceCol, this.currentRotation)) {
+                    this.pieceRow++; return true;
+                }
+                return false;
+            }
+
+            // Hard drop: ALWAYS drops to the lowest valid row, then places
+            hardDrop() {
+                if (this.gameOver) return -1;
+                // Drop to bottom
+                while (this.canPlace(this.pieceRow + 1, this.pieceCol, this.currentRotation)) {
+                    this.pieceRow++;
+                }
+                return this.placePiece();
+            }
+
+            // Place the current piece at its current position
+            placePiece() {
+                const cells = this.getCells(this.currentPiece, this.currentRotation);
+                for (const [dr, dc] of cells) {
+                    const r = this.pieceRow + dr, c = this.pieceCol + dc;
+                    if (r >= 0 && r < this.height && c >= 0 && c < this.width) {
+                        this.board[r][c] = this.currentPiece;
+                    }
+                }
+                this.piecesPlaced++;
+                this.score += 10;
+
+                const cleared = this.clearLines();
+                if (cleared > 0) {
+                    this.linesCleared += cleared;
+                    this.score += cleared * cleared * 100;
+                }
+
+                // Game over if top 2 rows have blocks
+                if (this.board[0].some(c => c !== null) || this.board[1].some(c => c !== null)) {
+                    this.gameOver = true;
+                    return cleared;
+                }
+                this.spawnPiece();
+                return cleared;
+            }
+
+            clearLines() {
+                let cleared = 0;
+                for (let r = this.height - 1; r >= 0; r--) {
+                    if (this.board[r].every(c => c !== null)) {
+                        this.board.splice(r, 1);
+                        this.board.unshift(Array(this.width).fill(null));
+                        cleared++;
+                        r++;
+                    }
+                }
+                return cleared;
+            }
+
+            getGhostRow() {
+                let row = this.pieceRow;
+                while (this.canPlace(row + 1, this.pieceCol, this.currentRotation)) row++;
+                return row;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // BOARD HEURISTICS (Dellacherie)
+        // ═══════════════════════════════════════════════════════════════
+
+        function computeColumnHeights(board, width, height) {
+            const heights = new Array(width).fill(0);
+            for (let c = 0; c < width; c++) {
+                for (let r = 0; r < height; r++) {
+                    if (board[r][c] !== null) { heights[c] = height - r; break; }
+                }
+            }
+            return heights;
+        }
+
+        function computeHeuristics(board, width, height) {
+            const heights = computeColumnHeights(board, width, height);
+
+            // Aggregate height
+            const aggHeight = heights.reduce((a, b) => a + b, 0);
+
+            // Holes: empty cells with a filled cell above
+            let holes = 0;
+            for (let c = 0; c < width; c++) {
+                let foundBlock = false;
+                for (let r = 0; r < height; r++) {
+                    if (board[r][c] !== null) foundBlock = true;
+                    else if (foundBlock) holes++;
+                }
+            }
+
+            // Bumpiness: sum of absolute differences of adjacent column heights
+            let bumpiness = 0;
+            for (let c = 0; c < width - 1; c++) {
+                bumpiness += Math.abs(heights[c] - heights[c + 1]);
+            }
+
+            return { aggHeight, holes, bumpiness };
+        }
+
+        function computeReward(linesBefore, linesAfter, boardBefore, boardAfter, width, height) {
+            const cleared = linesAfter - linesBefore;
+            const hBefore = computeHeuristics(boardBefore, width, height);
+            const hAfter = computeHeuristics(boardAfter, width, height);
+
+            return HEURISTIC.lines * cleared
+                + HEURISTIC.aggHeight * (hAfter.aggHeight - hBefore.aggHeight)
+                + HEURISTIC.holes * (hAfter.holes - hBefore.holes)
+                + HEURISTIC.bumpiness * (hAfter.bumpiness - hBefore.bumpiness);
+        }
+
+        function boardScore(board, width, height, linesCleared) {
+            const h = computeHeuristics(board, width, height);
+            return HEURISTIC.lines * linesCleared
+                + HEURISTIC.aggHeight * h.aggHeight
+                + HEURISTIC.holes * h.holes
+                + HEURISTIC.bumpiness * h.bumpiness;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // AI — Placement-based action space with Dellacherie heuristics
+        // ═══════════════════════════════════════════════════════════════
+
+        class PlacementAI {
+            constructor() {
+                this.episode = 0;
+                this.epsilon = 0.30;    // Exploration rate
+                this.bestLines = 0;
+                this.recentLines = [];
+                this.recentRewards = [];
+                // Learnable weights (start at Dellacherie, evolve)
+                this.weights = { ...HEURISTIC };
+            }
+
+            // Enumerate all valid placements for current piece
+            enumeratePlacements(game) {
+                const placements = [];
+                const piece = game.currentPiece;
+
+                for (let rot = 0; rot < game.config.rotations; rot++) {
+                    const cells = game.getCells(piece, rot);
+                    const minC = Math.min(...cells.map(([r, c]) => c));
+                    const maxC = Math.max(...cells.map(([r, c]) => c));
+
+                    for (let col = -minC; col < game.width - maxC; col++) {
+                        // Find drop row
+                        let row = 0;
+                        while (game.canPlacePiece(piece, row + 1, col, rot)) row++;
+
+                        // Verify it's a valid placement
+                        if (game.canPlacePiece(piece, row, col, rot)) {
+                            placements.push({ rotation: rot, col, row });
+                        }
+                    }
+                }
+                return placements;
+            }
+
+            // Score a placement using heuristic weights
+            scorePlacement(game, placement) {
+                const { rotation, col, row } = placement;
+
+                // Simulate placement on a copy of the board
+                const tempBoard = game.board.map(r => [...r]);
+                const cells = game.getCells(game.currentPiece, rotation);
+
+                for (const [dr, dc] of cells) {
+                    const r = row + dr, c = col + dc;
+                    if (r >= 0 && r < game.height && c >= 0 && c < game.width) {
+                        tempBoard[r][c] = game.currentPiece;
+                    }
+                }
+
+                // Count cleared lines
+                let cleared = 0;
+                for (let r = game.height - 1; r >= 0; r--) {
+                    if (tempBoard[r].every(c => c !== null)) {
+                        tempBoard.splice(r, 1);
+                        tempBoard.unshift(Array(game.width).fill(null));
+                        cleared++;
+                        r++;
+                    }
+                }
+
+                // Compute heuristic score
+                const h = computeHeuristics(tempBoard, game.width, game.height);
+                return this.weights.lines * cleared
+                    + this.weights.aggHeight * h.aggHeight
+                    + this.weights.holes * h.holes
+                    + this.weights.bumpiness * h.bumpiness;
+            }
+
+            // Select best placement (or random for exploration)
+            selectPlacement(game) {
+                const placements = this.enumeratePlacements(game);
+                if (placements.length === 0) return null;
+
+                if (Math.random() < this.epsilon) {
+                    // Random placement for exploration
+                    return placements[Math.floor(Math.random() * placements.length)];
+                }
+
+                // Greedy: pick best scoring placement
+                let best = placements[0];
+                let bestScore = -Infinity;
+                for (const p of placements) {
+                    const s = this.scorePlacement(game, p);
+                    if (s > bestScore) { bestScore = s; best = p; }
+                }
+                return best;
+            }
+
+            // Execute a placement: set rotation + column, then hard drop
+            executePlacement(game, placement) {
+                if (!placement) return;
+                game.currentRotation = placement.rotation;
+                game.pieceCol = placement.col;
+                game.hardDrop();
+            }
+
+            endEpisode(lines, totalReward) {
+                this.episode++;
+                this.recentLines.push(lines);
+                this.recentRewards.push(totalReward);
+                if (this.recentLines.length > 20) this.recentLines.shift();
+                if (this.recentRewards.length > 20) this.recentRewards.shift();
+                if (lines > this.bestLines) this.bestLines = lines;
+                this.epsilon = Math.max(0.02, this.epsilon * 0.993);
+            }
+
+            getAvgLines() {
+                if (this.recentLines.length === 0) return 0;
+                return this.recentLines.reduce((a, b) => a + b, 0) / this.recentLines.length;
+            }
+
+            getAvgReward() {
+                if (this.recentRewards.length === 0) return 0;
+                return this.recentRewards.reduce((a, b) => a + b, 0) / this.recentRewards.length;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // RENDERING
+        // ═══════════════════════════════════════════════════════════════
+
+        function resizeCanvas() {
+            const canvas = document.getElementById('game-canvas');
+            if (!game) return;
+            canvas.width = game.width * (CELL_SIZE + CELL_GAP) + CELL_GAP;
+            canvas.height = game.height * (CELL_SIZE + CELL_GAP) + CELL_GAP;
+        }
+
+        function drawBlock(ctx, row, col, color, alpha) {
+            const x = col * (CELL_SIZE + CELL_GAP) + CELL_GAP;
+            const y = row * (CELL_SIZE + CELL_GAP) + CELL_GAP;
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+            ctx.fillStyle = 'rgba(255,255,255,0.18)';
+            ctx.fillRect(x, y, CELL_SIZE, 2);
+            ctx.fillRect(x, y, 2, CELL_SIZE);
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+            ctx.fillRect(x, y + CELL_SIZE - 2, CELL_SIZE, 2);
+            ctx.fillRect(x + CELL_SIZE - 2, y, 2, CELL_SIZE);
+            ctx.globalAlpha = 1.0;
+        }
+
+        function render() {
+            if (!game) return;
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = '#0d0d24';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            for (let r = 0; r <= game.height; r++) {
+                const y = r * (CELL_SIZE + CELL_GAP);
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+            for (let c = 0; c <= game.width; c++) {
+                const x = c * (CELL_SIZE + CELL_GAP);
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+
+            // Placed blocks
+            for (let r = 0; r < game.height; r++) {
+                for (let c = 0; c < game.width; c++) {
+                    if (game.board[r][c]) drawBlock(ctx, r, c, PIECE_COLORS[game.board[r][c]], 1.0);
+                }
+            }
+
+            // Ghost piece
+            if (!game.gameOver && game.currentPiece) {
+                const ghostRow = game.getGhostRow();
+                if (ghostRow !== game.pieceRow) {
+                    const cells = game.getCells(game.currentPiece, game.currentRotation);
+                    for (const [dr, dc] of cells) {
+                        const r = ghostRow + dr, c = game.pieceCol + dc;
+                        if (r >= 0 && r < game.height && c >= 0 && c < game.width) {
+                            drawBlock(ctx, r, c, PIECE_COLORS[game.currentPiece], 0.15);
+                        }
+                    }
+                }
+            }
+
+            // Current piece
+            if (!game.gameOver && game.currentPiece) {
+                const cells = game.getCells(game.currentPiece, game.currentRotation);
+                for (const [dr, dc] of cells) {
+                    const r = game.pieceRow + dr, c = game.pieceCol + dc;
+                    if (r >= 0 && r < game.height && c >= 0 && c < game.width) {
+                        drawBlock(ctx, r, c, PIECE_COLORS[game.currentPiece], 1.0);
+                    }
+                }
+            }
+
+            // Stats
+            document.getElementById('stat-lines').textContent = game.linesCleared;
+            document.getElementById('stat-pieces').textContent = game.piecesPlaced;
+            document.getElementById('stat-score').textContent = game.score;
+
+            // Board heuristics
+            const h = computeHeuristics(game.board, game.width, game.height);
+            document.getElementById('stat-height').textContent = h.aggHeight;
+            document.getElementById('stat-holes').textContent = h.holes;
+            document.getElementById('stat-bump').textContent = h.bumpiness;
+            const hScore = boardScore(game.board, game.width, game.height, game.linesCleared);
+            document.getElementById('stat-heuristic').textContent = hScore.toFixed(2);
+
+            // Next piece
+            renderNextPiece();
+
+            // Game over overlay
+            const overlay = document.getElementById('game-over');
+            if (game.gameOver) {
+                overlay.classList.add('visible');
+                document.getElementById('game-over-msg').textContent =
+                    `Lines: ${game.linesCleared} | Score: ${game.score} | Pieces: ${game.piecesPlaced}`;
+            } else {
+                overlay.classList.remove('visible');
+            }
+        }
+
+        function renderNextPiece() {
+            const canvas = document.getElementById('next-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0d0d24';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (!game || !game.nextPiece) return;
+            const cells = game.getCells(game.nextPiece, 0);
+            const color = PIECE_COLORS[game.nextPiece];
+            const minC = Math.min(...cells.map(([r, c]) => c));
+            const maxC = Math.max(...cells.map(([r, c]) => c));
+            const minR = Math.min(...cells.map(([r, c]) => r));
+            const maxR = Math.max(...cells.map(([r, c]) => r));
+            const pw = maxC - minC + 1, ph = maxR - minR + 1;
+            const sz = 18;
+            const ox = (canvas.width - pw * sz) / 2 - minC * sz;
+            const oy = (canvas.height - ph * sz) / 2 - minR * sz;
+            for (const [dr, dc] of cells) {
+                ctx.fillStyle = color;
+                ctx.fillRect(ox + dc * sz, oy + dr * sz, sz - 1, sz - 1);
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.fillRect(ox + dc * sz, oy + dr * sz, sz - 1, 2);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // GAME CONTROLS
+        // ═══════════════════════════════════════════════════════════════
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${mode}`).classList.add('active');
+            document.getElementById('ai-panel').style.display = mode === 'ai' ? 'block' : 'none';
+            stopAI();
+            startGame();
+            if (mode === 'ai') startAI();
+        }
+
+        function setLevel(level) {
+            currentLevel = level;
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.level-btn[data-level="${level}"]`).classList.add('active');
+            document.getElementById('level-name').textContent = LEVELS[level].name;
+            stopAI();
+            startGame();
+            if (currentMode === 'ai') startAI();
+        }
+
+        function startGame() {
+            if (gravityTimer) { clearInterval(gravityTimer); gravityTimer = null; }
+            game = new TetrisGame(currentLevel);
+            resizeCanvas();
+            render();
+            // Gravity timer: piece falls every 600ms
+            gravityTimer = setInterval(() => {
+                if (!game || game.gameOver || currentMode === 'ai') return;
+                if (!game.softDrop()) {
+                    game.placePiece();
+                }
+                render();
+            }, 600);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (currentMode !== 'human' || !game || game.gameOver) {
+                if (e.key === 'r' || e.key === 'R') { startGame(); return; }
+                return;
+            }
+            let handled = true;
+            switch (e.key) {
+                case 'ArrowLeft': game.moveLeft(); break;
+                case 'ArrowRight': game.moveRight(); break;
+                case 'ArrowUp': game.rotate(); break;
+                case 'ArrowDown': game.softDrop(); break;
+                case ' ': game.hardDrop(); break;
+                case 'r': case 'R': startGame(); return;
+                default: handled = false;
+            }
+            if (handled) { e.preventDefault(); render(); }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // AI TRAINING LOOP — Placement-based
+        // ═══════════════════════════════════════════════════════════════
+
+        let ai = new PlacementAI();
+
+        function startAI() {
+            stopAI();
+            ai = new PlacementAI();
+            game = new TetrisGame(currentLevel);
+            resizeCanvas();
+            render();
+            const speed = parseInt(document.getElementById('speed-slider').value);
+            runAIStep(speed);
+        }
+
+        function stopAI() {
+            if (aiLoop) { clearInterval(aiLoop); aiLoop = null; }
+        }
+
+        function runAIStep(speed) {
+            stopAI();
+            const delay = Math.max(5, Math.round(1000 / speed));
+            let totalReward = 0;
+
+            aiLoop = setInterval(() => {
+                if (!game) return;
+
+                if (game.gameOver) {
+                    ai.endEpisode(game.linesCleared, totalReward);
+                    updateAIStats();
+                    game = new TetrisGame(currentLevel);
+                    resizeCanvas();
+                    totalReward = 0;
+                    render();
+                    return;
+                }
+
+                // Snapshot board before placement
+                const boardBefore = game.board.map(r => [...r]);
+                const linesBefore = game.linesCleared;
+
+                // AI selects and executes best placement
+                const placement = ai.selectPlacement(game);
+                if (placement) {
+                    ai.executePlacement(game, placement);
+                } else {
+                    game.gameOver = true;
+                }
+
+                // Compute heuristic reward
+                const reward = computeReward(linesBefore, game.linesCleared,
+                    boardBefore, game.board, game.width, game.height);
+                totalReward += reward;
+
+                render();
+            }, delay);
+        }
+
+        function updateAIStats() {
+            document.getElementById('ai-episode').textContent = ai.episode;
+            document.getElementById('ai-epsilon').textContent = ai.epsilon.toFixed(3);
+            document.getElementById('ai-best').textContent = ai.bestLines;
+            document.getElementById('ai-avg').textContent = ai.getAvgLines().toFixed(1);
+            document.getElementById('ai-reward').textContent = ai.getAvgReward().toFixed(2);
+        }
+
+        document.getElementById('speed-slider').addEventListener('input', (e) => {
+            const speed = parseInt(e.target.value);
+            document.getElementById('speed-val').textContent = speed;
+            if (currentMode === 'ai' && aiLoop) runAIStep(speed);
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════════
+
+        function init() {
+            const grid = document.getElementById('level-grid');
+            for (let i = 1; i <= 7; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'level-btn' + (i === 1 ? ' active' : '');
+                btn.dataset.level = i;
+                btn.textContent = i;
+                btn.onclick = () => setLevel(i);
+                grid.appendChild(btn);
+            }
+            startGame();
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
