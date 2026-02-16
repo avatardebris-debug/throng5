@@ -23,6 +23,9 @@ from throng4.meta_policy.env_fingerprint import (
 )
 from throng4.meta_policy.policy_tree import PolicyTree, PolicyNode
 from throng4.meta_policy.blind_concepts import BlindConceptLibrary, DiscoveredConcept
+from throng4.meta_policy.visual_patterns import VisualPatternExtractor, VisualPatterns
+from throng4.meta_policy.causal_discovery import CausalDiscovery, ActionEffect
+from throng4.meta_policy.hypothesis_executor import HypothesisExecutor, ExecutableStrategy
 from throng4.metastack_pipeline import MetaStackPipeline
 
 
@@ -59,10 +62,17 @@ class MetaPolicyController:
         self.policy_tree = PolicyTree()
         self.concept_library = BlindConceptLibrary()
         
+        # Hypothesis testing components
+        self.visual_extractor = VisualPatternExtractor()
+        self.causal_discovery = CausalDiscovery()
+        self.hypothesis_executor = HypothesisExecutor()
+        
         # Current state
         self.current_policy: Optional[PolicyNode] = None
         self.current_fingerprint: Optional[EnvironmentFingerprint] = None
         self.current_pipeline: Optional[MetaStackPipeline] = None
+        self.current_visual_patterns: Optional[VisualPatterns] = None
+        self.current_causal_effects: Optional[Dict[int, ActionEffect]] = None
         
         # Episode tracking
         self.episode_count = 0
@@ -70,11 +80,21 @@ class MetaPolicyController:
         self.episode_history: List[Dict] = []
         self.last_llm_query = -self.config.llm_cooldown
         
+        # State/transition tracking for visual/causal discovery
+        self.recent_states: deque = deque(maxlen=1000)
+        self.recent_transitions: List[Dict] = []
+        
+        # Hypothesis testing
+        self.active_hypothesis: Optional[ExecutableStrategy] = None
+        self.hypothesis_start_episode: int = 0
+        self.hypothesis_history: List[Dict] = []
+        
         # Stats
         self.environments_seen = 0
         self.total_concepts_discovered = 0
         self.total_policy_branches = 0
         self.total_policy_creates = 0
+        self.total_hypotheses_tested = 0
     
     def on_new_environment(self, env) -> MetaStackPipeline:
         """
@@ -167,8 +187,21 @@ class MetaPolicyController:
     
     def on_step(self, state: np.ndarray, action: int, reward: float,
                 next_state: np.ndarray):
-        """Record a step for concept discovery."""
+        """Record a step for concept discovery and causal/visual analysis."""
+        # Track for concept discovery
         self.concept_library.record_step(state, action, reward, next_state)
+        
+        # Track states for visual pattern extraction
+        self.recent_states.append(state)
+        
+        # Track transitions for causal discovery
+        self.causal_discovery.record_transition(state, action, reward, next_state)
+        self.recent_transitions.append({
+            'state': state,
+            'action': action,
+            'reward': reward,
+            'next_state': next_state,
+        })
     
     def on_episode_complete(self, reward: float):
         """
@@ -265,6 +298,18 @@ class MetaPolicyController:
         
         self.last_llm_query = self.episode_count
         
+        # Extract visual patterns if we have enough states
+        if len(self.recent_states) > 50:
+            self.current_visual_patterns = self.visual_extractor.extract_patterns(
+                list(self.recent_states)
+            )
+        
+        # Discover causal effects if we have enough transitions
+        if len(self.recent_transitions) > 100:
+            self.current_causal_effects = self.causal_discovery.discover_action_effects(
+                self.recent_transitions[-500:]  # Last 500 transitions
+            )
+        
         fp = self.current_fingerprint
         rewards = list(self.episode_rewards)
         
@@ -279,6 +324,17 @@ class MetaPolicyController:
             f"  - Reward range: [{fp.reward_min:.1f}, {fp.reward_max:.1f}]\n"
             f"  - State change rate: {fp.state_change_rate:.3f}\n"
             f"  - Action diversity: {fp.action_diversity_score:.3f}\n"
+        )
+        
+        # Add visual patterns
+        if self.current_visual_patterns:
+            prompt += f"\n{self.current_visual_patterns.summary()}\n"
+        
+        # Add causal discovery
+        if self.current_causal_effects:
+            prompt += f"\n{self.causal_discovery.get_summary(self.current_causal_effects)}\n"
+        
+        prompt += (
             f"\n"
             f"Current performance:\n"
             f"  - Episodes completed: {self.episode_count}\n"

@@ -11,6 +11,9 @@ from throng4.meta_policy.env_fingerprint import (
 )
 from throng4.meta_policy.policy_tree import PolicyTree, PolicyNode
 from throng4.meta_policy.blind_concepts import BlindConceptLibrary, DiscoveredConcept
+from throng4.meta_policy.visual_patterns import VisualPatternExtractor, VisualPatterns
+from throng4.meta_policy.causal_discovery import CausalDiscovery, ActionEffect
+from throng4.meta_policy.hypothesis_executor import HypothesisExecutor, ExecutableStrategy
 from throng4.meta_policy.meta_policy_controller import MetaPolicyController
 
 __all__ = [
@@ -20,5 +23,11 @@ __all__ = [
     'PolicyNode',
     'BlindConceptLibrary',
     'DiscoveredConcept',
+    'VisualPatternExtractor',
+    'VisualPatterns',
+    'CausalDiscovery',
+    'ActionEffect',
+    'HypothesisExecutor',
+    'ExecutableStrategy',
     'MetaPolicyController',
 ]
