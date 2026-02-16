@@ -1,0 +1,58 @@
+{
+  "games": [
+    "Breakout",
+    "Pong",
+    "SpaceInvaders",
+    "Freeway",
+    "Skiing",
+    "Boxing"
+  ],
+  "avg_rewards": [
+    1.96,
+    -19.36,
+    161.2,
+    2.96,
+    -7856.84,
+    -3.8
+  ],
+  "best_rewards": [
+    5.0,
+    -11.0,
+    600.0,
+    6.0,
+    -6656.0,
+    11.0
+  ],
+  "per_game": {
+    "Breakout": {
+      "avg_reward": 1.96,
+      "best_reward": 5.0,
+      "status": "completed"
+    },
+    "Pong": {
+      "avg_reward": -19.36,
+      "best_reward": -11.0,
+      "status": "completed"
+    },
+    "SpaceInvaders": {
+      "avg_reward": 161.2,
+      "best_reward": 600.0,
+      "status": "completed"
+    },
+    "Freeway": {
+      "avg_reward": 2.96,
+      "best_reward": 6.0,
+      "status": "completed"
+    },
+    "Skiing": {
+      "avg_reward": -7856.84,
+      "best_reward": -6656.0,
+      "status": "completed"
+    },
+    "Boxing": {
+      "avg_reward": -3.8,
+      "best_reward": 11.0,
+      "status": "completed"
+    }
+  }
+}

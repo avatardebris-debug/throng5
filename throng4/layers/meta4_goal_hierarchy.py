@@ -148,17 +148,19 @@ class GoalHierarchy:
         
         self.state.games_completed += 1
         
-        # Calculate transfer speedup
-        if self.state.games_completed > 1:
-            first_game = list(self.state.episodes_to_converge.values())[0]
+        # Calculate transfer speedup (only if we have reference data)
+        if self.state.games_completed > 1 and self.state.episodes_to_converge:
+            first_game_eps = list(self.state.episodes_to_converge.values())[0]
             current = convergence_episode or len(self.state.reward_history)
-            speedup = 1.0 - (current / max(first_game, 1))
-            self.state.transfer_speedups.append(speedup)
-            print(f"[Meta^4] Transfer speedup: {speedup:.1%}")
+            if first_game_eps > 0:
+                speedup = 1.0 - (current / max(first_game_eps, 1))
+                self.state.transfer_speedups.append(speedup)
+                print(f"[Meta^4] Transfer speedup: {speedup:.1%}")
         
         print(f"[Meta^4] Game {self.current_game} complete. "
               f"Episodes: {self.state.game_episodes}, "
               f"Best reward: {self.state.best_episode_reward:.1f}")
+
     
     def start_episode(self):
         """Begin a new episode. Update mode selection."""
