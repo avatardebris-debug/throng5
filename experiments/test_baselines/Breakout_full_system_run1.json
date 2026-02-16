@@ -1,0 +1,115 @@
+{
+  "baseline": "full_system",
+  "game": "Breakout",
+  "source_game": "tetris",
+  "timestamp": "2026-02-15T17:49:38.411127",
+  "episodes": 20,
+  "results": [
+    {
+      "score": 0.0,
+      "steps": 166,
+      "epsilon": 0.199
+    },
+    {
+      "score": 0.0,
+      "steps": 188,
+      "epsilon": 0.19800500000000001
+    },
+    {
+      "score": 0.0,
+      "steps": 148,
+      "epsilon": 0.197014975
+    },
+    {
+      "score": 2.0,
+      "steps": 370,
+      "epsilon": 0.19602990012500002
+    },
+    {
+      "score": 0.0,
+      "steps": 204,
+      "epsilon": 0.19504975062437502
+    },
+    {
+      "score": 2.0,
+      "steps": 364,
+      "epsilon": 0.19407450187125314
+    },
+    {
+      "score": 0.0,
+      "steps": 204,
+      "epsilon": 0.19310412936189686
+    },
+    {
+      "score": 0.0,
+      "steps": 259,
+      "epsilon": 0.19213860871508737
+    },
+    {
+      "score": 0.0,
+      "steps": 205,
+      "epsilon": 0.19117791567151193
+    },
+    {
+      "score": 3.0,
+      "steps": 314,
+      "epsilon": 0.19022202609315436
+    },
+    {
+      "score": 1.0,
+      "steps": 202,
+      "epsilon": 0.18927091596268858
+    },
+    {
+      "score": 1.0,
+      "steps": 342,
+      "epsilon": 0.18832456138287512
+    },
+    {
+      "score": 1.0,
+      "steps": 265,
+      "epsilon": 0.18738293857596075
+    },
+    {
+      "score": 2.0,
+      "steps": 436,
+      "epsilon": 0.18644602388308096
+    },
+    {
+      "score": 1.0,
+      "steps": 261,
+      "epsilon": 0.18551379376366556
+    },
+    {
+      "score": 0.0,
+      "steps": 236,
+      "epsilon": 0.18458622479484724
+    },
+    {
+      "score": 1.0,
+      "steps": 214,
+      "epsilon": 0.183663293670873
+    },
+    {
+      "score": 0.0,
+      "steps": 230,
+      "epsilon": 0.18274497720251864
+    },
+    {
+      "score": 1.0,
+      "steps": 260,
+      "epsilon": 0.18183125231650604
+    },
+    {
+      "score": 0.0,
+      "steps": 192,
+      "epsilon": 0.18092209605492351
+    }
+  ],
+  "summary": {
+    "mean_score": 0.75,
+    "std_score": 0.8874119674649424,
+    "max_score": 3.0,
+    "final_10_mean": 0.8
+  }
+}

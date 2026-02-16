@@ -1,0 +1,115 @@
+{
+  "baseline": "static_concepts",
+  "game": "Breakout",
+  "source_game": "tetris",
+  "timestamp": "2026-02-15T17:49:31.604615",
+  "episodes": 20,
+  "results": [
+    {
+      "score": 2.0,
+      "steps": 292,
+      "epsilon": 0.199
+    },
+    {
+      "score": 2.0,
+      "steps": 253,
+      "epsilon": 0.19800500000000001
+    },
+    {
+      "score": 0.0,
+      "steps": 191,
+      "epsilon": 0.197014975
+    },
+    {
+      "score": 2.0,
+      "steps": 255,
+      "epsilon": 0.19602990012500002
+    },
+    {
+      "score": 0.0,
+      "steps": 261,
+      "epsilon": 0.19504975062437502
+    },
+    {
+      "score": 0.0,
+      "steps": 209,
+      "epsilon": 0.19407450187125314
+    },
+    {
+      "score": 1.0,
+      "steps": 213,
+      "epsilon": 0.19310412936189686
+    },
+    {
+      "score": 1.0,
+      "steps": 259,
+      "epsilon": 0.19213860871508737
+    },
+    {
+      "score": 2.0,
+      "steps": 329,
+      "epsilon": 0.19117791567151193
+    },
+    {
+      "score": 0.0,
+      "steps": 204,
+      "epsilon": 0.19022202609315436
+    },
+    {
+      "score": 1.0,
+      "steps": 229,
+      "epsilon": 0.18927091596268858
+    },
+    {
+      "score": 0.0,
+      "steps": 211,
+      "epsilon": 0.18832456138287512
+    },
+    {
+      "score": 2.0,
+      "steps": 297,
+      "epsilon": 0.18738293857596075
+    },
+    {
+      "score": 3.0,
+      "steps": 340,
+      "epsilon": 0.18644602388308096
+    },
+    {
+      "score": 0.0,
+      "steps": 188,
+      "epsilon": 0.18551379376366556
+    },
+    {
+      "score": 2.0,
+      "steps": 288,
+      "epsilon": 0.18458622479484724
+    },
+    {
+      "score": 3.0,
+      "steps": 309,
+      "epsilon": 0.183663293670873
+    },
+    {
+      "score": 1.0,
+      "steps": 213,
+      "epsilon": 0.18274497720251864
+    },
+    {
+      "score": 0.0,
+      "steps": 204,
+      "epsilon": 0.18183125231650604
+    },
+    {
+      "score": 0.0,
+      "steps": 189,
+      "epsilon": 0.18092209605492351
+    }
+  ],
+  "summary": {
+    "mean_score": 1.1,
+    "std_score": 1.044030650891055,
+    "max_score": 3.0,
+    "final_10_mean": 1.2
+  }
+}

@@ -1,0 +1,30 @@
+A.L.E: Arcade Learning Environment (version 0.11.2+ecc1138)
+[Powered by Stella]
+
+######################################################################
+# RUN 1/1
+######################################################################
+
+======================================================================
+Baseline: tabula_rasa
+Game: Breakout
+Episodes: 500
+======================================================================
+
+Traceback (most recent call last):
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 288, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 281, in main
+    results = experiment.run_training(episodes=args.episodes)
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 226, in run_training
+    print(f"Episode {ep+1:3d}: Score={result['score']:6.1f}, "
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          f"Avg(10)={np.mean(recent_scores):6.1f}, "
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          f"\u03b5={result['epsilon']:.3f}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u03b5' in position 43: character maps to <undefined>

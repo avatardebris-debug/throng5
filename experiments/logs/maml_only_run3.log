@@ -1,0 +1,27 @@
+A.L.E: Arcade Learning Environment (version 0.11.2+ecc1138)
+[Powered by Stella]
+
+######################################################################
+# RUN 1/1
+######################################################################
+Traceback (most recent call last):
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 288, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 276, in main
+    experiment = BaselineExperiment(
+        game=args.game,
+        baseline=args.baseline
+    )
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 56, in __init__
+    self.agent = self._create_agent()
+                 ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\avata\aicompete\throng3\run_baseline_experiment.py", line 81, in _create_agent
+    agent.load_weights(weights_path)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\avata\aicompete\throng3\throng4\learning\portable_agent.py", line 340, in load_weights
+    if data['n_features'] != self.n_features:
+       ~~~~^^^^^^^^^^^^^^
+  File "C:\Users\avata\AppData\Roaming\Python\Python313\site-packages\numpy\lib\_npyio_impl.py", line 243, in __getitem__
+    raise KeyError(f"{key} is not a file in the archive") from None
+KeyError: 'n_features is not a file in the archive'

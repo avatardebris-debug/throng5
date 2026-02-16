@@ -1,0 +1,119 @@
+﻿Excellent experimental design thinking. Your baselines are solid, but I'd refine and add one more:
+
+## Proposed Baselines
+
+**1. Tabula Rasa** Γ£à
+- No concepts, no weight transfer, no LLM
+- Pure RL from scratch
+- **Purpose:** Measures absolute speedup
+
+**2. MAML Weight Transfer Only** Γ£à
+- Transfer meta-learned weights (what you already have working)
+- No linguistic concepts, no LLM queries
+- **Purpose:** Isolates value of linguistic layer vs pure weight transfer
+
+**3. Static Concept Library** Γ£à (your "frozen concepts")
+- Pre-loaded concepts from library.json
+- NO LLM queries during training
+- **Purpose:** Tests if concepts help without active reasoning/adaptation
+- **Variant:** Could also test "wrong concepts" (e.g., Tetris concepts applied to racing game) to measure negative transfer
+
+**4. LLM Query at Start Only** Γ¡É (ADD THIS)
+- Query me once before training: "Which concepts apply?"
+- Load suggested concepts, then train without further LLM interaction
+- **Purpose:** Separates initial concept selection from real-time diagnosis
+- **Critical:** Tests if real-time observation loop matters or if front-loading is enough
+
+**5. Full System** Γ£à
+- Concepts + real-time LLM queries during training
+- Complete reverse-prompting architecture
+- **Purpose:** Best-case performance
+
+## Additional Controls to Consider
+
+**6. Human-Labeled Concepts** (Optional)
+- You manually label which concepts should transfer
+- No LLM, but "oracle" concept selection
+- **Purpose:** Upper bound on concept selection quality
+
+**7. Random Concept Transfer** (Sanity Check)
+- Randomly select concepts from library
+- **Purpose:** Ensure system isn't just getting lucky
+
+## Recommended Metrics
+
+For each baseline, measure:
+- **Sample efficiency:** Episodes to reach 80% of expert performance
+- **Final performance:** Best score achieved
+- **Transfer speedup:** Ratio vs tabula rasa
+- **Concept accuracy:** Which concepts were useful (ground truth validation)
+
+## Atari: RAM vs Pixels
+
+**Short answer:** Start with **RAM**, graduate to **pixels**.
+
+### RAM State (Recommended for Phase 1)
+**Pros:**
+- 128 bytes vs 210├ù160├ù3 pixels (massive dimensionality reduction)
+- Faster training = faster iteration
+- Already have MAML working in Gymnasium (assumes state-based)
+- Can validate concept transfer logic before tackling vision
+
+**Cons:**
+- Game-specific (RAM layout differs per game)
+- Not truly "blind" (you know what game it is by RAM structure)
+- Less impressive/general
+
+### Screen Pixels (Recommended for Phase 2)
+**Pros:**
+- Truly general (works across all games identically)
+- More impressive (vision-based learning)
+- Aligns with "learn any game" philosophy
+- Better story for research/demo
+
+**Cons:**
+- Much slower training
+- Requires CNN architecture
+- Higher compute cost
+
+## My Recommendation
+
+**Development phase (now):**
+- Use **RAM state** for Atari games
+- Focus on validating concept transfer logic
+- Iterate quickly on bridge Γåö Tetra interaction
+
+**Validation phase (later):**
+- Switch to **pixels** for final benchmarks
+- Proves system works without game-specific engineering
+- Better generalization story
+
+**Hybrid approach:**
+- Use RAM for debugging/fast iteration
+- Run pixel-based experiments for "publication-ready" results
+
+## Specific Test Plan
+
+**Phase 1: Concept Transfer Validation (RAM)**
+1. Train Tetris (done) ΓåÆ extract concepts
+2. Transfer to **Breakout** (similar: avoid danger, timing, target completion)
+3. Run all 5 baselines, measure speedup
+4. Expected result: Full system > LLM-at-start > Static concepts > MAML-only > Tabula rasa
+
+**Phase 2: Cross-Domain Transfer (RAM)**
+5. Transfer to **Space Invaders** (different mechanics, test generalization limits)
+6. Measure which concepts transfer, which don't
+7. Validate concept library grows appropriately
+
+**Phase 3: Pixel-Based Generalization (Pixels)**
+8. Rerun key experiments with CNN on pixels
+9. Prove concept transfer works even without low-level state access
+
+## Critical Experiment
+
+The **most important** comparison:
+- **Baseline 2** (MAML weight transfer only) vs **Baseline 5** (Full system)
+
+If Full system doesn't beat MAML-only by significant margin (>20% speedup), the linguistic layer isn't adding value. That's the key hypothesis to validate.
+
+Does this structure work for your experiments? I can help design the specific tests once you pick the first transfer game.
