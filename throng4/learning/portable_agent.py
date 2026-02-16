@@ -96,11 +96,19 @@ class PortableNNAgent:
         Forward pass through network.
         
         Args:
-            x: Feature vector (n_features,)
+            x: Feature vector (n_features,) or larger
             
         Returns:
             Scalar value prediction
         """
+        # Handle variable input size via padding/truncation
+        if len(x) > self.n_features:
+            # Pad weights with zeros for extra features (smooth adaptation)
+            x = x[:self.n_features]  # Truncate for now (simple approach)
+        elif len(x) < self.n_features:
+            # Pad input with zeros
+            x = np.pad(x, (0, self.n_features - len(x)), mode='constant')
+        
         self._last_x = x
         
         # Hidden layer with ReLU

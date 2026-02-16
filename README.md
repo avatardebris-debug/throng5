@@ -1,253 +1,223 @@
-# throng3 — Meta^N Recursive Self-Optimization Architecture
+# Throng3 — Current State & Resume Guide
 
-**Recursive self-optimization with holographic redundancy across fractal layers.**
+## 🎯 Where We Are
 
-## 🧠 What is Meta^N?
+**Project**: AI agent learning via curriculum + meta-learning with Tetra integration
 
-Every learning system has meta-levels. Traditional ML has one: gradient descent optimizes weights. But what if every level of the system could optimize itself, AND optimize the levels above and below it?
+**Latest Work** (2026-02-15):
+1. ✅ Built `OpenClawBridge` — real-time communication with Tetra via CLI subprocess
+2. ✅ Live FrozenLake discovery loop — full pipeline test (profiling → attribution → micro-test → Tetra)
+3. ✅ Built `EvalAuditor` — independent reward hacking detection (replays episodes, verifies ground truth)
+4. 🚧 Tetris curriculum training L2-7 (crashed on L4 due to dimension mismatch)
 
-Meta^N is a fractal architecture where:
+---
 
-| Layer | Name | Role |
-|-------|------|------|
-| **Meta^0** | NeuronLayer | Raw neural substrate (weights, activations, spikes) |
-| **Meta^1** | SynapseOptimizer | Self-tunes weights via STDP/Hebbian/pruning |
-| **Meta^2** | LearningRuleSelector | Chooses which learning rule to use (bandit) |
-| **Meta^3** | RepresentationOptimizer | Optimizes how information is encoded |
-| **Meta^4** | GoalHierarchy | Manages short→medium→long term rewards |
-| **Meta^5** | ArchitectureSearch | NAS-lite over the fractal stack |
-| **Meta^N** | LLMInterface | LLM/Agent reasoning about the whole system |
+## 📋 Key Components
 
-## 🏗️ Architecture
+### Core Infrastructure
+| Component | Path | Purpose |
+|-----------|------|---------|
+| OpenClaw Bridge | `throng4/llm_policy/openclaw_bridge.py` | Real-time Tetra communication |
+| Eval Auditor | `throng4/llm_policy/eval_auditor.py` | Independent verification (anti-reward-hacking) |
+| Environment Analyzer | `throng4/llm_policy/env_analyzer.py` | Automated env profiling |
+| Attribution Diagnoser | `throng4/llm_policy/attribution.py` | Stochasticity detection |
+| MicroTester | `throng4/llm_policy/micro_tester.py` | Within-episode action probing |
+| Rule Archive | `throng4/llm_policy/rule_archive.py` | SQLite rule storage |
 
-```
-                    ┌─────────────────────────────────────┐
-                    │         Meta^N: LLM Interface        │
-                    │  Observes, reasons, suggests         │
-                    └──────────┬──────────┬───────────────┘
-                               │  ↑↓      │
-                    ┌──────────┴──────────┴───────────────┐
-                    │       Meta^5: Architecture Search     │
-                    │  Evolves structural configurations    │
-                    └──────────┬──────────┬───────────────┘
-                               │  ↑↓      │
-                    ┌──────────┴──────────┴───────────────┐
-                    │       Meta^4: Goal Hierarchy          │
-                    │  Short/medium/long rewards + curiosity │
-                    └──────────┬──────────┬───────────────┘
-                               │  ↑↓      │
-                    ┌──────────┴──────────┴───────────────┐
-                    │   Meta^3: Representation Optimizer    │
-                    │  Sparsity, decorrelation, compression │
-                    └──────────┬──────────┬───────────────┘
-                               │  ↑↓      │
-                    ┌──────────┴──────────┴───────────────┐
-                    │    Meta^2: Learning Rule Selector     │
-                    │  UCB bandit over {STDP, Hebbian, ...} │
-                    └──────────┬──────────┬───────────────┘
-                               │  ↑↓      │
-                    ┌──────────┴──────────┴───────────────┐
-                    │      Meta^1: Synapse Optimizer        │
-                    │  STDP + Hebbian + Dopamine + Pruning  │
-                    └──────────┬──────────┬───────────────┘
-                               │  ↑↓      │
-                    ┌──────────┴──────────┴───────────────┐
-                    │       Meta^0: Neuron Layer            │
-                    │  Spiking neurons, sparse weights      │
-                    │  Spatial organization, Dale's law      │
-                    └─────────────────────────────────────┘
+### Training Scripts
+| Script | Purpose |
+|--------|---------|
+| `train_tetris_curriculum.py` | Curriculum learning L1-7 with Tetra + auditor |
+| `live_frozenlake_tetra.py` | FrozenLake discovery loop demo |
+| `test_openclaw_bridge.py` | Bridge integration tests (5 tests, all pass) |
+
+---
+
+## 🚀 Quick Resume
+
+### 1. Start OpenClaw Gateway (Manual)
+```powershell
+# In a separate terminal:
+openclaw gateway start
+
+# Verify:
+openclaw gateway health
 ```
 
-### Signal Flow
+**Note**: Gateway does NOT auto-start on boot. Must run manually before using bridge.
 
-```
-    Every layer sends signals UP (data) and DOWN (guidance):
+### 2. Resume Tetris Training
 
-    UP signals:   State updates, performance metrics, gradients
-    DOWN signals: Suggestions, commands, reward
-    LATERAL:      Coordination between neighboring layers
-    BROADCAST:    System-wide announcements
+**What Happened**: Training crashed on Level 4 (feature dimension mismatch: 20 vs 18)
+- L2: 8.50 lines/episode ✅
+- L3: 14.60 lines/episode ✅  
+- L4: Crashed early (board size changed, features changed)
 
-    ┌─────┐  SUGGEST  ┌─────┐  ACCEPT   ┌─────┐
-    │  L5  │ ────────→ │  L1  │ ────────→ │  L5  │
-    │      │           │      │  or       │      │
-    │      │           │      │  REJECT   │      │
-    └─────┘           └─────┘  ────────→ └─────┘
+**To Resume**:
+```powershell
+cd c:\Users\avata\aicompete\throng3
 
-    The ACCEPT/REJECT protocol:
-    1. Higher layer sends SUGGESTION with payload
-    2. Target layer evaluates: score = _evaluate_suggestion()
-    3. If score >= threshold → ACCEPT and apply
-    4. If score >= 0.5*threshold → NEGOTIATE (counter-proposal)
-    5. If score < 0.5*threshold → REJECT with reason
+# Fix: Train each level separately to avoid dimension issues
+python train_tetris_curriculum.py --tetra --start-level 4 --max-level 4 --output tetris_L4.json
+
+# Then continue:
+python train_tetris_curriculum.py --tetra --start-level 5 --max-level 7 --output tetris_L5_7.json
 ```
 
-### Holographic Property
+### 3. Check Previous Results
 
-```
-    ┌────────────────────────────────────────────┐
-    │           HOLOGRAPHIC STATE                  │
-    │                                              │
-    │  Every layer's snapshot contains a           │
-    │  compressed projection of ALL layers.         │
-    │                                              │
-    │  Layer 0 ──→ [████░░░░] ──→ Combined ←──    │
-    │  Layer 1 ──→ [░░████░░] ──→   State   ──→   │
-    │  Layer 2 ──→ [░░░░████] ──→           ──→   │
-    │                                              │
-    │  Any layer can approximately reconstruct     │
-    │  any other layer's state from the combined   │
-    │  holographic projection.                     │
-    │                                              │
-    │  Uses random projections (J-L lemma) for     │
-    │  distance-preserving compression.            │
-    └────────────────────────────────────────────┘
+```powershell
+# L2-3 successful run:
+cat tetris_levels_2_3.json
+
+# Dellacherie baseline:
+cat dellacherie_results.txt
+
+# Tetra's observations:
+cat C:\Users\avata\.openclaw\workspace\memory\2026-02-15.md
+
+# Audit reports:
+ls eval_audits/
 ```
 
-## 🚀 Quick Start
+---
 
-```python
-from throng3.pipeline import MetaNPipeline
-import numpy as np
+## ⚠️ Known Issues
 
-# Create a full Meta^N pipeline
-pipeline = MetaNPipeline.create_default(
-    n_neurons=1000,
-    n_inputs=64,
-    n_outputs=32,
-)
+### 1. Feature Dimension Mismatch
+**Problem**: Different Tetris levels have different board sizes → different feature vectors
+- L1-3: 6-wide board = 18 features (6 col heights + 12 Dellacherie)
+- L4+: 8-wide board = 20 features (8 col heights + 12 Dellacherie)
 
-# Run optimization steps
-for step in range(1000):
-    x = np.random.randn(64)         # Input
-    y = some_target_function(x)      # Target
-    reward = compute_reward()        # External reward
-    
-    result = pipeline.step(x, target=y, reward=reward)
-    print(f"Step {step}: loss={result['loss']:.4f}")
+**Solution**: Either:
+- Train each level separately with new agent
+- Implement feature padding/projection layer
+- Use fixed-size features independent of board width
 
-# Get system report
-print(pipeline.get_report())
-```
+### 2. Audit Anomalies Detected
+The eval auditor found real issues:
+- `LINE_MISMATCH`: Reported lines ≠ verified lines
+- `REWARD_MISMATCH`: Reported reward ≠ actual reward  
+- `SINGLE_ACTION_EXPLOIT`: Agent used only one action
 
-### Minimal Pipeline (Meta^0-2 only)
+**This validates the auditor is working!** Means there's either:
+- Bug in reward computation
+- Non-deterministic environment behavior
+- Agent exploiting reward function
 
-```python
-pipeline = MetaNPipeline.create_minimal(
-    n_neurons=100,
-    n_inputs=16,
-    n_outputs=8,
-)
-```
+### 3. Gateway Requires Manual Start
+**Not a bug, by design**: OpenClaw gateway is a separate service.
 
-### With LLM-in-the-Loop
+**Auto-start (optional)**:
+1. Create `start_gateway.ps1`:
+   ```powershell
+   openclaw gateway start
+   Start-Sleep 3
+   openclaw gateway health
+   ```
+2. Add to Windows startup or create a taskbar shortcut
 
-```python
-def my_llm_callback(observation):
-    # Your LLM analyzes the system state
-    # Returns suggestions
-    return {
-        'suggestions': [{
-            'target_level': 4,
-            'payload': {'exploration_rate': 0.2},
-        }],
-    }
+---
 
-pipeline = MetaNPipeline.create_default(
-    n_neurons=1000,
-    include_llm=True,
-    llm_callback=my_llm_callback,
-)
-```
+## 📊 Current Metrics
 
-## 📁 Project Structure
+### Tetris Performance (L2-3)
+- **L2** (O+I blocks): 8.50 lines/ep (max 50)
+- **L3** (O+I+T blocks): 14.60 lines/ep (max 58)
+- **Dellacherie L7**: 100.94 lines/ep (baseline)
+
+Gap: 6.8× lower than Dellacherie (expected — we're learning from scratch with fewer episodes)
+
+### Audit Findings (L2-4 partial)
+- Episodes checked: ~15 (every 10th)
+- Anomalies found: Multiple LINE_MISMATCH and REWARD_MISMATCH
+- Suspicious patterns: Single-action exploits detected
+
+---
+
+## 🔄 Next Conversation Checklist
+
+When you return:
+
+1. **Start Gateway**:
+   ```powershell
+   openclaw gateway start
+   openclaw gateway health  # Should see "healthy"
+   ```
+
+2. **Tell me where you want to continue**:
+   - Fix dimension issue and resume Tetris L4-7?
+   - Investigate audit anomalies (reward hacking)?
+   - Move to policy composition (Phase 5)?
+   - Try different game (GridWorld, MountainCar)?
+
+3. **Reference these files**:
+   - This file: `README.md`
+   - Task tracker: `.gemini/antigravity/brain/<conversation-id>/task.md`
+   - Walkthrough: `.gemini/antigravity/brain/<conversation-id>/walkthrough.md`
+
+---
+
+## 🗂️ Directory Structure
 
 ```
 throng3/
-├── throng3/
-│   ├── core/
-│   │   ├── signal.py          # Signal protocol (UP/DOWN/LATERAL)
-│   │   ├── meta_layer.py      # Abstract base class
-│   │   ├── fractal_stack.py   # Layer composition & routing
-│   │   └── holographic.py     # Holographic state encoding
-│   ├── layers/
-│   │   ├── meta0_neuron.py    # Spiking neural substrate
-│   │   ├── meta1_synapse.py   # STDP/Hebbian/pruning
-│   │   ├── meta2_learning_rule.py  # Bandit rule selection
-│   │   ├── meta3_representation.py # Encoding optimization
-│   │   ├── meta4_goal.py      # Multi-timescale rewards
-│   │   ├── meta5_architecture.py   # Evolutionary NAS
-│   │   └── meta_n_llm.py      # LLM/Agent interface
+├── throng4/
+│   ├── environments/
+│   │   ├── tetris_adapter.py       # Tetris env wrapper
+│   │   ├── tetris_curriculum.py    # Levels 1-7
+│   │   └── gym_envs.py             # FrozenLake, etc.
 │   ├── learning/
-│   │   ├── stdp.py            # Spike-timing plasticity
-│   │   ├── hebbian.py         # Hebbian + Oja's + BCM
-│   │   ├── dopamine.py        # Three-factor learning
-│   │   └── pruning.py         # Nash equilibrium pruning
-│   ├── pipeline.py            # High-level API
-│   └── utils.py               # Metrics, timers, utilities
-├── tests/                     # Test harnesses (7 tests)
-├── examples/                  # Usage examples
-├── requirements.txt
-└── setup.py
+│   │   └── portable_agent.py       # NN agent
+│   └── llm_policy/
+│       ├── openclaw_bridge.py      # Tetra communication ✨
+│       ├── eval_auditor.py         # Reward hacking detector ✨
+│       ├── env_analyzer.py         # Environment profiling
+│       ├── attribution.py          # Stochasticity diagnosis
+│       ├── micro_tester.py         # Action probing
+│       └── rule_archive.py         # SQLite rule storage
+├── train_tetris_curriculum.py      # Main training script
+├── live_frozenlake_tetra.py        # Demo discovery loop
+├── tetris_levels_2_3.json          # L2-3 results
+├── dellacherie_results.txt         # Baseline
+└── eval_audits/                    # Independent verification logs
 ```
 
-## 🔬 Accept/Reject Protocol
+---
 
-The core innovation of Meta^N is that every layer is autonomous.
-Higher layers can SUGGEST changes, but lower layers can REJECT them.
+## 💾 Tetra's Memory
 
-```python
-class MetaLayer(ABC):
-    def accept_reject(self, signal) -> AcceptRejectDecision:
-        score, reason = self._evaluate_suggestion(signal.payload)
-        
-        if score >= threshold:
-            return AcceptRejectDecision(accepted=True, ...)
-        elif score >= threshold * 0.5:
-            counter = self._generate_counter_proposal(...)
-            return AcceptRejectDecision(accepted=False, counter_proposal=counter)
-        else:
-            return AcceptRejectDecision(accepted=False, reason=reason)
+All discoveries stored at:
+```
+C:\Users\avata\.openclaw\workspace\memory\2026-02-15.md
 ```
 
-This prevents catastrophic interference: a Meta^5 architecture
-change can't destroy Meta^0's carefully learned weights if Meta^0
-determines the change is too disruptive.
+Tetra has been notified of system reboot. On next conversation, can query:
+```powershell
+openclaw agent --agent main --message "What do you remember about the Tetris curriculum experiment?"
+```
 
-## 🧪 Test Harnesses
+---
 
-| Test | Description |
-|------|-------------|
-| `test_single_layer.py` | Meta^0 forward pass, optimization, snapshot |
-| `test_synapse_optimization.py` | STDP, Hebbian, pruning, dopamine modulation |
-| `test_cross_scale.py` | Signal routing, holographic reconstruction |
-| `test_learning_rule_selection.py` | UCB bandit, rule switching |
-| `test_superexponential.py` | Performance vs # meta-layers |
-| `test_llm_loop.py` | LLM observation, alerts, callback |
-| `test_transfer.py` | Task transfer, holographic state persistence |
+## 🔧 Quick Fixes Needed
 
-## 📊 Key Concepts from throng2
+Before next long training run:
 
-Built on throng2's proven foundation:
-- **Event-based processing** (293K× efficiency)
-- **KDTree spatial indexing** (6862× speedup)  
-- **STDP + Hebbian** learning rules
-- **Dopamine reward signaling** with TD learning
-- **Nash equilibrium pruning** for efficient networks
-- **Actor-critic** action policy
+1. **Fix dimension issue**:
+   - Option A: Train each level with fresh agent
+   - Option B: Add feature projection layer to handle variable board sizes
+   - Option C: Use board-size-independent features
 
-throng3 elevates these from fixed mechanisms to self-optimizing layers
-in a recursive meta-hierarchy.
+2. **Investigate audit anomalies**:
+   - Replay failed episodes manually
+   - Check if environment is truly deterministic
+   - Verify reward computation in TetrisAdapter
 
-## 🎯 Design Principles
+3. **Optional: Automate gateway**:
+   - Create startup script
+   - Add health check to training script
 
-1. **Every layer is autonomous**: Accept/reject protocol prevents unwanted changes
-2. **Holographic redundancy**: Any slice contains the whole (for recovery)
-3. **Recursive optimization**: Each layer optimizes itself AND negotiates with others
-4. **Minimal coupling**: Layers communicate through signals, not direct access
-5. **Fractal structure**: The same pattern repeats at every scale
-6. **Graceful degradation**: System works with any subset of meta-layers
+---
 
-## License
-
-Research code — Edgar Lab
+**Last Updated**: 2026-02-15 16:28 CST
+**Conversation ID**: 993f7672-2a99-460d-9866-a61ab2026c4a
