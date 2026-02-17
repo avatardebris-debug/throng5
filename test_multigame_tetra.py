@@ -83,8 +83,8 @@ def cycle_hypotheses(controller, pipeline, env, n_hypotheses=3):
         if i > 0:
             controller.llm_client.reset_conversation()
         
-        # Query Tetra
-        result = controller.test_hypothesis_with_tetra(pipeline)
+        # Query Tetra (force=True bypasses plateau check for stress testing)
+        result = controller.test_hypothesis_with_tetra(pipeline, force=True)
         
         if result['status'] != 'hypothesis_applied':
             print(f"  Hypothesis {i+1}/{n_hypotheses}: skipped ({result['status']})")

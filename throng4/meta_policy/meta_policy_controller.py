@@ -490,14 +490,18 @@ class MetaPolicyController:
         ]
         return "\n".join(lines)
     
-    def test_hypothesis_with_tetra(self, pipeline) -> Dict:
+    def test_hypothesis_with_tetra(self, pipeline, force: bool = False) -> Dict:
         """
         Full dialogue loop with Tetra:
-        1. Detect plateau
+        1. Detect plateau (or force query)
         2. Extract visual/causal patterns
         3. Query Tetra with enhanced prompt
         4. Parse response into strategy
         5. Apply strategy to pipeline
+        
+        Args:
+            pipeline: The current MetaStackPipeline
+            force: If True, skip plateau check (for stress testing)
         
         Returns dict with status and strategy info.
         Caller should then run test episodes and call report_hypothesis_results().
@@ -505,7 +509,7 @@ class MetaPolicyController:
         if not self.llm_client:
             return {'status': 'no_llm_client'}
         
-        if not self._is_plateauing():
+        if not force and not self._is_plateauing():
             return {'status': 'not_plateauing'}
         
         # Generate enhanced prompt
