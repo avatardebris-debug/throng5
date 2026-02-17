@@ -221,8 +221,8 @@ def run_game(game_name, tetra, game_index):
     if controller.current_causal_effects:
         game_results['causal_effects'] = {
             str(k): {
-                'state_delta': v.avg_state_change,
-                'reward_corr': v.reward_correlation,
+                'state_delta': v.avg_state_delta,
+                'reward': v.avg_reward,
                 'creates_entities': v.creates_entities,
             }
             for k, v in controller.current_causal_effects.items()
