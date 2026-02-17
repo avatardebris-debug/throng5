@@ -286,35 +286,27 @@ class MetaPolicyController:
               f"Avg reward: {np.mean(list(self.episode_rewards)[-25:]):.1f}, "
               f"Concepts discovered: {len(self.current_policy.discovered_concepts) if self.current_policy else 0}")
     
-    def get_abstract_llm_prompt(self) -> Optional[str]:
-        """
-        Generate an LLM prompt with ONLY numerical data.
-        NO game names. NO domain hints.
-        
-        Returns None if LLM query not needed or on cooldown.
-        """
-        if not self._is_plateauing():
-            return None
-        
-        if self.episode_count - self.last_llm_query < self.config.llm_cooldown:
-            return None
-        
-        self.last_llm_query = self.episode_count
-        
-        # Extract visual patterns if we have enough states
+    def _update_visual_causal_patterns(self):
+        """Extract current visual and causal patterns from recent data."""
         if len(self.recent_states) > 50:
             self.current_visual_patterns = self.visual_extractor.extract_patterns(
                 list(self.recent_states)
             )
         
-        # Discover causal effects if we have enough transitions
         if len(self.recent_transitions) > 100:
             self.current_causal_effects = self.causal_discovery.discover_action_effects(
-                self.recent_transitions[-500:]  # Last 500 transitions
+                self.recent_transitions[-500:]
             )
-        
+    
+    def _build_llm_prompt(self) -> Optional[str]:
+        """Build LLM prompt from current data. No cooldown/plateau checks."""
         fp = self.current_fingerprint
+        if not fp:
+            return None
+        
         rewards = list(self.episode_rewards)
+        if not rewards:
+            return None
         
         # Build prompt from numbers only
         prompt = (
@@ -378,6 +370,24 @@ class MetaPolicyController:
         )
         
         return prompt
+
+    def get_abstract_llm_prompt(self) -> Optional[str]:
+        """
+        Generate an LLM prompt with ONLY numerical data.
+        NO game names. NO domain hints.
+        
+        Returns None if LLM query not needed or on cooldown.
+        """
+        if not self._is_plateauing():
+            return None
+        
+        if self.episode_count - self.last_llm_query < self.config.llm_cooldown:
+            return None
+        
+        self.last_llm_query = self.episode_count
+        
+        self._update_visual_causal_patterns()
+        return self._build_llm_prompt()
     
     def _adapt_weights(self, source_weights: dict, 
                         target_n_inputs: int, target_n_outputs: int) -> dict:
@@ -512,8 +522,14 @@ class MetaPolicyController:
         if not force and not self._is_plateauing():
             return {'status': 'not_plateauing'}
         
-        # Generate enhanced prompt
-        prompt = self.get_abstract_llm_prompt()
+        # Generate enhanced prompt (bypass cooldown when forced)
+        if force:
+            # Force: generate prompt directly, skip plateau/cooldown checks
+            self._update_visual_causal_patterns()
+            prompt = self._build_llm_prompt()
+        else:
+            prompt = self.get_abstract_llm_prompt()
+        
         if not prompt:
             return {'status': 'cooldown'}
         
