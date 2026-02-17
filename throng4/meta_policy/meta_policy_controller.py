@@ -489,71 +489,6 @@ class MetaPolicyController:
             self.concept_library.summary(),
         ]
         return "\n".join(lines)
-
-
-if __name__ == "__main__":
-    """Test the full meta-policy controller."""
-    import sys
-    sys.path.insert(0, '.')
-    from throng4.environments.atari_adapter import AtariAdapter
-    
-    print("=" * 60)
-    print("META-POLICY CONTROLLER TEST (BLIND)")
-    print("=" * 60)
-    
-    controller = MetaPolicyController(ControllerConfig(
-        fingerprint_episodes=10,  # Fewer for quick test
-        concept_discovery_interval=25,
-        promote_after_episodes=30,
-    ))
-    
-    # Test on 3 games (controller doesn't know game names)
-    games = ['Breakout', 'Pong', 'SpaceInvaders']
-    
-    for game in games:
-        print(f"\n{'#' * 60}")
-        print(f"# Testing environment (name hidden from controller)")
-        print(f"{'#' * 60}")
-        
-        env = AtariAdapter(game)
-        
-        # Controller sees only the environment interface, not the name
-        pipeline = controller.on_new_environment(env)
-        
-        # Run 50 episodes
-        for ep in range(50):
-            state = env.reset()
-            done = False
-            episode_reward = 0.0
-            steps = 0
-            
-            while not done and steps < 500:
-                action = pipeline.select_action(state, explore=True)
-                next_state, reward, done, info = env.step(action)
-                
-                # Record for concept discovery
-                controller.on_step(state, action, reward, next_state)
-                
-                pipeline.update(state, action, reward, next_state, done)
-                episode_reward += reward
-                state = next_state
-                steps += 1
-            
-            meta_status = controller.on_episode_complete(episode_reward)
-            
-            if (ep + 1) % 25 == 0:
-                print(f"  Ep {ep+1}: avg={meta_status['avg_reward']:.1f}, "
-                      f"policy={meta_status['policy_id']}, "
-                      f"concepts={meta_status['concepts_in_library']}")
-        
-        controller.on_environment_done()
-        env.close()
-        
-        # Check LLM prompt (should have NO game names)
-        prompt = controller.get_abstract_llm_prompt()
-        if prompt:
-            print(f"\n  LLM prompt (BLIND — no game names):")
-            print(f"  {prompt[:200]}...")
     
     def test_hypothesis_with_tetra(self, pipeline) -> Dict:
         """
@@ -665,6 +600,72 @@ if __name__ == "__main__":
         self.total_hypotheses_tested += 1
         
         return refinement
+
+
+
+if __name__ == "__main__":
+    """Test the full meta-policy controller."""
+    import sys
+    sys.path.insert(0, '.')
+    from throng4.environments.atari_adapter import AtariAdapter
+    
+    print("=" * 60)
+    print("META-POLICY CONTROLLER TEST (BLIND)")
+    print("=" * 60)
+    
+    controller = MetaPolicyController(ControllerConfig(
+        fingerprint_episodes=10,  # Fewer for quick test
+        concept_discovery_interval=25,
+        promote_after_episodes=30,
+    ))
+    
+    # Test on 3 games (controller doesn't know game names)
+    games = ['Breakout', 'Pong', 'SpaceInvaders']
+    
+    for game in games:
+        print(f"\n{'#' * 60}")
+        print(f"# Testing environment (name hidden from controller)")
+        print(f"{'#' * 60}")
+        
+        env = AtariAdapter(game)
+        
+        # Controller sees only the environment interface, not the name
+        pipeline = controller.on_new_environment(env)
+        
+        # Run 50 episodes
+        for ep in range(50):
+            state = env.reset()
+            done = False
+            episode_reward = 0.0
+            steps = 0
+            
+            while not done and steps < 500:
+                action = pipeline.select_action(state, explore=True)
+                next_state, reward, done, info = env.step(action)
+                
+                # Record for concept discovery
+                controller.on_step(state, action, reward, next_state)
+                
+                pipeline.update(state, action, reward, next_state, done)
+                episode_reward += reward
+                state = next_state
+                steps += 1
+            
+            meta_status = controller.on_episode_complete(episode_reward)
+            
+            if (ep + 1) % 25 == 0:
+                print(f"  Ep {ep+1}: avg={meta_status['avg_reward']:.1f}, "
+                      f"policy={meta_status['policy_id']}, "
+                      f"concepts={meta_status['concepts_in_library']}")
+        
+        controller.on_environment_done()
+        env.close()
+        
+        # Check LLM prompt (should have NO game names)
+        prompt = controller.get_abstract_llm_prompt()
+        if prompt:
+            print(f"\n  LLM prompt (BLIND — no game names):")
+            print(f"  {prompt[:200]}...")
     
     # Final report
     print(f"\n{controller.summary()}")
