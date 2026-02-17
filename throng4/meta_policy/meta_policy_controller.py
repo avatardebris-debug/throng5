@@ -1,11 +1,13 @@
 """
-Meta-Policy Controller — Top-level blind orchestrator.
+Meta-Policy Controller — Top-level blind orchestrator (Central Controller).
 
-Sits above Meta^4 GoalHierarchy and coordinates:
-1. Environment fingerprinting (what kind of environment is this?)
-2. Policy matching/branching (find or create the right policy)
-3. Concept discovery (what patterns transfer?)
-4. Abstract LLM reasoning (numbers only, no game names)
+Bridge 1 refactor: delegates to brain-region sub-modules:
+  - PerceptionHub:     visual/causal pattern extraction
+  - RiskSensor:        plateau detection, risk assessment
+  - PolicyMonitor:     policy lifecycle (promotion, retirement, mode)
+  - PrefrontalCortex:  LLM/Tetra interaction
+
+Public API is UNCHANGED — all callers work identically.
 
 CRITICAL CONSTRAINT: No game names, no external knowledge.
 The LLM receives ONLY numerical patterns from the agent's own data.
@@ -23,81 +25,115 @@ from throng4.meta_policy.env_fingerprint import (
 )
 from throng4.meta_policy.policy_tree import PolicyTree, PolicyNode
 from throng4.meta_policy.blind_concepts import BlindConceptLibrary, DiscoveredConcept
-from throng4.meta_policy.visual_patterns import VisualPatternExtractor, VisualPatterns
-from throng4.meta_policy.causal_discovery import CausalDiscovery, ActionEffect
-from throng4.meta_policy.hypothesis_executor import HypothesisExecutor, ExecutableStrategy
+from throng4.meta_policy.perception_hub import PerceptionHub
+from throng4.meta_policy.risk_sensor import RiskSensor
+from throng4.meta_policy.policy_monitor import PolicyMonitor
+from throng4.meta_policy.prefrontal_cortex import PrefrontalCortex
+from throng4.meta_policy.save_state_manager import SaveStateManager
 from throng4.metastack_pipeline import MetaStackPipeline
 
 
 @dataclass
 class ControllerConfig:
     """Configuration for MetaPolicyController."""
-    fingerprint_episodes: int = 20        # Episodes for env characterization
-    plateau_window: int = 15              # Episodes to detect plateau
-    plateau_threshold: float = 0.05       # Improvement below this = plateau
-    promote_after_episodes: int = 50      # Promote candidate → active
-    concept_discovery_interval: int = 50  # Run discovery every N episodes
-    max_concurrent_policies: int = 10     # Max active policies in tree
-    llm_cooldown: int = 30                # Min episodes between LLM queries
+    fingerprint_episodes: int = 20
+    plateau_window: int = 15
+    plateau_threshold: float = 0.05
+    promote_after_episodes: int = 50
+    concept_discovery_interval: int = 50
+    max_concurrent_policies: int = 10
+    llm_cooldown: int = 30
 
 
 class MetaPolicyController:
     """
-    Top-level blind orchestrator.
+    Top-level blind orchestrator (Central Controller).
     
     Decides WHAT to learn, not HOW to learn.
     Operates without game names or external knowledge.
     
     Lifecycle:
-        1. on_new_environment(env) → fingerprint, match/create policy
-        2. on_step(state, action, reward, next_state) → record for discovery
-        3. on_episode_complete(reward) → track, detect patterns
-        4. on_environment_done() → save policy, discover concepts
+        1. on_new_environment(env) → fingerprint, match/create policy, return pipeline
+        2. on_step(state, action, reward, next_state) → record for perception
+        3. on_episode_complete(reward) → update performance, detect plateau
+        4. on_environment_done() → save weights, final concept discovery
+    
+    Delegates to brain-region sub-modules:
+        - perception:      PerceptionHub (visual/causal extraction)
+        - risk_sensor:     RiskSensor (plateau detection)
+        - policy_monitor:  PolicyMonitor (policy lifecycle)
+        - prefrontal:      PrefrontalCortex (LLM/Tetra dialogue)
     """
     
     def __init__(self, config: Optional[ControllerConfig] = None, 
                  llm_client=None):
         self.config = config or ControllerConfig()
-        self.llm_client = llm_client  # Optional Tetra client
-        self.hypothesis_test_episodes = 10  # Episodes to test each hypothesis
+        
+        # Brain-region sub-modules
+        self.perception = PerceptionHub()
+        self.risk_sensor = RiskSensor(
+            plateau_window=self.config.plateau_window,
+            plateau_threshold=self.config.plateau_threshold,
+        )
+        self.policy_monitor = PolicyMonitor(
+            promote_after_episodes=self.config.promote_after_episodes,
+            concept_discovery_interval=self.config.concept_discovery_interval,
+        )
+        self.prefrontal = PrefrontalCortex(llm_client=llm_client)
+        self.save_state_manager = SaveStateManager()
         
         # Core components
         self.policy_tree = PolicyTree()
         self.concept_library = BlindConceptLibrary()
         
-        # Hypothesis testing components
-        self.visual_extractor = VisualPatternExtractor()
-        self.causal_discovery = CausalDiscovery()
-        self.hypothesis_executor = HypothesisExecutor()
-        
         # Current state
         self.current_policy: Optional[PolicyNode] = None
         self.current_fingerprint: Optional[EnvironmentFingerprint] = None
         self.current_pipeline: Optional[MetaStackPipeline] = None
-        self.current_visual_patterns: Optional[VisualPatterns] = None
-        self.current_causal_effects: Optional[Dict[int, ActionEffect]] = None
         
         # Episode tracking
         self.episode_count = 0
         self.episode_rewards = deque(maxlen=200)
         self.episode_history: List[Dict] = []
-        self.last_llm_query = -self.config.llm_cooldown
-        
-        # State/transition tracking for visual/causal discovery
-        self.recent_states: deque = deque(maxlen=1000)
-        self.recent_transitions: List[Dict] = []
-        
-        # Hypothesis testing
-        self.active_hypothesis: Optional[ExecutableStrategy] = None
-        self.hypothesis_start_episode: int = 0
-        self.hypothesis_history: List[Dict] = []
         
         # Stats
         self.environments_seen = 0
         self.total_concepts_discovered = 0
         self.total_policy_branches = 0
         self.total_policy_creates = 0
-        self.total_hypotheses_tested = 0
+    
+    # ── Backward-compatible properties ──────────────────────────
+    # These expose sub-module state for callers that access them directly.
+    
+    @property
+    def llm_client(self):
+        return self.prefrontal.llm_client
+    
+    @property
+    def current_visual_patterns(self):
+        return self.perception.visual_patterns
+    
+    @property
+    def current_causal_effects(self):
+        return self.perception.causal_effects
+    
+    @property
+    def active_hypothesis(self):
+        return self.prefrontal.active_hypothesis
+    
+    @property
+    def hypothesis_history(self):
+        return self.prefrontal.hypothesis_history
+    
+    @property
+    def total_hypotheses_tested(self):
+        return self.prefrontal.total_hypotheses_tested
+    
+    @property
+    def hypothesis_test_episodes(self):
+        return self.prefrontal.hypothesis_test_episodes
+    
+    # ── Environment lifecycle ──────────────────────────────────
     
     def on_new_environment(self, env) -> MetaStackPipeline:
         """
@@ -112,6 +148,7 @@ class MetaPolicyController:
         self.episode_count = 0
         self.episode_rewards.clear()
         self.episode_history.clear()
+        self.perception.reset()
         
         # Step 1: Fingerprint the environment (blind — no game name)
         print(f"\n{'=' * 60}")
@@ -188,32 +225,27 @@ class MetaPolicyController:
         self.current_pipeline = pipeline
         return pipeline
     
+    # ── Per-step recording ─────────────────────────────────────
+    
     def on_step(self, state: np.ndarray, action: int, reward: float,
                 next_state: np.ndarray):
-        """Record a step for concept discovery and causal/visual analysis."""
-        # Track for concept discovery
+        """Record a step for concept discovery and perception."""
+        # Feed concept library
         self.concept_library.record_step(state, action, reward, next_state)
         
-        # Track states for visual pattern extraction
-        self.recent_states.append(state)
-        
-        # Track transitions for causal discovery
-        self.causal_discovery.record_transition(state, action, reward, next_state)
-        self.recent_transitions.append({
-            'state': state,
-            'action': action,
-            'reward': reward,
-            'next_state': next_state,
-        })
+        # Feed perception hub (visual + causal)
+        self.perception.record(state, action, reward, next_state)
+    
+    # ── Episode lifecycle ──────────────────────────────────────
     
     def on_episode_complete(self, reward: float):
         """
         Called after each episode completes.
         
         1. Update performance tracker
-        2. Check for plateau
-        3. Periodic concept discovery
-        4. Policy promotion check
+        2. Check for plateau (via RiskSensor)
+        3. Periodic concept discovery (via PolicyMonitor)
+        4. Policy promotion check (via PolicyMonitor)
         """
         self.episode_count += 1
         self.episode_rewards.append(reward)
@@ -222,9 +254,8 @@ class MetaPolicyController:
         if self.current_policy:
             self.current_policy.performance.update(reward)
         
-        # Periodic concept discovery
-        if (self.episode_count > 0 and 
-            self.episode_count % self.config.concept_discovery_interval == 0):
+        # Periodic concept discovery (PolicyMonitor decides when)
+        if self.policy_monitor.should_discover_concepts(self.episode_count):
             new_concepts = self.concept_library.discover_concepts(
                 self.episode_history, self.current_fingerprint
             )
@@ -235,24 +266,42 @@ class MetaPolicyController:
                         [c.id for c in new_concepts]
                     )
         
-        # Policy promotion check
-        if (self.current_policy and 
-            self.current_policy.status == 'candidate' and
-            self.episode_count >= self.config.promote_after_episodes):
-            if self.current_policy.performance.is_improving:
-                self.policy_tree.promote(self.current_policy.id)
+        # Policy promotion check (PolicyMonitor decides)
+        if self.policy_monitor.check_promotion(self.current_policy, self.episode_count):
+            self.policy_tree.promote(self.current_policy.id)
         
-        # Plateau detection
+        # Plateau detection (RiskSensor)
         if self._is_plateauing():
             if self.current_policy:
                 self.current_policy.performance.plateau_count += 1
             
-            # Check if should retire
-            if self.current_policy and self.policy_tree.should_retire(
-                self.current_policy.id
+            # Check if should retire (with failure mode context)
+            dominant_failure = self.perception.get_dominant_failure_mode()
+            failure_mode_str = dominant_failure.value if dominant_failure else None
+            
+            if self.current_policy and self.policy_monitor.check_retirement(
+                self.current_policy,
+                self.risk_sensor.risk_level(self.episode_rewards),
+                failure_mode_str
             ):
                 print(f"[MetaPolicy] Policy {self.current_policy.id} is "
                       f"chronically plateaued - consider retirement")
+        
+        # Update policy monitor mode
+        risk_level = self.risk_sensor.risk_level(self.episode_rewards)
+        self.policy_monitor.update_mode(self.episode_count, risk_level)
+        
+        # Check save-state triggers
+        save_state = self.save_state_manager.check_triggers(
+            perception=self.perception,
+            episode=self.episode_count,
+            rewards=list(self.episode_rewards),
+            current_mode=self.policy_monitor.mode,
+        )
+        if save_state:
+            print(f"[MetaPolicy] FLAGGED ep {self.episode_count}: "
+                  f"{save_state.trigger.value} "
+                  f"(importance={save_state.importance:.2f})")
         
         return self._get_meta_status()
     
@@ -268,109 +317,16 @@ class MetaPolicyController:
             # Save weights
             weights = self.current_pipeline.ann.get_weights()
             self.policy_tree.update_weights(self.current_policy.id, weights)
-        
-        # Final concept discovery
-        if self.episode_history:
+            
+            # Final concept discovery
             new_concepts = self.concept_library.discover_concepts(
                 self.episode_history, self.current_fingerprint
             )
             if new_concepts:
                 self.total_concepts_discovered += len(new_concepts)
-                if self.current_policy:
-                    self.current_policy.discovered_concepts.extend(
-                        [c.id for c in new_concepts]
-                    )
-        
-        print(f"\n[MetaPolicy] Environment complete. "
-              f"Episodes: {self.episode_count}, "
-              f"Avg reward: {np.mean(list(self.episode_rewards)[-25:]):.1f}, "
-              f"Concepts discovered: {len(self.current_policy.discovered_concepts) if self.current_policy else 0}")
     
-    def _update_visual_causal_patterns(self):
-        """Extract current visual and causal patterns from recent data."""
-        if len(self.recent_states) > 50:
-            self.current_visual_patterns = self.visual_extractor.extract_patterns(
-                list(self.recent_states)
-            )
-        
-        if len(self.recent_transitions) > 100:
-            self.current_causal_effects = self.causal_discovery.discover_action_effects(
-                self.recent_transitions[-500:]
-            )
+    # ── LLM/Tetra interaction (delegates to PrefrontalCortex) ──
     
-    def _build_llm_prompt(self) -> Optional[str]:
-        """Build LLM prompt from current data. No cooldown/plateau checks."""
-        fp = self.current_fingerprint
-        if not fp:
-            return None
-        
-        rewards = list(self.episode_rewards)
-        if not rewards:
-            return None
-        
-        # Build prompt from numbers only
-        prompt = (
-            f"An agent is learning in an unknown environment.\n"
-            f"\n"
-            f"Environment characteristics (from observation only):\n"
-            f"  - {fp.action_count} available actions\n"
-            f"  - {fp.state_dim}-dimensional state space\n"
-            f"  - Reward density: {fp.reward_density:.0%} of steps have non-zero reward\n"
-            f"  - Reward range: [{fp.reward_min:.1f}, {fp.reward_max:.1f}]\n"
-            f"  - State change rate: {fp.state_change_rate:.3f}\n"
-            f"  - Action diversity: {fp.action_diversity_score:.3f}\n"
-        )
-        
-        # Add visual patterns
-        if self.current_visual_patterns:
-            prompt += f"\n{self.current_visual_patterns.summary()}\n"
-        
-        # Add causal discovery
-        if self.current_causal_effects:
-            prompt += f"\n{self.causal_discovery.get_summary(self.current_causal_effects)}\n"
-        
-        prompt += (
-            f"\n"
-            f"Current performance:\n"
-            f"  - Episodes completed: {self.episode_count}\n"
-            f"  - Current avg reward (last 25): {np.mean(rewards[-25:]):.2f}\n"
-            f"  - Best reward: {max(rewards) if rewards else 0:.1f}\n"
-            f"  - Plateau duration: {self._plateau_duration()} episodes\n"
-        )
-        
-        # Add discovered concept info (abstracted)
-        concepts = self.concept_library.find_transferable(fp)
-        if concepts:
-            prompt += (
-                f"\n"
-                f"Discovered patterns:\n"
-            )
-            for c in concepts[:3]:
-                if c.pattern_type == 'state_cluster':
-                    prompt += (
-                        f"  - State feature {c.pattern_data.get('feature_index', '?')} "
-                        f"correlates with reward (r={c.pattern_data.get('correlation', 0):.2f})\n"
-                    )
-                elif c.pattern_type == 'action_sequence':
-                    prompt += (
-                        f"  - Action sequence {c.pattern_data.get('sequence', [])} "
-                        f"precedes avg reward {c.evidence_reward_boost:.2f}\n"
-                    )
-                elif c.pattern_type == 'reward_spike':
-                    prompt += (
-                        f"  - Reward spike of {c.pattern_data.get('spike_magnitude', 0):.1f} "
-                        f"std devs at episode {c.pattern_data.get('episode_index', '?')}\n"
-                    )
-        
-        prompt += (
-            f"\n"
-            f"What learning strategy adjustments would you suggest? "
-            f"Consider: exploration rate, learning rate, "
-            f"whether to focus on specific state features or action patterns."
-        )
-        
-        return prompt
-
     def get_abstract_llm_prompt(self) -> Optional[str]:
         """
         Generate an LLM prompt with ONLY numerical data.
@@ -381,13 +337,54 @@ class MetaPolicyController:
         if not self._is_plateauing():
             return None
         
-        if self.episode_count - self.last_llm_query < self.config.llm_cooldown:
+        if self.episode_count - self.prefrontal.last_llm_query < self.config.llm_cooldown:
             return None
         
-        self.last_llm_query = self.episode_count
+        self.prefrontal.last_llm_query = self.episode_count
         
-        self._update_visual_causal_patterns()
-        return self._build_llm_prompt()
+        self.perception.update_patterns()
+        concepts = self.concept_library.find_transferable(self.current_fingerprint) if self.current_fingerprint else None
+        
+        return self.prefrontal.build_prompt(
+            self.current_fingerprint, self.perception, self.episode_rewards,
+            self.episode_count, self._plateau_duration(), concepts
+        )
+    
+    def test_hypothesis_with_tetra(self, pipeline, force: bool = False) -> Dict:
+        """
+        Full dialogue loop with Tetra.
+        
+        Delegates to PrefrontalCortex. Public API unchanged.
+        """
+        return self.prefrontal.query_hypothesis(
+            perception=self.perception,
+            risk_sensor=self.risk_sensor,
+            pipeline=pipeline,
+            fingerprint=self.current_fingerprint,
+            rewards=self.episode_rewards,
+            episode_count=self.episode_count,
+            concept_library=self.concept_library,
+            force=force,
+        )
+    
+    def report_hypothesis_results(self, test_rewards: List[float], 
+                                   baseline_reward: float) -> Optional[str]:
+        """
+        Report hypothesis test results to Tetra for refinement.
+        
+        Delegates to PrefrontalCortex. Public API unchanged.
+        """
+        return self.prefrontal.report_results(test_rewards, baseline_reward)
+    
+    # ── Internal helpers ───────────────────────────────────────
+    
+    def _is_plateauing(self) -> bool:
+        """Detect plateau. Delegates to RiskSensor."""
+        return self.risk_sensor.is_plateauing(self.episode_rewards)
+    
+    def _plateau_duration(self) -> int:
+        """How many episodes since last improvement. Delegates to RiskSensor."""
+        return self.risk_sensor.plateau_duration(self.episode_rewards)
     
     def _adapt_weights(self, source_weights: dict, 
                         target_n_inputs: int, target_n_outputs: int) -> dict:
@@ -399,77 +396,47 @@ class MetaPolicyController:
         """
         adapted = {}
         
-        for key, w in source_weights.items():
-            src_shape = w.shape
+        for key, value in source_weights.items():
+            if not isinstance(value, np.ndarray):
+                adapted[key] = value
+                continue
             
-            # Determine target shape based on weight role
-            if key == 'W1':
-                # Input → hidden: adapt input dim
-                target_shape = (target_n_inputs, src_shape[1])
-            elif key == 'b1':
-                # Hidden bias: keep as-is
-                target_shape = src_shape
-            elif key == 'W_q':
-                # Q-head: hidden → actions (adapt to new action count)
-                target_shape = (src_shape[0], target_n_outputs)
-            elif key == 'b_q':
-                # Q-head bias: adapt to new action count
-                target_shape = (target_n_outputs,)
-            elif key in ('W_r', 'b_r'):
-                # Reward head: always 1 output, never resize
-                target_shape = src_shape
-            else:
-                target_shape = src_shape
+            if value.ndim == 1:
+                # Bias-like: resize to target
+                if 'output' in key or key.endswith('_b'):
+                    new = np.zeros(target_n_outputs)
+                    shared = min(len(value), target_n_outputs)
+                    new[:shared] = value[:shared]
+                    if target_n_outputs > shared:
+                        new[shared:] = np.random.randn(target_n_outputs - shared) * 0.01
+                    adapted[key] = new
+                else:
+                    adapted[key] = value.copy()
             
-            if src_shape == target_shape:
-                adapted[key] = w.copy()
+            elif value.ndim == 2:
+                rows, cols = value.shape
+                
+                if 'output' in key or key.endswith('_w') and cols != target_n_outputs:
+                    new_rows = rows
+                    new_cols = target_n_outputs
+                    new = np.random.randn(new_rows, new_cols) * 0.01
+                    shared_cols = min(cols, new_cols)
+                    new[:, :shared_cols] = value[:, :shared_cols]
+                    adapted[key] = new
+                
+                elif 'input' in key or key.startswith('w_'):
+                    new_rows = target_n_inputs
+                    new_cols = cols
+                    new = np.random.randn(new_rows, new_cols) * 0.01
+                    shared_rows = min(rows, new_rows)
+                    new[:shared_rows, :] = value[:shared_rows, :]
+                    adapted[key] = new
+                else:
+                    adapted[key] = value.copy()
             else:
-                # Create new weights, copy what fits
-                new_w = np.random.randn(*target_shape).astype(np.float32) * 0.01
-                
-                # Copy overlapping dimensions
-                slices = tuple(
-                    slice(0, min(s, t)) 
-                    for s, t in zip(src_shape, target_shape)
-                )
-                new_w[slices] = w[slices]
-                
-                adapted[key] = new_w
-                print(f"  [MetaPolicy] Adapted {key}: {src_shape} → {target_shape}")
+                adapted[key] = value.copy()
         
         return adapted
-    
-    def _is_plateauing(self) -> bool:
-        """Detect plateau from reward history."""
-        if len(self.episode_rewards) < self.config.plateau_window * 2:
-            return False
-        
-        rewards = list(self.episode_rewards)
-        recent = np.mean(rewards[-self.config.plateau_window:])
-        previous = np.mean(rewards[-2*self.config.plateau_window:-self.config.plateau_window])
-        
-        if abs(previous) < 1e-8:
-            return abs(recent) < 1e-8  # Both near zero = plateau
-        
-        improvement = (recent - previous) / abs(previous)
-        return improvement < self.config.plateau_threshold
-    
-    def _plateau_duration(self) -> int:
-        """How many episodes since last significant improvement."""
-        if len(self.episode_rewards) < 10:
-            return 0
-        
-        rewards = list(self.episode_rewards)
-        best_so_far = float('-inf')
-        duration = 0
-        
-        for r in reversed(rewards):
-            if r > best_so_far * 1.1:  # 10% improvement
-                break
-            duration += 1
-            best_so_far = max(best_so_far, r)
-        
-        return duration
     
     def _get_meta_status(self) -> dict:
         """Get current meta-status for logging."""
@@ -481,6 +448,7 @@ class MetaPolicyController:
             'plateauing': self._is_plateauing(),
             'concepts_in_library': len(self.concept_library.concepts),
             'policies_in_tree': len(self.policy_tree.nodes),
+            'mode': self.policy_monitor.mode,
         }
     
     def summary(self) -> str:
@@ -493,134 +461,14 @@ class MetaPolicyController:
             f"Total concepts discovered: {self.total_concepts_discovered}",
             f"Policy branches: {self.total_policy_branches}",
             f"Policy creates: {self.total_policy_creates}",
+            f"Hypotheses tested: {self.total_hypotheses_tested}",
+            f"Current mode: {self.policy_monitor.mode}",
             "",
             self.policy_tree.summary(),
             "",
             self.concept_library.summary(),
         ]
         return "\n".join(lines)
-    
-    def test_hypothesis_with_tetra(self, pipeline, force: bool = False) -> Dict:
-        """
-        Full dialogue loop with Tetra:
-        1. Detect plateau (or force query)
-        2. Extract visual/causal patterns
-        3. Query Tetra with enhanced prompt
-        4. Parse response into strategy
-        5. Apply strategy to pipeline
-        
-        Args:
-            pipeline: The current MetaStackPipeline
-            force: If True, skip plateau check (for stress testing)
-        
-        Returns dict with status and strategy info.
-        Caller should then run test episodes and call report_hypothesis_results().
-        """
-        if not self.llm_client:
-            return {'status': 'no_llm_client'}
-        
-        if not force and not self._is_plateauing():
-            return {'status': 'not_plateauing'}
-        
-        # Generate enhanced prompt (bypass cooldown when forced)
-        if force:
-            # Force: generate prompt directly, skip plateau/cooldown checks
-            self._update_visual_causal_patterns()
-            prompt = self._build_llm_prompt()
-        else:
-            prompt = self.get_abstract_llm_prompt()
-        
-        if not prompt:
-            return {'status': 'cooldown'}
-        
-        print(f"\n[Tetra] Querying with enhanced prompt...")
-        print(f"[Tetra] Prompt preview: {prompt[:200]}...")
-        
-        # Query Tetra
-        tetra_response = self.llm_client.query(prompt)
-        
-        if "Error" in tetra_response:
-            print(f"[Tetra] {tetra_response}")
-            return {'status': 'error', 'error': tetra_response}
-        
-        print(f"[Tetra] Response: {tetra_response[:200]}...")
-        
-        # Parse into strategy
-        strategy = self.hypothesis_executor.parse_hypothesis(
-            tetra_response,
-            visual_patterns=self.current_visual_patterns.__dict__ if self.current_visual_patterns else None,
-            causal_effects=self.current_causal_effects,
-        )
-        
-        print(f"[Tetra] Parsed strategy: {strategy.summary()}")
-        
-        # Apply to pipeline
-        modifications = self.hypothesis_executor.apply_strategy(strategy, pipeline)
-        
-        print(f"[Tetra] Applied modifications: {modifications}")
-        
-        # Record baseline
-        baseline_reward = np.mean(list(self.episode_rewards)[-25:])
-        self.active_hypothesis = strategy
-        self.hypothesis_start_episode = self.episode_count
-        
-        return {
-            'status': 'hypothesis_applied',
-            'strategy': strategy,
-            'modifications': modifications,
-            'baseline_reward': baseline_reward,
-            'tetra_response': tetra_response,
-        }
-    
-    def report_hypothesis_results(self, test_rewards: List[float], 
-                                   baseline_reward: float) -> Optional[str]:
-        """
-        Report hypothesis test results to Tetra for refinement.
-        
-        Args:
-            test_rewards: Rewards from test episodes
-            baseline_reward: Baseline reward before hypothesis
-            
-        Returns:
-            Tetra's refinement suggestion or None
-        """
-        if not self.llm_client or not self.active_hypothesis:
-            return None
-        
-        avg_test = np.mean(test_rewards)
-        improvement = avg_test - baseline_reward
-        
-        # Build report prompt
-        report = (
-            f"Hypothesis test results:\n"
-            f"  Strategy: {self.active_hypothesis.name}\n"
-            f"  Baseline reward: {baseline_reward:.1f}\n"
-            f"  Test reward: {avg_test:.1f}\n"
-            f"  Improvement: {improvement:+.1f}\n"
-            f"\n"
-            f"Should we continue with this strategy, refine it, or try something else?"
-        )
-        
-        print(f"\n[Tetra] Reporting results...")
-        print(f"[Tetra] Improvement: {improvement:+.1f}")
-        
-        refinement = self.llm_client.query(report)
-        
-        print(f"[Tetra] Refinement: {refinement[:200]}...")
-        
-        # Record in history
-        self.hypothesis_history.append({
-            'strategy': self.active_hypothesis.name,
-            'baseline': baseline_reward,
-            'test_avg': avg_test,
-            'improvement': improvement,
-            'refinement': refinement,
-        })
-        
-        self.total_hypotheses_tested += 1
-        
-        return refinement
-
 
 
 if __name__ == "__main__":

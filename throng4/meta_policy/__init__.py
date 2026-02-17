@@ -15,6 +15,17 @@ from throng4.meta_policy.visual_patterns import VisualPatternExtractor, VisualPa
 from throng4.meta_policy.causal_discovery import CausalDiscovery, ActionEffect
 from throng4.meta_policy.hypothesis_executor import HypothesisExecutor, ExecutableStrategy
 from throng4.meta_policy.tetra_client import TetraClient
+from throng4.meta_policy.perception_hub import PerceptionHub
+from throng4.meta_policy.risk_sensor import RiskSensor
+from throng4.meta_policy.policy_monitor import PolicyMonitor
+from throng4.meta_policy.prefrontal_cortex import PrefrontalCortex
+from throng4.meta_policy.failure_profiler import FailureProfiler, FailureMode, FailureAnalysis
+from throng4.meta_policy.prediction_error_tracker import (
+    PredictionErrorTracker, PredictionErrorType, PredictionError
+)
+from throng4.meta_policy.save_state_manager import (
+    SaveStateManager, SaveStateTrigger, SaveState
+)
 from throng4.meta_policy.meta_policy_controller import MetaPolicyController, ControllerConfig
 
 __all__ = [
@@ -31,6 +42,19 @@ __all__ = [
     'HypothesisExecutor',
     'ExecutableStrategy',
     'TetraClient',
+    'PerceptionHub',
+    'RiskSensor',
+    'PolicyMonitor',
+    'PrefrontalCortex',
+    'FailureProfiler',
+    'FailureMode',
+    'FailureAnalysis',
+    'PredictionErrorTracker',
+    'PredictionErrorType',
+    'PredictionError',
+    'SaveStateManager',
+    'SaveStateTrigger',
+    'SaveState',
     'MetaPolicyController',
     'ControllerConfig',
 ]

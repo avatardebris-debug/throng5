@@ -2,255 +2,255 @@
   {
     "game": "SpaceInvaders",
     "visual_patterns": {
-      "entity_count": 22,
+      "entity_count": 19,
       "motion_type": "bouncing",
       "spatial_layout": "scattered",
-      "collision_frequency": 0.32432432432432434
+      "collision_frequency": 0.2902902902902903
     },
     "causal_effects": {
+      "5": {
+        "state_delta": 0.014208360575139523,
+        "reward": 0.10869565217391304,
+        "creates_entities": "True"
+      },
       "1": {
-        "state_delta": 0.011447416618466377,
-        "reward": 0.3448275862068966,
-        "creates_entities": "False"
+        "state_delta": 0.01118259783834219,
+        "reward": 0.0625,
+        "creates_entities": "True"
       },
       "2": {
-        "state_delta": 0.012107388116419315,
-        "reward": 0.06172839506172839,
-        "creates_entities": "False"
-      },
-      "3": {
-        "state_delta": 0.014037738554179668,
-        "reward": 0.6164383561643836,
-        "creates_entities": "False"
-      },
-      "5": {
-        "state_delta": 0.01186815183609724,
-        "reward": 0.17647058823529413,
-        "creates_entities": "False"
-      },
-      "0": {
-        "state_delta": 0.011412013322114944,
-        "reward": 0.23809523809523808,
+        "state_delta": 0.011379552073776722,
+        "reward": 0.0,
         "creates_entities": "False"
       },
       "4": {
-        "state_delta": 0.017452683299779892,
-        "reward": 0.2222222222222222,
-        "creates_entities": "True"
+        "state_delta": 0.01303662545979023,
+        "reward": 0.0,
+        "creates_entities": "False"
+      },
+      "0": {
+        "state_delta": 0.012460896745324135,
+        "reward": 0.19736842105263158,
+        "creates_entities": "False"
+      },
+      "3": {
+        "state_delta": 0.0121986735612154,
+        "reward": 0.058823529411764705,
+        "creates_entities": "False"
       }
     },
     "hypotheses": [
       {
         "strategy": "llm_exploratory",
-        "baseline": 128.6,
-        "test_avg": 156.25,
-        "improvement": 27.650000000000006,
+        "baseline": 126.6,
+        "test_avg": 133.75,
+        "improvement": 7.150000000000006,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": 128.6,
-        "test_avg": 178.75,
-        "improvement": 50.150000000000006,
+        "baseline": 126.6,
+        "test_avg": 100.625,
+        "improvement": -25.974999999999994,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": 128.6,
-        "test_avg": 113.75,
-        "improvement": -14.849999999999994,
+        "baseline": 126.6,
+        "test_avg": 91.875,
+        "improvement": -34.724999999999994,
         "tetra_response": "completed",
         "refinement": "completed"
       }
     ],
     "retired": false,
-    "final_avg": 107.0,
+    "final_avg": 126.0,
     "episode_count": 80,
     "reward_trajectory": [
-      120.0,
-      119.16666666666667,
-      100.0,
-      140.83333333333334,
-      135.83333333333334,
-      153.33333333333334,
-      105.83333333333333,
-      99.16666666666667,
-      97.5,
-      146.66666666666666,
-      110.83333333333333,
-      128.33333333333334,
+      80.0,
       125.83333333333333,
-      110.83333333333333,
-      129.16666666666666,
-      107.5
+      133.33333333333334,
+      143.33333333333334,
+      84.16666666666667,
+      130.0,
+      124.16666666666667,
+      125.0,
+      170.83333333333334,
+      144.16666666666666,
+      105.0,
+      142.5,
+      113.33333333333333,
+      160.0,
+      115.83333333333333,
+      149.16666666666666
     ]
   },
   {
     "game": "Breakout",
     "visual_patterns": {
-      "entity_count": 14,
+      "entity_count": 15,
       "motion_type": "bouncing",
       "spatial_layout": "scattered",
-      "collision_frequency": 0.035035035035035036
+      "collision_frequency": 0.025025025025025027
     },
     "causal_effects": {
+      "2": {
+        "state_delta": 0.0025049385149031878,
+        "reward": 0.0,
+        "creates_entities": "False"
+      },
       "3": {
-        "state_delta": 0.0030188262462615967,
-        "reward": 0.02586206896551724,
+        "state_delta": 0.002198487054556608,
+        "reward": 0.0,
         "creates_entities": "True"
       },
-      "2": {
-        "state_delta": 0.0015835908707231283,
-        "reward": 0.0,
+      "0": {
+        "state_delta": 0.0017120098927989602,
+        "reward": 0.016,
         "creates_entities": "False"
       },
       "1": {
-        "state_delta": 0.0027232286520302296,
+        "state_delta": 0.0018465686589479446,
         "reward": 0.0,
-        "creates_entities": "False"
-      },
-      "0": {
-        "state_delta": 0.0011455344501882792,
-        "reward": 0.008130081300813009,
-        "creates_entities": "False"
+        "creates_entities": "True"
       }
     },
     "hypotheses": [
       {
         "strategy": "llm_exploratory",
-        "baseline": 0.84,
+        "baseline": 0.88,
+        "test_avg": 1.25,
+        "improvement": 0.37,
+        "tetra_response": "completed",
+        "refinement": "completed"
+      },
+      {
+        "strategy": "llm_exploratory",
+        "baseline": 0.88,
         "test_avg": 0.75,
-        "improvement": -0.08999999999999997,
+        "improvement": -0.13,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": 0.84,
-        "test_avg": 2.0,
-        "improvement": 1.1600000000000001,
-        "tetra_response": "completed",
-        "refinement": "completed"
-      },
-      {
-        "strategy": "llm_exploratory",
-        "baseline": 0.84,
-        "test_avg": 1.625,
-        "improvement": 0.785,
+        "baseline": 0.88,
+        "test_avg": 1.0,
+        "improvement": 0.12,
         "tetra_response": "completed",
         "refinement": "completed"
       }
     ],
     "retired": false,
-    "final_avg": 1.95,
+    "final_avg": 2.4,
     "episode_count": 80,
     "reward_trajectory": [
       2.0,
-      0.5,
-      1.0,
-      1.1666666666666667,
       1.3333333333333333,
+      1.5,
+      1.1666666666666667,
+      0.8333333333333334,
+      0.0,
+      0.8333333333333334,
+      1.5,
+      1.1666666666666667,
+      0.8333333333333334,
       0.6666666666666666,
       2.0,
       1.5,
-      1.1666666666666667,
-      1.3333333333333333,
-      1.6666666666666667,
-      1.3333333333333333,
-      1.3333333333333333,
-      2.1666666666666665,
-      2.3333333333333335,
-      1.3333333333333333
+      3.0,
+      2.6666666666666665,
+      1.6666666666666667
     ]
   },
   {
     "game": "Pong",
     "visual_patterns": {
-      "entity_count": 11,
+      "entity_count": 10,
       "motion_type": "bouncing",
       "spatial_layout": "scattered",
-      "collision_frequency": 0.10810810810810811
+      "collision_frequency": 0.08708708708708708
     },
     "causal_effects": {
-      "3": {
-        "state_delta": 0.006520681548863649,
-        "reward": -0.010309278350515464,
-        "creates_entities": "True"
-      },
-      "4": {
-        "state_delta": 0.006751336622983217,
-        "reward": 0.012987012987012988,
+      "1": {
+        "state_delta": 0.0063541666604578495,
+        "reward": -0.023529411764705882,
         "creates_entities": "False"
       },
-      "2": {
-        "state_delta": 0.007864266633987427,
-        "reward": -0.022988505747126436,
+      "3": {
+        "state_delta": 0.006754902191460133,
+        "reward": -0.013333333333333334,
         "creates_entities": "True"
       },
       "0": {
-        "state_delta": 0.006967633031308651,
-        "reward": -0.011764705882352941,
+        "state_delta": 0.006287680473178625,
+        "reward": -0.022988505747126436,
         "creates_entities": "True"
       },
-      "5": {
-        "state_delta": 0.008149153552949429,
-        "reward": 0.0,
+      "2": {
+        "state_delta": 0.006894658785313368,
+        "reward": -0.027777777777777776,
+        "creates_entities": "True"
+      },
+      "4": {
+        "state_delta": 0.006650777533650398,
+        "reward": -0.023255813953488372,
         "creates_entities": "False"
       },
-      "1": {
-        "state_delta": 0.0068100313656032085,
-        "reward": -0.029411764705882353,
+      "5": {
+        "state_delta": 0.006692143622785807,
+        "reward": -0.010526315789473684,
         "creates_entities": "False"
       }
     },
     "hypotheses": [
       {
         "strategy": "llm_exploratory",
-        "baseline": -10.88,
-        "test_avg": -10.375,
-        "improvement": 0.5050000000000008,
+        "baseline": -10.76,
+        "test_avg": -11.125,
+        "improvement": -0.3650000000000002,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": -10.88,
-        "test_avg": -9.125,
-        "improvement": 1.7550000000000008,
+        "baseline": -10.76,
+        "test_avg": -9.25,
+        "improvement": 1.5099999999999998,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": -10.88,
-        "test_avg": -9.0,
-        "improvement": 1.8800000000000008,
+        "baseline": -10.76,
+        "test_avg": -10.75,
+        "improvement": 0.009999999999999787,
         "tetra_response": "completed",
         "refinement": "completed"
       }
     ],
     "retired": false,
-    "final_avg": -10.0,
+    "final_avg": -10.5,
     "episode_count": 80,
     "reward_trajectory": [
-      -12.0,
-      -10.666666666666666,
+      -13.0,
       -11.0,
-      -11.5,
-      -10.5,
       -11.333333333333334,
-      -11.5,
-      -11.166666666666666,
-      -10.166666666666666,
+      -11.333333333333334,
+      -11.333333333333334,
+      -9.666666666666666,
+      -8.833333333333334,
+      -9.666666666666666,
       -10.666666666666666,
-      -10.166666666666666,
-      -10.833333333333334,
-      -9.333333333333334,
+      -9.833333333333334,
+      -9.666666666666666,
+      -9.833333333333334,
+      -9.0,
       -9.5,
-      -10.166666666666666,
-      -10.333333333333334
+      -10.666666666666666,
+      -10.5
     ]
   },
   {
@@ -259,76 +259,76 @@
       "entity_count": 47,
       "motion_type": "tracking",
       "spatial_layout": "linear",
-      "collision_frequency": 0.5185185185185185
+      "collision_frequency": 0.5375375375375375
     },
     "causal_effects": {
-      "13": {
-        "state_delta": 0.037067726254463196,
-        "reward": 0.0,
+      "6": {
+        "state_delta": 0.046643417328596115,
+        "reward": 1.4705882352941178,
         "creates_entities": "True"
-      },
-      "2": {
-        "state_delta": 0.029616013169288635,
-        "reward": 0.6060606060606061,
-        "creates_entities": "True"
-      },
-      "1": {
-        "state_delta": 0.0337669663131237,
-        "reward": 1.2820512820512822,
-        "creates_entities": "False"
       },
       "5": {
-        "state_delta": 0.03953814506530762,
-        "reward": 1.75,
+        "state_delta": 0.04990808665752411,
+        "reward": 1.3513513513513513,
         "creates_entities": "False"
       },
-      "7": {
-        "state_delta": 0.04159297049045563,
-        "reward": 0.5405405405405406,
+      "12": {
+        "state_delta": 0.043320123106241226,
+        "reward": 2.1875,
+        "creates_entities": "True"
+      },
+      "3": {
+        "state_delta": 0.03371374309062958,
+        "reward": 1.3888888888888888,
         "creates_entities": "False"
       },
       "0": {
-        "state_delta": 0.024354761466383934,
-        "reward": 1.5151515151515151,
+        "state_delta": 0.03102022036910057,
+        "reward": 1.6666666666666667,
         "creates_entities": "False"
       },
+      "10": {
+        "state_delta": 0.03580094501376152,
+        "reward": 0.0,
+        "creates_entities": "True"
+      },
       "8": {
-        "state_delta": 0.04144477844238281,
+        "state_delta": 0.03682226687669754,
+        "reward": 0.0,
+        "creates_entities": "True"
+      },
+      "7": {
+        "state_delta": 0.038781359791755676,
+        "reward": 1.4705882352941178,
+        "creates_entities": "False"
+      },
+      "2": {
+        "state_delta": 0.04258207231760025,
         "reward": 0.0,
         "creates_entities": "True"
       },
       "11": {
-        "state_delta": 0.0478542186319828,
+        "state_delta": 0.040175653994083405,
         "reward": 0.0,
         "creates_entities": "False"
       },
-      "10": {
-        "state_delta": 0.03255161643028259,
-        "reward": 0.0,
-        "creates_entities": "False"
-      },
-      "12": {
-        "state_delta": 0.03629625216126442,
-        "reward": 0.6451612903225806,
+      "9": {
+        "state_delta": 0.03181728348135948,
+        "reward": 3.225806451612903,
         "creates_entities": "True"
       },
-      "6": {
-        "state_delta": 0.03460631147027016,
-        "reward": 1.25,
+      "13": {
+        "state_delta": 0.03764237463474274,
+        "reward": 0.0,
+        "creates_entities": "True"
+      },
+      "1": {
+        "state_delta": 0.043887607753276825,
+        "reward": 1.5254237288135593,
         "creates_entities": "True"
       },
       "4": {
-        "state_delta": 0.028320685029029846,
-        "reward": 3.225806451612903,
-        "creates_entities": "False"
-      },
-      "3": {
-        "state_delta": 0.03142903745174408,
-        "reward": 0.0,
-        "creates_entities": "True"
-      },
-      "9": {
-        "state_delta": 0.03836112469434738,
+        "state_delta": 0.03551652282476425,
         "reward": 0.0,
         "creates_entities": "False"
       }
@@ -336,49 +336,49 @@
     "hypotheses": [
       {
         "strategy": "llm_exploratory",
-        "baseline": 361.6,
-        "test_avg": 393.75,
-        "improvement": 32.14999999999998,
+        "baseline": 493.6,
+        "test_avg": 605.0,
+        "improvement": 111.39999999999998,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": 361.6,
-        "test_avg": 476.25,
-        "improvement": 114.64999999999998,
+        "baseline": 493.6,
+        "test_avg": 458.75,
+        "improvement": -34.85000000000002,
         "tetra_response": "completed",
         "refinement": "completed"
       },
       {
         "strategy": "llm_exploratory",
-        "baseline": 361.6,
-        "test_avg": 466.25,
-        "improvement": 104.64999999999998,
+        "baseline": 493.6,
+        "test_avg": 525.0,
+        "improvement": 31.399999999999977,
         "tetra_response": "completed",
         "refinement": "completed"
       }
     ],
     "retired": false,
-    "final_avg": 486.5,
+    "final_avg": 396.0,
     "episode_count": 80,
     "reward_trajectory": [
-      440.0,
-      408.3333333333333,
-      331.6666666666667,
-      358.3333333333333,
-      435.0,
-      373.3333333333333,
-      515.0,
-      481.6666666666667,
-      523.3333333333334,
-      601.6666666666666,
-      515.0,
-      470.0,
-      416.6666666666667,
-      456.6666666666667,
+      730.0,
+      390.0,
+      443.3333333333333,
+      430.0,
+      580.0,
+      626.6666666666666,
       491.6666666666667,
-      431.6666666666667
+      498.3333333333333,
+      431.6666666666667,
+      565.0,
+      511.6666666666667,
+      518.3333333333334,
+      400.0,
+      400.0,
+      386.6666666666667,
+      440.0
     ]
   }
 ]
