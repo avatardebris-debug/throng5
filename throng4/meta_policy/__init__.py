@@ -14,6 +14,7 @@ from throng4.meta_policy.blind_concepts import BlindConceptLibrary, DiscoveredCo
 from throng4.meta_policy.visual_patterns import VisualPatternExtractor, VisualPatterns
 from throng4.meta_policy.causal_discovery import CausalDiscovery, ActionEffect
 from throng4.meta_policy.hypothesis_executor import HypothesisExecutor, ExecutableStrategy
+from throng4.meta_policy.tetra_client import TetraClient
 from throng4.meta_policy.meta_policy_controller import MetaPolicyController, ControllerConfig
 
 __all__ = [
@@ -29,6 +30,7 @@ __all__ = [
     'ActionEffect',
     'HypothesisExecutor',
     'ExecutableStrategy',
+    'TetraClient',
     'MetaPolicyController',
     'ControllerConfig',
 ]

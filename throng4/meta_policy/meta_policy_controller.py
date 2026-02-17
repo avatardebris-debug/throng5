@@ -55,8 +55,11 @@ class MetaPolicyController:
         4. on_environment_done() → save policy, discover concepts
     """
     
-    def __init__(self, config: Optional[ControllerConfig] = None):
+    def __init__(self, config: Optional[ControllerConfig] = None, 
+                 llm_client=None):
         self.config = config or ControllerConfig()
+        self.llm_client = llm_client  # Optional Tetra client
+        self.hypothesis_test_episodes = 10  # Episodes to test each hypothesis
         
         # Core components
         self.policy_tree = PolicyTree()
@@ -551,6 +554,117 @@ if __name__ == "__main__":
         if prompt:
             print(f"\n  LLM prompt (BLIND — no game names):")
             print(f"  {prompt[:200]}...")
+    
+    def test_hypothesis_with_tetra(self, pipeline) -> Dict:
+        """
+        Full dialogue loop with Tetra:
+        1. Detect plateau
+        2. Extract visual/causal patterns
+        3. Query Tetra with enhanced prompt
+        4. Parse response into strategy
+        5. Apply strategy to pipeline
+        
+        Returns dict with status and strategy info.
+        Caller should then run test episodes and call report_hypothesis_results().
+        """
+        if not self.llm_client:
+            return {'status': 'no_llm_client'}
+        
+        if not self._is_plateauing():
+            return {'status': 'not_plateauing'}
+        
+        # Generate enhanced prompt
+        prompt = self.get_abstract_llm_prompt()
+        if not prompt:
+            return {'status': 'cooldown'}
+        
+        print(f"\n[Tetra] Querying with enhanced prompt...")
+        print(f"[Tetra] Prompt preview: {prompt[:200]}...")
+        
+        # Query Tetra
+        tetra_response = self.llm_client.query(prompt)
+        
+        if "Error" in tetra_response:
+            print(f"[Tetra] {tetra_response}")
+            return {'status': 'error', 'error': tetra_response}
+        
+        print(f"[Tetra] Response: {tetra_response[:200]}...")
+        
+        # Parse into strategy
+        strategy = self.hypothesis_executor.parse_hypothesis(
+            tetra_response,
+            visual_patterns=self.current_visual_patterns.__dict__ if self.current_visual_patterns else None,
+            causal_effects=self.current_causal_effects,
+        )
+        
+        print(f"[Tetra] Parsed strategy: {strategy.summary()}")
+        
+        # Apply to pipeline
+        modifications = self.hypothesis_executor.apply_strategy(strategy, pipeline)
+        
+        print(f"[Tetra] Applied modifications: {modifications}")
+        
+        # Record baseline
+        baseline_reward = np.mean(list(self.episode_rewards)[-25:])
+        self.active_hypothesis = strategy
+        self.hypothesis_start_episode = self.episode_count
+        
+        return {
+            'status': 'hypothesis_applied',
+            'strategy': strategy,
+            'modifications': modifications,
+            'baseline_reward': baseline_reward,
+            'tetra_response': tetra_response,
+        }
+    
+    def report_hypothesis_results(self, test_rewards: List[float], 
+                                   baseline_reward: float) -> Optional[str]:
+        """
+        Report hypothesis test results to Tetra for refinement.
+        
+        Args:
+            test_rewards: Rewards from test episodes
+            baseline_reward: Baseline reward before hypothesis
+            
+        Returns:
+            Tetra's refinement suggestion or None
+        """
+        if not self.llm_client or not self.active_hypothesis:
+            return None
+        
+        avg_test = np.mean(test_rewards)
+        improvement = avg_test - baseline_reward
+        
+        # Build report prompt
+        report = (
+            f"Hypothesis test results:\n"
+            f"  Strategy: {self.active_hypothesis.name}\n"
+            f"  Baseline reward: {baseline_reward:.1f}\n"
+            f"  Test reward: {avg_test:.1f}\n"
+            f"  Improvement: {improvement:+.1f}\n"
+            f"\n"
+            f"Should we continue with this strategy, refine it, or try something else?"
+        )
+        
+        print(f"\n[Tetra] Reporting results...")
+        print(f"[Tetra] Improvement: {improvement:+.1f}")
+        
+        refinement = self.llm_client.query(report)
+        
+        print(f"[Tetra] Refinement: {refinement[:200]}...")
+        
+        # Record in history
+        self.hypothesis_history.append({
+            'strategy': self.active_hypothesis.name,
+            'baseline': baseline_reward,
+            'test_avg': avg_test,
+            'improvement': improvement,
+            'refinement': refinement,
+        })
+        
+        self.total_hypotheses_tested += 1
+        
+        return refinement
     
     # Final report
     print(f"\n{controller.summary()}")
