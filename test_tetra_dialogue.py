@@ -20,20 +20,20 @@ print("=" * 60)
 print("TETRA DIALOGUE LOOP TEST")
 print("=" * 60)
 
-# Create Tetra client
-print("\nConnecting to Tetra...")
-tetra = TetraClient(base_url="http://localhost:8000")
+# Create Tetra client (uses OpenClaw gateway)
+print("\nConnecting to Tetra via OpenClaw gateway...")
+tetra = TetraClient(game="SpaceInvaders_Blind")
 
 # Test connection
-test_response = tetra.query("Hello, can you hear me?")
-if "Error" in test_response:
-    print(f"⚠️  {test_response}")
-    print("\nMake sure Tetra is running on http://localhost:8000")
-    print("Exiting test...")
+if not tetra.check_gateway():
+    print("⚠️  Gateway not available!")
+    print("\nMake sure OpenClaw gateway is running:")
+    print("  openclaw gateway start")
+    print("  openclaw gateway health")
+    print("\nExiting test...")
     sys.exit(1)
 
-print(f"✅ Tetra connected: {test_response[:100]}...")
-tetra.reset_conversation()  # Clear test message
+print("✅ Gateway connected!")
 
 # Create controller with Tetra client
 controller = MetaPolicyController(

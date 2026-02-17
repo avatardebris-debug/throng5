@@ -1,24 +1,35 @@
 """
-Tetra Client — Interface to Tetra LLM for hypothesis generation.
+Tetra Client — Interface to Tetra via OpenClaw Gateway.
 
-Simple HTTP wrapper for querying Tetra's API.
+Uses OpenClawBridge to communicate with Tetra through the gateway.
 Maintains conversation history for multi-turn dialogue.
 """
 
-import requests
 from typing import Optional, List, Dict
+from throng4.llm_policy.openclaw_bridge import OpenClawBridge
 
 
 class TetraClient:
     """
-    Simple client for querying Tetra.
+    Client for querying Tetra via OpenClaw Gateway.
     
-    Tetra should be running locally (e.g., on port 8000).
+    Uses OpenClawBridge which handles gateway communication.
     """
     
-    def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+    def __init__(self, game: str = "UnknownGame"):
+        """
+        Initialize Tetra client with OpenClaw bridge.
+        
+        Args:
+            game: Game identifier for the bridge (can be generic)
+        """
+        self.bridge = OpenClawBridge(game=game)
         self.conversation_history: List[Dict[str, str]] = []
+        self.episode_counter = 0
+    
+    def check_gateway(self) -> bool:
+        """Check if gateway is available."""
+        return self.bridge.check_gateway()
     
     def query(self, prompt: str, temperature: float = 0.7) -> str:
         """
@@ -26,7 +37,7 @@ class TetraClient:
         
         Args:
             prompt: The prompt to send
-            temperature: Sampling temperature
+            temperature: Sampling temperature (not used by bridge, kept for compatibility)
             
         Returns:
             Tetra's text response
@@ -37,20 +48,12 @@ class TetraClient:
             'content': prompt,
         })
         
-        # Query Tetra API
         try:
-            response = requests.post(
-                f"{self.base_url}/query",
-                json={
-                    'messages': self.conversation_history,
-                    'temperature': temperature,
-                },
-                timeout=30,
-            )
-            response.raise_for_status()
+            # Query Tetra via bridge
+            response = self.bridge.query(prompt)
             
-            result = response.json()
-            tetra_response = result.get('response', '')
+            # Extract response text
+            tetra_response = response.raw if hasattr(response, 'raw') else str(response)
             
             # Add to history
             self.conversation_history.append({
@@ -60,39 +63,71 @@ class TetraClient:
             
             return tetra_response
             
-        except requests.exceptions.ConnectionError:
-            return "Error: Could not connect to Tetra. Is it running?"
-        except requests.exceptions.Timeout:
-            return "Error: Tetra query timed out."
         except Exception as e:
-            print(f"[TetraClient] Error: {e}")
-            return f"Error querying Tetra: {e}"
+            error_msg = f"Error querying Tetra via gateway: {e}"
+            print(f"[TetraClient] {error_msg}")
+            return error_msg
+    
+    def send_observation(self, observation: str, context: Optional[Dict] = None) -> str:
+        """
+        Send an observation to Tetra (for tracking, not expecting response).
+        
+        Args:
+            observation: Observation text
+            context: Optional context dict
+            
+        Returns:
+            Tetra's acknowledgment
+        """
+        try:
+            response = self.bridge.send_observation(
+                episode=self.episode_counter,
+                observation=observation,
+                context=context or {}
+            )
+            
+            return response.raw if hasattr(response, 'raw') else str(response)
+            
+        except Exception as e:
+            error_msg = f"Error sending observation: {e}"
+            print(f"[TetraClient] {error_msg}")
+            return error_msg
     
     def reset_conversation(self):
-        """Clear conversation history."""
+        """Clear conversation history and increment episode."""
         self.conversation_history.clear()
+        self.episode_counter += 1
 
 
 if __name__ == "__main__":
-    """Test Tetra client connection."""
+    """Test Tetra client connection via gateway."""
     print("=" * 60)
-    print("TETRA CLIENT TEST")
+    print("TETRA CLIENT TEST (via OpenClaw Gateway)")
     print("=" * 60)
     
-    client = TetraClient()
+    client = TetraClient(game="TestGame")
     
-    print("\nTesting connection to Tetra...")
-    response = client.query("Hello, can you hear me?")
-    
-    if "Error" in response:
-        print(f"⚠️  {response}")
-        print("\nMake sure Tetra is running on http://localhost:8000")
+    print("\nChecking gateway connection...")
+    if not client.check_gateway():
+        print("⚠️  Gateway not available!")
+        print("\nMake sure OpenClaw gateway is running:")
+        print("  openclaw gateway start")
+        print("  openclaw gateway health")
     else:
-        print(f"✅ Tetra responded: {response[:100]}...")
+        print("✅ Gateway is available!")
         
-        # Test multi-turn
-        print("\nTesting multi-turn dialogue...")
-        response2 = client.query("What did I just say?")
-        print(f"✅ Tetra responded: {response2[:100]}...")
+        # Test query
+        print("\nTesting query...")
+        response = client.query("Hello, can you hear me?")
+        
+        if "Error" in response:
+            print(f"⚠️  {response}")
+        else:
+            print(f"✅ Tetra responded: {response[:100]}...")
+            
+            # Test multi-turn
+            print("\nTesting multi-turn dialogue...")
+            response2 = client.query("What did I just say?")
+            print(f"✅ Tetra responded: {response2[:100]}...")
     
     print("\n" + "=" * 60)
