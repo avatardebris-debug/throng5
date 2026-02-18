@@ -1,0 +1,39 @@
+{
+  "level": 2,
+  "level_name": "O + I blocks",
+  "dreamer_enabled": true,
+  "episodes": 30,
+  "elapsed_s": 6.19726300239563,
+  "mean_lines": 10.933333333333334,
+  "std_lines": 6.345251943163663,
+  "max_lines": 28,
+  "mean_reward": 56.49833333333334,
+  "final_mean_lines": 9.4,
+  "final_max_lines": 19,
+  "dreamer": {
+    "final_reliance": 1.0,
+    "dreamer_needed": true,
+    "signals_generated": 27,
+    "signals_followed": 0,
+    "active_options": 2,
+    "promoted_options": 0,
+    "hypothesis_profiles": {
+      "build_flat": {
+        "win_rate": 0.7272727272727273,
+        "avg_reward": 64.19749792755385,
+        "specialization": 0.37952806322327803
+      },
+      "maximize_lines": {
+        "win_rate": 0.2727272727272727,
+        "avg_reward": 61.94157619676055,
+        "specialization": 0.3713873220989905
+      },
+      "minimize_height": {
+        "win_rate": 0.0,
+        "avg_reward": 59.95878159079695,
+        "specialization": 0.3906831008182056
+      }
+    },
+    "amygdala_overrides": 0
+  }
+}

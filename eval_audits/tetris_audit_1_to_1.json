@@ -1,0 +1,40 @@
+{
+  "session_id": "20260217_113912",
+  "timestamp": "2026-02-17T11:39:12.811743",
+  "summary": {
+    "total_episodes": 1,
+    "discrepancies_found": 1,
+    "total_anomalies": 3,
+    "anomaly_types": {
+      "REWARD_MISMATCH": 1,
+      "SINGLE_ACTION_EXPLOIT": 1,
+      "COLUMN_FIXATION": 1
+    },
+    "mean_reported_lines": 0.0,
+    "mean_verified_lines": 0.0,
+    "mean_reward_gap": 1.6600000000000006,
+    "suspicious_episodes": [
+      10
+    ]
+  },
+  "episodes": [
+    {
+      "episode_id": 10,
+      "level": 1,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -4.0600000000000005,
+      "verified_reward": -2.4,
+      "pieces_placed": 1,
+      "action_distribution": {
+        "(0, 0)": 1
+      },
+      "anomalies": [
+        "REWARD_MISMATCH: gap=1.660",
+        "SINGLE_ACTION_EXPLOIT: only used action (0, 0)",
+        "COLUMN_FIXATION: all placements in same column"
+      ],
+      "timestamp": "2026-02-17T11:39:12.792045"
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+[
+  {
+    "level": 2,
+    "level_name": "O + I blocks",
+    "dreamer_enabled": true,
+    "episodes": 50,
+    "elapsed_s": 0.6701633930206299,
+    "mean_lines": 12.16,
+    "std_lines": 16.786137137531078,
+    "max_lines": 74,
+    "mean_reward": 59.364000000000004,
+    "final_mean_lines": 5.85,
+    "final_max_lines": 22,
+    "dreamer": {
+      "final_reliance": 1.0,
+      "dreamer_needed": true,
+      "signals_generated": 47,
+      "signals_followed": 0,
+      "active_options": 2,
+      "promoted_options": 0,
+      "hypothesis_profiles": {
+        "minimize_height": {
+          "win_rate": 0.8604651162790697,
+          "avg_reward": 104.44553389388116,
+          "specialization": 0.4157223829763437
+        },
+        "maximize_lines": {
+          "win_rate": 0.0,
+          "avg_reward": 95.60098954276674,
+          "specialization": 0.40003263863611893
+        },
+        "build_flat": {
+          "win_rate": 0.13953488372093023,
+          "avg_reward": 97.26979070127233,
+          "specialization": 0.4050168259548243
+        }
+      },
+      "amygdala_overrides": 0
+    }
+  },
+  {
+    "level": 3,
+    "level_name": "O + I + T blocks",
+    "dreamer_enabled": true,
+    "episodes": 100,
+    "elapsed_s": 2.346803903579712,
+    "mean_lines": 13.87,
+    "std_lines": 14.262997581153831,
+    "max_lines": 54,
+    "mean_reward": 66.92639999999999,
+    "final_mean_lines": 13.35,
+    "final_max_lines": 48,
+    "dreamer": {
+      "final_reliance": 0.0,
+      "dreamer_needed": false,
+      "signals_generated": 162,
+      "signals_followed": 0,
+      "active_options": 2,
+      "promoted_options": 1,
+      "hypothesis_profiles": {
+        "minimize_height": {
+          "win_rate": 0.7902097902097902,
+          "avg_reward": 164.64694855500994,
+          "specialization": 0.3847426845938953
+        },
+        "maximize_lines": {
+          "win_rate": 0.03496503496503497,
+          "avg_reward": 153.21768974638616,
+          "specialization": 0.3836534313800039
+        },
+        "build_flat": {
+          "win_rate": 0.17482517482517482,
+          "avg_reward": 157.07458225881817,
+          "specialization": 0.37852511373763986
+        }
+      },
+      "amygdala_overrides": 0
+    }
+  },
+  {
+    "level": 4,
+    "level_name": "+ S, Z blocks",
+    "dreamer_enabled": true,
+    "episodes": 150,
+    "elapsed_s": 4.258608341217041,
+    "mean_lines": 9.593333333333334,
+    "std_lines": 11.359634188163318,
+    "max_lines": 65,
+    "mean_reward": 64.25293333333333,
+    "final_mean_lines": 10.8,
+    "final_max_lines": 29,
+    "dreamer": {
+      "final_reliance": 0.39,
+      "dreamer_needed": true,
+      "signals_generated": 319,
+      "signals_followed": 105,
+      "active_options": 2,
+      "promoted_options": 2,
+      "hypothesis_profiles": {
+        "minimize_height": {
+          "win_rate": 0.447098976109215,
+          "avg_reward": 185.53245368421042,
+          "specialization": 0.32252560041818307
+        },
+        "maximize_lines": {
+          "win_rate": 0.023890784982935155,
+          "avg_reward": 181.74639167689992,
+          "specialization": 0.3303851716147818
+        },
+        "build_flat": {
+          "win_rate": 0.5290102389078498,
+          "avg_reward": 210.42661114677833,
+          "specialization": 0.3622506003066761
+        }
+      },
+      "amygdala_overrides": 0
+    }
+  },
+  {
+    "level": 5,
+    "level_name": "All blocks, 8-wide",
+    "dreamer_enabled": true,
+    "episodes": 200,
+    "elapsed_s": 7.565779447555542,
+    "mean_lines": 19.275,
+    "std_lines": 28.550120402548217,
+    "max_lines": 188,
+    "mean_reward": 115.62244999999999,
+    "final_mean_lines": 26.85,
+    "final_max_lines": 172,
+    "dreamer": {
+      "final_reliance": 0.975,
+      "dreamer_needed": true,
+      "signals_generated": 519,
+      "signals_followed": 1218,
+      "active_options": 2,
+      "promoted_options": 2,
+      "hypothesis_profiles": {
+        "minimize_height": {
+          "win_rate": 0.36511156186612576,
+          "avg_reward": 177.0854834953077,
+          "specialization": 0.3220502085241107
+        },
+        "maximize_lines": {
+          "win_rate": 0.028397565922920892,
+          "avg_reward": 169.70388195614478,
+          "specialization": 0.3149312768736786
+        },
+        "build_flat": {
+          "win_rate": 0.6064908722109533,
+          "avg_reward": 213.20789416832207,
+          "specialization": 0.3160237976575645
+        }
+      },
+      "amygdala_overrides": 0
+    }
+  },
+  {
+    "level": 6,
+    "level_name": "All blocks, 10-wide",
+    "dreamer_enabled": true,
+    "episodes": 200,
+    "elapsed_s": 8.173390865325928,
+    "mean_lines": 14.365,
+    "std_lines": 20.805090122371496,
+    "max_lines": 125,
+    "mean_reward": 114.1473,
+    "final_mean_lines": 11.4,
+    "final_max_lines": 51,
+    "dreamer": {
+      "final_reliance": 0.98,
+      "dreamer_needed": true,
+      "signals_generated": 720,
+      "signals_followed": 2446,
+      "active_options": 2,
+      "promoted_options": 2,
+      "hypothesis_profiles": {
+        "minimize_height": {
+          "win_rate": 0.5050505050505051,
+          "avg_reward": 217.59904555567678,
+          "specialization": 0.4044000766850014
+        },
+        "maximize_lines": {
+          "win_rate": 0.020202020202020204,
+          "avg_reward": 167.8138210077031,
+          "specialization": 0.3088541023376984
+        },
+        "build_flat": {
+          "win_rate": 0.47474747474747475,
+          "avg_reward": 221.57319667896343,
+          "specialization": 0.3145120879828472
+        }
+      },
+      "amygdala_overrides": 0
+    }
+  },
+  {
+    "level": 7,
+    "level_name": "Standard Tetris",
+    "dreamer_enabled": true,
+    "episodes": 200,
+    "elapsed_s": 7.8515214920043945,
+    "mean_lines": 11.575,
+    "std_lines": 17.866011726179963,
+    "max_lines": 79,
+    "mean_reward": 87.03105,
+    "final_mean_lines": 11.85,
+    "final_max_lines": 39,
+    "dreamer": {
+      "final_reliance": 0.985,
+      "dreamer_needed": true,
+      "signals_generated": 920,
+      "signals_followed": 3427,
+      "active_options": 2,
+      "promoted_options": 2,
+      "hypothesis_profiles": {
+        "minimize_height": {
+          "win_rate": 0.4165733482642777,
+          "avg_reward": 231.26001076695363,
+          "specialization": 0.3842574222589852
+        },
+        "maximize_lines": {
+          "win_rate": 0.015677491601343786,
+          "avg_reward": 169.45516933836973,
+          "specialization": 0.3132593205628822
+        },
+        "build_flat": {
+          "win_rate": 0.5677491601343785,
+          "avg_reward": 246.66279007134224,
+          "specialization": 0.3494235685216386
+        }
+      },
+      "amygdala_overrides": 0
+    }
+  }
+]

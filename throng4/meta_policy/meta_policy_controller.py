@@ -31,6 +31,9 @@ from throng4.meta_policy.policy_monitor import PolicyMonitor
 from throng4.meta_policy.prefrontal_cortex import PrefrontalCortex
 from throng4.meta_policy.save_state_manager import SaveStateManager
 from throng4.metastack_pipeline import MetaStackPipeline
+from throng4.basal_ganglia.dreamer_engine import DreamerEngine, Hypothesis
+from throng4.basal_ganglia.amygdala import Amygdala
+from throng4.basal_ganglia.hypothesis_profiler import DreamerTeacher
 
 
 @dataclass
@@ -81,6 +84,23 @@ class MetaPolicyController:
         )
         self.prefrontal = PrefrontalCortex(llm_client=llm_client)
         self.save_state_manager = SaveStateManager()
+        
+        # Bridge Step 4: Basal Ganglia (dreamer) + Amygdala (danger detection)
+        self.basal_ganglia = DreamerEngine(
+            n_hypotheses=3,
+            network_size='micro',
+            state_size=64,
+            n_actions=4,  # Updated on_new_environment
+            dream_interval=5,
+        )
+        self.amygdala = Amygdala()
+        
+        # Bridge Step 4, Phase 7: Dreamer-as-Teacher pipeline
+        self.dreamer_teacher = DreamerTeacher(
+            n_actions=4,  # Updated on_new_environment
+            state_dim=16,
+        )
+        self._last_observed_state: Optional[np.ndarray] = None
         
         # Core components
         self.policy_tree = PolicyTree()
@@ -229,12 +249,23 @@ class MetaPolicyController:
     
     def on_step(self, state: np.ndarray, action: int, reward: float,
                 next_state: np.ndarray):
-        """Record a step for concept discovery and perception."""
+        """Record a step for concept discovery, perception, and dreamer."""
         # Feed concept library
         self.concept_library.record_step(state, action, reward, next_state)
         
         # Feed perception hub (visual + causal)
         self.perception.record(state, action, reward, next_state)
+        
+        # Feed basal ganglia world model (learns from every real step)
+        self.basal_ganglia.learn(state, action, next_state, reward)
+        self._last_observed_state = state
+        
+        # Record policy vs dreamer agreement (for dreamer_reliance tracking)
+        dreamer_rec = self.dreamer_teacher.get_best_action(state)
+        dreamer_action = dreamer_rec[0] if dreamer_rec else None
+        self.dreamer_teacher.record_policy_action(
+            state, action, dreamer_action, reward
+        )
     
     # ── Episode lifecycle ──────────────────────────────────────
     
@@ -286,6 +317,42 @@ class MetaPolicyController:
             ):
                 print(f"[MetaPolicy] Policy {self.current_policy.id} is "
                       f"chronically plateaued - consider retirement")
+        
+        # Basal Ganglia dream check (if calibrated)
+        if self.basal_ganglia.is_calibrated and self.basal_ganglia.should_dream():
+            hypotheses = self.basal_ganglia.create_default_hypotheses(
+                self.basal_ganglia.n_actions
+            )
+            # Use last observed state if available
+            dream_state = np.zeros(self.basal_ganglia.state_size)
+            dream_results = self.basal_ganglia.dream(
+                dream_state, hypotheses, n_steps=10
+            )
+            if dream_results:
+                # Feed DreamerTeacher — builds profiles, options, teaching signals
+                dream_state_for_teacher = (
+                    self._last_observed_state
+                    if self._last_observed_state is not None
+                    else dream_state
+                )
+                teaching_signals = self.dreamer_teacher.process_dream_results(
+                    dream_results, dream_state_for_teacher, self.episode_count
+                )
+                
+                # Dynamically adjust dream interval based on reliance
+                self.basal_ganglia.dream_interval = (
+                    self.dreamer_teacher.recommended_dream_interval
+                )
+                
+                # Amygdala danger check
+                danger = self.amygdala.assess_danger(
+                    dream_results, current_step=self.episode_count
+                )
+                if self.amygdala.should_override(danger, self.episode_count):
+                    self.amygdala.record_override(self.episode_count)
+                    print(f"[Amygdala] {danger.summary()}")
+                    print(f"[Amygdala] Override recommended: "
+                          f"{danger.recommended_action.value}")
         
         # Update policy monitor mode
         risk_level = self.risk_sensor.risk_level(self.episode_rewards)
@@ -449,6 +516,12 @@ class MetaPolicyController:
             'concepts_in_library': len(self.concept_library.concepts),
             'policies_in_tree': len(self.policy_tree.nodes),
             'mode': self.policy_monitor.mode,
+            'dreamer_calibrated': self.basal_ganglia.is_calibrated,
+            'amygdala_alertness': self.amygdala.alertness,
+            'dreamer_reliance': self.dreamer_teacher.dreamer_reliance,
+            'dreamer_needed': self.dreamer_teacher.dreamer_is_needed,
+            'active_options': len(self.dreamer_teacher.options.active_options),
+            'dream_interval': self.basal_ganglia.dream_interval,
         }
     
     def summary(self) -> str:

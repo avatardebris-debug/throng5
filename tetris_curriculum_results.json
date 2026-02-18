@@ -1,10 +1,10 @@
 {
-  "timestamp": 1771193420.0602007,
+  "timestamp": 1771349952.8105674,
   "config": {
     "start_level": 1,
-    "max_level": 3,
-    "auto_advance": true,
-    "tetra_enabled": true
+    "max_level": 1,
+    "auto_advance": false,
+    "tetra_enabled": false
   },
   "agent_config": {
     "n_features": 18,
@@ -19,13 +19,13 @@
       "level_name": "O-block only",
       "episodes": 10,
       "max_pieces": 50,
-      "mean_lines": 0.0,
-      "std_lines": 0.0,
-      "max_lines": 0,
-      "mean_reward": -1.7560000000000002,
+      "mean_lines": 1.8,
+      "std_lines": 5.4,
+      "max_lines": 18,
+      "mean_reward": 12.487999999999996,
       "lines_history": [
         0,
-        0,
+        18,
         0,
         0,
         0,
@@ -40,10 +40,10 @@
   "comparison": [
     {
       "level": 1,
-      "curriculum": 0.0,
+      "curriculum": 1.8,
       "dellacherie": 0.0,
-      "gap": 0.0,
-      "max": 0
+      "gap": 1.8,
+      "max": 18
     }
   ],
   "baseline": {}

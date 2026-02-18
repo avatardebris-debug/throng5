@@ -169,11 +169,16 @@ class OpenClawBridge:
             TetraResponse with Tetra's reply
         """
         try:
+            # Condense message for CLI (replace newlines, limit length)
+            cli_message = message.replace('\n', ' | ').replace('\r', '')
+            if len(cli_message) > 6000:
+                cli_message = cli_message[:6000] + '... [truncated]'
+            
             result = subprocess.run(
                 [
                     "openclaw", "agent",
                     "--agent", self.agent_id,
-                    "--message", message
+                    "--message", cli_message
                 ],
                 capture_output=True,
                 text=True,
@@ -272,7 +277,9 @@ class OpenClawBridge:
         
         self.session_observations.append(obs)
         
-        message = obs.to_message()
+        # Send plain-text observation directly (JSON format gets treated
+        # as system message by OpenClaw, bypassing the LLM)
+        message = observation
         
         # Try live send
         response = self._send_to_agent(message)
