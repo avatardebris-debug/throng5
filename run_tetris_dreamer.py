@@ -37,6 +37,8 @@ from throng4.basal_ganglia.hypothesis_profiler import DreamerTeacher, Hypothesis
 from throng4.basal_ganglia.bootstrap_hypotheses import bootstrap_hypotheses
 from throng4.basal_ganglia.execution_profiler import ExecutionProfiler
 from throng4.llm_policy.openclaw_bridge import OpenClawBridge
+from throng4.storage.experiment_db import ExperimentDB
+from throng4.storage.telemetry_logger import TelemetryLogger
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -138,7 +140,7 @@ class DreamerTetrisRunner:
                  dream_steps: int = 20,
                  nudge_strength: float = 0.3,
                  tetra_observation_interval: int = 50,
-                 db=None,
+                 db_path: str = "experiments/experiments.db",
                  game: str = "tetris"):
         """
         Args:
@@ -157,7 +159,12 @@ class DreamerTetrisRunner:
         self.nudge_strength = nudge_strength
         self.tetra_observation_interval = tetra_observation_interval
         self.game = game
-        self.db = db
+
+        # Persistent storage — open once, keep open for the session
+        import uuid as _uuid
+        self.db = ExperimentDB(db_path)
+        self.telemetry = TelemetryLogger()
+        self.session_id = str(_uuid.uuid4())[:8]
 
         # Environment
         self.adapter = TetrisAdapter(level=level, max_pieces=max_pieces)
@@ -388,6 +395,60 @@ class DreamerTetrisRunner:
         }
 
         self.episode_results.append(result)
+
+        # ── Persist to ExperimentDB ──────────────────────────────────────────
+        # Grab board features for DB (max_height, holes, bumpiness)
+        try:
+            _bf = self.adapter._compute_board_features(self.adapter.env.board)
+            _max_h  = _bf['max_height']
+            _holes  = _bf['holes']
+            _bump   = float(_bf['bumpiness'])
+        except Exception:
+            _max_h = _holes = 0; _bump = 0.0
+
+        # Hypothesis performance snapshot
+        _hyp_perf = {}
+        if self.hypotheses:
+            for h in self.hypotheses:
+                _hyp_perf[h.name] = {
+                    'win_rate': round(getattr(h, 'win_rate', 0.0), 3),
+                    'avg_reward': round(getattr(h, 'avg_reward', 0.0), 3),
+                }
+
+        self.db.log_episode(
+            game=self.game,
+            level=self.level,
+            episode_num=episode_num,
+            score=episode_reward,
+            lines_cleared=lines,
+            pieces_placed=info['pieces_placed'],
+            max_height=_max_h,
+            holes=_holes,
+            bumpiness=_bump,
+            outcome_tags={
+                'dreamer_nudges': dreamer_nudges,
+                'exec_nudges': exec_nudges,
+                'best_hypothesis': dream_info.get('best_hypothesis', ''),
+            },
+            hypothesis_performance=_hyp_perf if _hyp_perf else None,
+            session_id=self.session_id,
+        )
+
+        # Compact JSONL trace (greppable, no SQLite overhead)
+        self.telemetry.log_episode({
+            'game': self.game,
+            'level': self.level,
+            'episode': episode_num,
+            'session': self.session_id,
+            'lines': lines,
+            'score': round(episode_reward, 2),
+            'pieces': info['pieces_placed'],
+            'max_height': _max_h,
+            'holes': _holes,
+            'dreamer_nudges': dreamer_nudges,
+            'exec_nudges': exec_nudges,
+            'best_hypothesis': dream_info.get('best_hypothesis', ''),
+        })
         
         # ── Send observation to Tetra (every N episodes) ──
         if (self.tetra_enabled and self.bridge
@@ -511,6 +572,21 @@ class DreamerTetrisRunner:
                     del self.teacher.profiles[hyp.id]
                     print(f"  ⚙️  Evolved H{hyp.id}: {hyp.name} → {new_hyp.name} "
                           f"(was win={profile.win_rate:.0%})")
+                    # Persist both old (retired) and new (candidate) to DB
+                    self.db.upsert_hypothesis(
+                        name=hyp.name, game=self.game, level=self.level,
+                        confidence=profile.win_rate,
+                        win_rate=profile.win_rate,
+                        evidence_count=profile.n_attempts,
+                        status='retired',
+                        metadata={'evolved_into': new_hyp.name},
+                    )
+                    self.db.upsert_hypothesis(
+                        name=new_hyp.name, game=self.game, level=self.level,
+                        confidence=0.5, win_rate=0.0, evidence_count=0,
+                        status='candidate',
+                        metadata={'evolved_from': hyp.name},
+                    )
 
         return {
             'dreamer_reliance': self.teacher.dreamer_reliance,
@@ -1046,6 +1122,8 @@ def main():
     parser.add_argument('--nudge', type=float, default=0.3, help="Nudge strength")
     parser.add_argument('--dream-steps', type=int, default=20, help="Dream lookahead")
     parser.add_argument('--output', type=str, default=None, help="Save results JSON")
+    parser.add_argument('--db', type=str, default='experiments/experiments.db',
+                        help="Path to ExperimentDB SQLite file")
     args = parser.parse_args()
 
     if args.compare:
@@ -1057,6 +1135,7 @@ def main():
             tetra_enabled=args.tetra,
             dream_steps=args.dream_steps,
             nudge_strength=args.nudge,
+            db_path=args.db,
         )
         results = runner.run_curriculum(
             start_level=args.start_level,
@@ -1064,6 +1143,13 @@ def main():
             auto_advance=True,
             verbose=True
         )
+        # Print DB summary after curriculum
+        stats = runner.db.summary_stats()
+        print(f"\nDB: {stats['total_episodes']} episodes, "
+              f"{stats['total_hypotheses']} hypotheses persisted")
+        for row in stats['episodes_by_level']:
+            print(f"  L{row['level']}: {row['n']} eps, "
+                  f"avg_lines={row['avg_lines']:.1f}, max={row['max_lines']}")
     else:
         runner = DreamerTetrisRunner(
             level=args.level,
@@ -1072,6 +1158,7 @@ def main():
             tetra_enabled=args.tetra,
             dream_steps=args.dream_steps,
             nudge_strength=args.nudge,
+            db_path=args.db,
         )
         results = runner.run_training(
             n_episodes=args.episodes, verbose=True
