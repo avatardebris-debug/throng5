@@ -577,7 +577,7 @@ class DreamerTetrisRunner:
                         name=hyp.name, game=self.game, level=self.level,
                         confidence=profile.win_rate,
                         win_rate=profile.win_rate,
-                        evidence_count=profile.n_attempts,
+                        evidence_count=profile.total_evaluations,
                         status='retired',
                         metadata={'evolved_into': new_hyp.name},
                     )
