@@ -1,0 +1,316 @@
+{
+  "levels": [
+    {
+      "level": 2,
+      "game": "tetris",
+      "episodes": 500,
+      "mean_lines": 12.49,
+      "final_mean_lines": 5.65,
+      "max_lines": 298,
+      "elapsed_s": 12.0,
+      "eps_per_s": 41.6,
+      "pack_version": 5,
+      "session_id": "1583bf60"
+    }
+  ],
+  "elapsed_s": 12.1,
+  "db_stats": {
+    "total_episodes": 2822,
+    "total_hypotheses": 34,
+    "total_concepts": 8,
+    "total_events": 72,
+    "total_policy_packs": 6,
+    "episodes_by_level": [
+      {
+        "game": "breakout",
+        "level": 0,
+        "n": 4,
+        "avg_lines": 7.5,
+        "max_lines": 11
+      },
+      {
+        "game": "tetris",
+        "level": 2,
+        "n": 944,
+        "avg_lines": 11.172669491525424,
+        "max_lines": 298
+      },
+      {
+        "game": "tetris",
+        "level": 3,
+        "n": 230,
+        "avg_lines": 26.456521739130434,
+        "max_lines": 266
+      },
+      {
+        "game": "tetris",
+        "level": 4,
+        "n": 214,
+        "avg_lines": 18.757009345794394,
+        "max_lines": 129
+      },
+      {
+        "game": "tetris",
+        "level": 5,
+        "n": 210,
+        "avg_lines": 44.12380952380953,
+        "max_lines": 220
+      },
+      {
+        "game": "tetris",
+        "level": 6,
+        "n": 210,
+        "avg_lines": 18.523809523809526,
+        "max_lines": 160
+      },
+      {
+        "game": "tetris",
+        "level": 7,
+        "n": 1010,
+        "avg_lines": 12.009900990099009,
+        "max_lines": 152
+      }
+    ],
+    "hypotheses": [
+      {
+        "name": "aim_center",
+        "status": "testing",
+        "win_rate": 0.1,
+        "confidence": 0.1,
+        "evidence_count": 50
+      },
+      {
+        "name": "maximize_hits",
+        "status": "testing",
+        "win_rate": 0.12,
+        "confidence": 0.12,
+        "evidence_count": 50
+      },
+      {
+        "name": "track_ball",
+        "status": "active",
+        "win_rate": 0.78,
+        "confidence": 0.78,
+        "evidence_count": 50
+      },
+      {
+        "name": "maximize_gain",
+        "status": "retired",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 75
+      },
+      {
+        "name": "maximize_gain_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 1972
+      },
+      {
+        "name": "minimize_cost",
+        "status": "retired",
+        "win_rate": 0.5818639798488665,
+        "confidence": 0.5818639798488665,
+        "evidence_count": 397
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "candidate",
+        "win_rate": 1.0,
+        "confidence": 1.0,
+        "evidence_count": 23
+      },
+      {
+        "name": "minimize_cost_v2",
+        "status": "candidate",
+        "win_rate": 1.0,
+        "confidence": 1.0,
+        "evidence_count": 1788
+      },
+      {
+        "name": "minimize_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 46
+      },
+      {
+        "name": "minimize_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 1164
+      },
+      {
+        "name": "minimize_v3",
+        "status": "retired",
+        "win_rate": 0.021739130434782608,
+        "confidence": 0.021739130434782608,
+        "evidence_count": 46
+      },
+      {
+        "name": "minimize_v4",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 731
+      },
+      {
+        "name": "minimize_variance",
+        "status": "retired",
+        "win_rate": 0.0364963503649635,
+        "confidence": 0.0364963503649635,
+        "evidence_count": 137
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.06,
+        "confidence": 0.32,
+        "evidence_count": 50
+      },
+      {
+        "name": "maximize_gain",
+        "status": "retired",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 23
+      },
+      {
+        "name": "maximize_gain_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.5,
+        "evidence_count": 0
+      },
+      {
+        "name": "maximize_lines",
+        "status": "active",
+        "win_rate": 0.89,
+        "confidence": 0.58,
+        "evidence_count": 50
+      },
+      {
+        "name": "minimize_cost",
+        "status": "retired",
+        "win_rate": 0.09782608695652174,
+        "confidence": 0.09782608695652174,
+        "evidence_count": 184
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.5,
+        "evidence_count": 0
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.06,
+        "confidence": 0.09,
+        "evidence_count": 50
+      },
+      {
+        "name": "minimize_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 23
+      },
+      {
+        "name": "minimize_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.5,
+        "evidence_count": 0
+      },
+      {
+        "name": "minimize_variance",
+        "status": "retired",
+        "win_rate": 0.09259259259259259,
+        "confidence": 0.09259259259259259,
+        "evidence_count": 54
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.38,
+        "confidence": 0.38,
+        "evidence_count": 100
+      },
+      {
+        "name": "maximize_lines",
+        "status": "active",
+        "win_rate": 0.55,
+        "confidence": 0.55,
+        "evidence_count": 100
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "confidence": 0.0,
+        "evidence_count": 23
+      },
+      {
+        "name": "minimize_cost_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.5,
+        "evidence_count": 0
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.12,
+        "confidence": 0.12,
+        "evidence_count": 100
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.3,
+        "confidence": 0.3,
+        "evidence_count": 20
+      },
+      {
+        "name": "maximize_lines",
+        "status": "testing",
+        "win_rate": 0.59,
+        "confidence": 0.59,
+        "evidence_count": 20
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.11,
+        "confidence": 0.11,
+        "evidence_count": 20
+      },
+      {
+        "name": "minimize_v2",
+        "status": "retired",
+        "win_rate": 0.09965635738831616,
+        "confidence": 0.09965635738831616,
+        "evidence_count": 1164
+      },
+      {
+        "name": "minimize_v3",
+        "status": "retired",
+        "win_rate": 0.043478260869565216,
+        "confidence": 0.043478260869565216,
+        "evidence_count": 23
+      },
+      {
+        "name": "minimize_v4",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.5,
+        "evidence_count": 0
+      }
+    ]
+  },
+  "pack_version": 6
+}
