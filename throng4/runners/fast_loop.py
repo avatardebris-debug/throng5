@@ -52,6 +52,7 @@ from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 from throng4.storage.experiment_db import ExperimentDB
 from throng4.storage.telemetry_logger import TelemetryLogger
 from throng4.storage.policy_pack import PolicyPack, PromotionGates
+from throng4.storage.auto_metric import AutoMetric
 
 
 # ── Novelty detector ───────────────────────────────────────────────────────
@@ -154,6 +155,19 @@ class FastLoop:
         # Novelty detector on lines_cleared
         self._novelty = _NoveltyDetector()
 
+        # AutoMetric — records raw board observations passively
+        # Runs correlation analysis every auto_metric_interval episodes
+        board_h = {1:8, 2:10, 3:12, 4:14, 5:16, 6:18, 7:20}.get(level, 12)
+        self._auto_metric = AutoMetric(
+            db=self.db,
+            game=game,
+            obs_shape=(board_h, _tmp_adapter.board_width),
+            min_correlation=0.35,
+            min_episodes=100,
+            storage_path=f'{log_dir}/auto_metric_{game}_L{level}.jsonl',
+        )
+        self._auto_metric_interval = 500  # analyze every N episodes
+
         # Session ID for this FastLoop run
         import uuid
         self.session_id = str(uuid.uuid4())[:8]
@@ -208,12 +222,29 @@ class FastLoop:
 
         # Board features for DB
         try:
-            bf       = adapter._compute_board_features(adapter.env.board)
-            max_h    = bf['max_height']
-            holes    = bf['holes']
+            bf        = adapter._compute_board_features(adapter.env.board)
+            max_h     = bf['max_height']
+            holes     = bf['holes']
             bumpiness = float(bf['bumpiness'])
         except Exception:
             max_h = holes = 0; bumpiness = 0.0
+
+        # AutoMetric: record raw board snapshot passively
+        try:
+            raw_board = np.array(adapter.env.board, dtype=np.float32)
+            self._auto_metric.record(
+                raw_obs=raw_board,
+                outcome=float(lines),
+                episode_id=f'{self.session_id}_{episode_num}',
+                extra={
+                    'known_holes':     float(holes),
+                    'known_max_height': float(max_h),
+                    'known_bumpiness': float(bumpiness),
+                    'pieces_placed':   float(pieces),
+                }
+            )
+        except Exception:
+            pass
 
         return {
             'episode': episode_num,
@@ -299,6 +330,14 @@ class FastLoop:
                           'episode': ep, 'level': self.level,
                           'session': self.session_id},
                 )
+
+            # Periodic AutoMetric analysis
+            if ep > 0 and ep % self._auto_metric_interval == 0:
+                discoveries = self._auto_metric.analyze()
+                if discoveries and verbose:
+                    print(f"  [AutoMetric] {len(discoveries)} features discovered:")
+                    for d in discoveries[:5]:
+                        print(f"    {d.name:<30} r={d.correlation:+.3f}  {d.description[:60]}")
 
             # Progress print
             if verbose and (ep + 1) % 50 == 0:

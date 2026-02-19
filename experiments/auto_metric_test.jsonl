@@ -1,0 +1,750 @@
+{"outcome": 13, "ts": 1771472845.9226077, "episode_id": "ep_0", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472845.9256265, "episode_id": "ep_1", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472845.9276288, "episode_id": "ep_2", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 17, "ts": 1771472845.9344072, "episode_id": "ep_3", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472845.937958, "episode_id": "ep_4", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472845.9398832, "episode_id": "ep_5", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472845.9440007, "episode_id": "ep_6", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 162, "ts": 1771472845.9949594, "episode_id": "ep_7", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472845.998817, "episode_id": "ep_8", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472846.000722, "episode_id": "ep_9", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472846.0034227, "episode_id": "ep_10", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 80, "ts": 1771472846.0267777, "episode_id": "ep_11", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 28, "ts": 1771472846.03824, "episode_id": "ep_12", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 108, "ts": 1771472846.07272, "episode_id": "ep_13", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 9, "ts": 1771472846.0769935, "episode_id": "ep_14", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 52, "ts": 1771472846.0909884, "episode_id": "ep_15", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472846.0929034, "episode_id": "ep_16", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 45, "ts": 1771472846.1067455, "episode_id": "ep_17", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 54, "ts": 1771472846.1244695, "episode_id": "ep_18", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 33, "ts": 1771472846.1358774, "episode_id": "ep_19", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 97, "ts": 1771472846.1686652, "episode_id": "ep_20", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 40, "ts": 1771472846.1807146, "episode_id": "ep_21", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 44, "ts": 1771472846.1928453, "episode_id": "ep_22", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472846.1962085, "episode_id": "ep_23", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 29, "ts": 1771472846.206376, "episode_id": "ep_24", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 16, "ts": 1771472846.212131, "episode_id": "ep_25", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 56, "ts": 1771472846.228852, "episode_id": "ep_26", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 35, "ts": 1771472846.2390637, "episode_id": "ep_27", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472846.2407677, "episode_id": "ep_28", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472846.244233, "episode_id": "ep_29", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 150, "ts": 1771472846.287682, "episode_id": "ep_30", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 74, "ts": 1771472846.3089557, "episode_id": "ep_31", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 199, "ts": 1771472846.3638923, "episode_id": "ep_32", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 7, "ts": 1771472846.3682404, "episode_id": "ep_33", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 20, "ts": 1771472846.3757222, "episode_id": "ep_34", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 88, "ts": 1771472846.4010072, "episode_id": "ep_35", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 54, "ts": 1771472846.417765, "episode_id": "ep_36", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 102, "ts": 1771472846.4465349, "episode_id": "ep_37", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 118, "ts": 1771472846.4767692, "episode_id": "ep_38", "known_holes": 12.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 52, "ts": 1771472846.4910023, "episode_id": "ep_39", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 20, "ts": 1771472846.4998748, "episode_id": "ep_40", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472846.5034482, "episode_id": "ep_41", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472846.505082, "episode_id": "ep_42", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 51, "ts": 1771472846.5197008, "episode_id": "ep_43", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 82, "ts": 1771472846.5576985, "episode_id": "ep_44", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 16, "ts": 1771472846.5647037, "episode_id": "ep_45", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472846.5751348, "episode_id": "ep_46", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 16, "ts": 1771472846.5818348, "episode_id": "ep_47", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472846.5857756, "episode_id": "ep_48", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 52, "ts": 1771472846.609518, "episode_id": "ep_49", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472846.6140208, "episode_id": "ep_50", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 13, "ts": 1771472846.6196265, "episode_id": "ep_51", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 13, "ts": 1771472846.6245625, "episode_id": "ep_52", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472846.6276596, "episode_id": "ep_53", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472846.629277, "episode_id": "ep_54", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 25, "ts": 1771472846.6375618, "episode_id": "ep_55", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472846.642211, "episode_id": "ep_56", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 9, "ts": 1771472846.6466637, "episode_id": "ep_57", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 54, "ts": 1771472846.661539, "episode_id": "ep_58", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 24, "ts": 1771472846.6689258, "episode_id": "ep_59", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472846.6735895, "episode_id": "ep_60", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 181, "ts": 1771472846.723042, "episode_id": "ep_61", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 13, "ts": 1771472846.7279508, "episode_id": "ep_62", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472846.7296052, "episode_id": "ep_63", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 48, "ts": 1771472846.7447724, "episode_id": "ep_64", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 8, "ts": 1771472846.7481942, "episode_id": "ep_65", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 48, "ts": 1771472846.7627735, "episode_id": "ep_66", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 123, "ts": 1771472846.8073516, "episode_id": "ep_67", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 12, "ts": 1771472846.8126786, "episode_id": "ep_68", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 12, "ts": 1771472846.8169508, "episode_id": "ep_69", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 29, "ts": 1771472846.8266866, "episode_id": "ep_70", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472846.8284302, "episode_id": "ep_71", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 77, "ts": 1771472846.8484828, "episode_id": "ep_72", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 145, "ts": 1771472846.8869846, "episode_id": "ep_73", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472846.889023, "episode_id": "ep_74", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 81, "ts": 1771472846.9118884, "episode_id": "ep_75", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 13, "ts": 1771472846.9191709, "episode_id": "ep_76", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 35, "ts": 1771472846.9289215, "episode_id": "ep_77", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 68, "ts": 1771472846.949444, "episode_id": "ep_78", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 146, "ts": 1771472846.9906635, "episode_id": "ep_79", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472846.9924521, "episode_id": "ep_80", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 109, "ts": 1771472847.0242624, "episode_id": "ep_81", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472847.0279148, "episode_id": "ep_82", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472847.0295963, "episode_id": "ep_83", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472847.0311127, "episode_id": "ep_84", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 43, "ts": 1771472847.0479543, "episode_id": "ep_85", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 143, "ts": 1771472847.0918229, "episode_id": "ep_86", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 15, "ts": 1771472847.0980484, "episode_id": "ep_87", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 134, "ts": 1771472847.1601577, "episode_id": "ep_88", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472847.1621785, "episode_id": "ep_89", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 115, "ts": 1771472847.2174115, "episode_id": "ep_90", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472847.2244935, "episode_id": "ep_91", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 104, "ts": 1771472847.2701683, "episode_id": "ep_92", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472847.2724113, "episode_id": "ep_93", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472847.2750719, "episode_id": "ep_94", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 19, "ts": 1771472847.2817225, "episode_id": "ep_95", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 88, "ts": 1771472847.3087726, "episode_id": "ep_96", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 66, "ts": 1771472847.3275955, "episode_id": "ep_97", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 22, "ts": 1771472847.3342767, "episode_id": "ep_98", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 65, "ts": 1771472847.351792, "episode_id": "ep_99", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472847.3535593, "episode_id": "ep_100", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 13, "ts": 1771472847.3590152, "episode_id": "ep_101", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 13, "ts": 1771472847.3637586, "episode_id": "ep_102", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472847.3668716, "episode_id": "ep_103", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472847.3693779, "episode_id": "ep_104", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 21, "ts": 1771472847.378447, "episode_id": "ep_105", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472847.380166, "episode_id": "ep_106", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 11, "ts": 1771472847.3856606, "episode_id": "ep_107", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 90, "ts": 1771472847.4097872, "episode_id": "ep_108", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 45, "ts": 1771472847.4245489, "episode_id": "ep_109", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472847.426373, "episode_id": "ep_110", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472847.4281654, "episode_id": "ep_111", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 12, "ts": 1771472847.4329531, "episode_id": "ep_112", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 96, "ts": 1771472847.4729602, "episode_id": "ep_113", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 7, "ts": 1771472847.4773302, "episode_id": "ep_114", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 29, "ts": 1771472847.486036, "episode_id": "ep_115", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472847.4904704, "episode_id": "ep_116", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472847.4921856, "episode_id": "ep_117", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 20, "ts": 1771472847.498178, "episode_id": "ep_118", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472847.5029674, "episode_id": "ep_119", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472847.5049577, "episode_id": "ep_120", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472847.506668, "episode_id": "ep_121", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472847.5095644, "episode_id": "ep_122", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 10, "ts": 1771472847.512558, "episode_id": "ep_123", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 32, "ts": 1771472847.5233998, "episode_id": "ep_124", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472847.526559, "episode_id": "ep_125", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472847.5281343, "episode_id": "ep_126", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472847.5313694, "episode_id": "ep_127", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 13, "ts": 1771472847.5366874, "episode_id": "ep_128", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472847.5396833, "episode_id": "ep_129", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 118, "ts": 1771472847.5722163, "episode_id": "ep_130", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 205, "ts": 1771472847.6279128, "episode_id": "ep_131", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 13, "ts": 1771472847.6329558, "episode_id": "ep_132", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 77, "ts": 1771472847.6518562, "episode_id": "ep_133", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472847.653408, "episode_id": "ep_134", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 53, "ts": 1771472847.6701627, "episode_id": "ep_135", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 168, "ts": 1771472847.7127094, "episode_id": "ep_136", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 12, "ts": 1771472847.717144, "episode_id": "ep_137", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 53, "ts": 1771472847.7318568, "episode_id": "ep_138", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 87, "ts": 1771472847.7531996, "episode_id": "ep_139", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 54, "ts": 1771472847.7695837, "episode_id": "ep_140", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472847.7728932, "episode_id": "ep_141", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 104, "ts": 1771472847.8010795, "episode_id": "ep_142", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472847.8060646, "episode_id": "ep_143", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 16, "ts": 1771472847.8117542, "episode_id": "ep_144", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 52, "ts": 1771472847.823982, "episode_id": "ep_145", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472847.82563, "episode_id": "ep_146", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 7, "ts": 1771472847.8287964, "episode_id": "ep_147", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 21, "ts": 1771472847.8354182, "episode_id": "ep_148", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 29, "ts": 1771472847.8456225, "episode_id": "ep_149", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 72, "ts": 1771472860.698476, "episode_id": "ep_0", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 51, "ts": 1771472860.715151, "episode_id": "ep_1", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472860.716983, "episode_id": "ep_2", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 184, "ts": 1771472860.780174, "episode_id": "ep_3", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 32, "ts": 1771472860.7974524, "episode_id": "ep_4", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 30, "ts": 1771472860.808724, "episode_id": "ep_5", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472860.8104975, "episode_id": "ep_6", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 55, "ts": 1771472860.826913, "episode_id": "ep_7", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472860.8317068, "episode_id": "ep_8", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472860.8332958, "episode_id": "ep_9", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472860.8348753, "episode_id": "ep_10", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 7, "ts": 1771472860.8381402, "episode_id": "ep_11", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 11, "ts": 1771472860.8424118, "episode_id": "ep_12", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 69, "ts": 1771472860.8598142, "episode_id": "ep_13", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 12, "ts": 1771472860.8640416, "episode_id": "ep_14", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472860.8656363, "episode_id": "ep_15", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 17, "ts": 1771472860.8714087, "episode_id": "ep_16", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 17, "ts": 1771472860.8774514, "episode_id": "ep_17", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472860.8790183, "episode_id": "ep_18", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472860.8805504, "episode_id": "ep_19", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 91, "ts": 1771472860.9052534, "episode_id": "ep_20", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 40, "ts": 1771472860.9190283, "episode_id": "ep_21", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 58, "ts": 1771472860.9343069, "episode_id": "ep_22", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472860.9378197, "episode_id": "ep_23", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 25, "ts": 1771472860.947563, "episode_id": "ep_24", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 15, "ts": 1771472860.9534783, "episode_id": "ep_25", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472860.9556398, "episode_id": "ep_26", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 77, "ts": 1771472860.981955, "episode_id": "ep_27", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 19, "ts": 1771472860.9897969, "episode_id": "ep_28", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 11, "ts": 1771472860.9956813, "episode_id": "ep_29", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472860.9972842, "episode_id": "ep_30", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472860.9988046, "episode_id": "ep_31", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.000424, "episode_id": "ep_32", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 24, "ts": 1771472861.0068455, "episode_id": "ep_33", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 29, "ts": 1771472861.0136688, "episode_id": "ep_34", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472861.0152926, "episode_id": "ep_35", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 12, "ts": 1771472861.0193615, "episode_id": "ep_36", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.022254, "episode_id": "ep_37", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.0256205, "episode_id": "ep_38", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.0274193, "episode_id": "ep_39", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 133, "ts": 1771472861.0653694, "episode_id": "ep_40", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 53, "ts": 1771472861.082772, "episode_id": "ep_41", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 14, "ts": 1771472861.0876815, "episode_id": "ep_42", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 31, "ts": 1771472861.0983024, "episode_id": "ep_43", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.101409, "episode_id": "ep_44", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 153, "ts": 1771472861.140636, "episode_id": "ep_45", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472861.1424072, "episode_id": "ep_46", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 87, "ts": 1771472861.1675625, "episode_id": "ep_47", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 10, "ts": 1771472861.1726773, "episode_id": "ep_48", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 34, "ts": 1771472861.1870675, "episode_id": "ep_49", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.1893399, "episode_id": "ep_50", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 107, "ts": 1771472861.222376, "episode_id": "ep_51", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 112, "ts": 1771472861.259374, "episode_id": "ep_52", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472861.2622762, "episode_id": "ep_53", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.2640343, "episode_id": "ep_54", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.265559, "episode_id": "ep_55", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 80, "ts": 1771472861.2922199, "episode_id": "ep_56", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 21, "ts": 1771472861.3013742, "episode_id": "ep_57", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.3030372, "episode_id": "ep_58", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 49, "ts": 1771472861.3197248, "episode_id": "ep_59", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472861.3218791, "episode_id": "ep_60", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472861.3257194, "episode_id": "ep_61", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 26, "ts": 1771472861.3343399, "episode_id": "ep_62", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 26, "ts": 1771472861.3426971, "episode_id": "ep_63", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472861.3457613, "episode_id": "ep_64", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 154, "ts": 1771472861.3857207, "episode_id": "ep_65", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 16, "ts": 1771472861.391554, "episode_id": "ep_66", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 86, "ts": 1771472861.4167454, "episode_id": "ep_67", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 36, "ts": 1771472861.430121, "episode_id": "ep_68", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472861.4327352, "episode_id": "ep_69", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.4343781, "episode_id": "ep_70", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 98, "ts": 1771472861.4645493, "episode_id": "ep_71", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 15, "ts": 1771472861.470531, "episode_id": "ep_72", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 14, "ts": 1771472861.478168, "episode_id": "ep_73", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 44, "ts": 1771472861.4900944, "episode_id": "ep_74", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.4924529, "episode_id": "ep_75", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.4948452, "episode_id": "ep_76", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 61, "ts": 1771472861.5158267, "episode_id": "ep_77", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472861.517611, "episode_id": "ep_78", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 102, "ts": 1771472861.5507104, "episode_id": "ep_79", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472861.5525298, "episode_id": "ep_80", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 170, "ts": 1771472861.5975626, "episode_id": "ep_81", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 13, "ts": 1771472861.6022565, "episode_id": "ep_82", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 33, "ts": 1771472861.613387, "episode_id": "ep_83", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.6151261, "episode_id": "ep_84", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472861.6189985, "episode_id": "ep_85", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 82, "ts": 1771472861.6400445, "episode_id": "ep_86", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 164, "ts": 1771472861.693552, "episode_id": "ep_87", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472861.6956165, "episode_id": "ep_88", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 33, "ts": 1771472861.7076821, "episode_id": "ep_89", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 65, "ts": 1771472861.7260516, "episode_id": "ep_90", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472861.7277858, "episode_id": "ep_91", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.7301984, "episode_id": "ep_92", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.7318077, "episode_id": "ep_93", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 13, "ts": 1771472861.7369733, "episode_id": "ep_94", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 15, "ts": 1771472861.74223, "episode_id": "ep_95", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472861.7445977, "episode_id": "ep_96", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472861.7466624, "episode_id": "ep_97", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 7, "ts": 1771472861.7497733, "episode_id": "ep_98", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472861.7526205, "episode_id": "ep_99", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 16, "ts": 1771472861.758721, "episode_id": "ep_100", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 47, "ts": 1771472861.772479, "episode_id": "ep_101", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 45, "ts": 1771472861.7863832, "episode_id": "ep_102", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 14, "ts": 1771472861.7925909, "episode_id": "ep_103", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 19, "ts": 1771472861.798873, "episode_id": "ep_104", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 85, "ts": 1771472861.8200018, "episode_id": "ep_105", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 7, "ts": 1771472861.824245, "episode_id": "ep_106", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 12, "ts": 1771472861.828939, "episode_id": "ep_107", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 14, "ts": 1771472861.833857, "episode_id": "ep_108", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472861.8354502, "episode_id": "ep_109", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 34, "ts": 1771472861.8466039, "episode_id": "ep_110", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 60, "ts": 1771472861.877907, "episode_id": "ep_111", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 81, "ts": 1771472861.9022295, "episode_id": "ep_112", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472861.9068677, "episode_id": "ep_113", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 90, "ts": 1771472861.9337063, "episode_id": "ep_114", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 39, "ts": 1771472861.9468894, "episode_id": "ep_115", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 93, "ts": 1771472861.9771116, "episode_id": "ep_116", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 131, "ts": 1771472862.014196, "episode_id": "ep_117", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472862.0161302, "episode_id": "ep_118", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472862.0198362, "episode_id": "ep_119", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472862.0229864, "episode_id": "ep_120", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 20, "ts": 1771472862.0304277, "episode_id": "ep_121", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 134, "ts": 1771472862.0679803, "episode_id": "ep_122", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 21, "ts": 1771472862.0748892, "episode_id": "ep_123", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 237, "ts": 1771472862.1394897, "episode_id": "ep_124", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 7, "ts": 1771472862.1427963, "episode_id": "ep_125", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472862.1459057, "episode_id": "ep_126", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 111, "ts": 1771472862.1740465, "episode_id": "ep_127", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 11, "ts": 1771472862.1781437, "episode_id": "ep_128", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472862.1798224, "episode_id": "ep_129", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 106, "ts": 1771472862.207636, "episode_id": "ep_130", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 208, "ts": 1771472862.2612014, "episode_id": "ep_131", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 20, "ts": 1771472862.268099, "episode_id": "ep_132", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 52, "ts": 1771472862.28079, "episode_id": "ep_133", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 7, "ts": 1771472862.2839367, "episode_id": "ep_134", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 70, "ts": 1771472862.3022006, "episode_id": "ep_135", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472862.3040695, "episode_id": "ep_136", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472862.3057444, "episode_id": "ep_137", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 33, "ts": 1771472862.3149402, "episode_id": "ep_138", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472862.316465, "episode_id": "ep_139", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472862.3179889, "episode_id": "ep_140", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472862.3225725, "episode_id": "ep_141", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 136, "ts": 1771472862.3564827, "episode_id": "ep_142", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 132, "ts": 1771472862.3855789, "episode_id": "ep_143", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472862.3873496, "episode_id": "ep_144", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472862.3902633, "episode_id": "ep_145", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 8, "ts": 1771472862.393411, "episode_id": "ep_146", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 86, "ts": 1771472862.414073, "episode_id": "ep_147", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472862.4172843, "episode_id": "ep_148", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 25, "ts": 1771472862.42474, "episode_id": "ep_149", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 11, "ts": 1771472870.1759763, "episode_id": "ep_0", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 81, "ts": 1771472870.2031665, "episode_id": "ep_1", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 117, "ts": 1771472870.2357738, "episode_id": "ep_2", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 74, "ts": 1771472870.2539775, "episode_id": "ep_3", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472870.2555983, "episode_id": "ep_4", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472870.258637, "episode_id": "ep_5", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 73, "ts": 1771472870.277969, "episode_id": "ep_6", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472870.2798066, "episode_id": "ep_7", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472870.282998, "episode_id": "ep_8", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 23, "ts": 1771472870.288751, "episode_id": "ep_9", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472870.2922149, "episode_id": "ep_10", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 117, "ts": 1771472870.3239765, "episode_id": "ep_11", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 7, "ts": 1771472870.327185, "episode_id": "ep_12", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472870.32865, "episode_id": "ep_13", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 16, "ts": 1771472870.3344169, "episode_id": "ep_14", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472870.3375266, "episode_id": "ep_15", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472870.339038, "episode_id": "ep_16", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 84, "ts": 1771472870.3600116, "episode_id": "ep_17", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472870.36416, "episode_id": "ep_18", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 9, "ts": 1771472870.3683717, "episode_id": "ep_19", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472870.3700783, "episode_id": "ep_20", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 194, "ts": 1771472870.4212377, "episode_id": "ep_21", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 138, "ts": 1771472870.4567773, "episode_id": "ep_22", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 55, "ts": 1771472870.4724607, "episode_id": "ep_23", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472870.4742095, "episode_id": "ep_24", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472870.4775662, "episode_id": "ep_25", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472870.480741, "episode_id": "ep_26", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 9, "ts": 1771472870.4847937, "episode_id": "ep_27", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 52, "ts": 1771472870.4984937, "episode_id": "ep_28", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 16, "ts": 1771472870.504192, "episode_id": "ep_29", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 47, "ts": 1771472870.5192401, "episode_id": "ep_30", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 36, "ts": 1771472870.530306, "episode_id": "ep_31", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 273, "ts": 1771472870.6091957, "episode_id": "ep_32", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472870.6114783, "episode_id": "ep_33", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 7, "ts": 1771472870.614705, "episode_id": "ep_34", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 131, "ts": 1771472870.651681, "episode_id": "ep_35", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 173, "ts": 1771472870.6992064, "episode_id": "ep_36", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 12, "ts": 1771472870.7033541, "episode_id": "ep_37", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 198, "ts": 1771472870.760028, "episode_id": "ep_38", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472870.7656193, "episode_id": "ep_39", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472870.7673872, "episode_id": "ep_40", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 14, "ts": 1771472870.7718198, "episode_id": "ep_41", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472870.773315, "episode_id": "ep_42", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 45, "ts": 1771472870.7873838, "episode_id": "ep_43", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472870.789024, "episode_id": "ep_44", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 56, "ts": 1771472870.8049293, "episode_id": "ep_45", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 75, "ts": 1771472870.825839, "episode_id": "ep_46", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472870.8274784, "episode_id": "ep_47", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 75, "ts": 1771472870.8506923, "episode_id": "ep_48", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472870.8525574, "episode_id": "ep_49", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 22, "ts": 1771472870.859227, "episode_id": "ep_50", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 91, "ts": 1771472870.8862853, "episode_id": "ep_51", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 15, "ts": 1771472870.891119, "episode_id": "ep_52", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 7, "ts": 1771472870.8956034, "episode_id": "ep_53", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 102, "ts": 1771472870.9200947, "episode_id": "ep_54", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 200, "ts": 1771472870.9734209, "episode_id": "ep_55", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472870.9764256, "episode_id": "ep_56", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472870.9780126, "episode_id": "ep_57", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 45, "ts": 1771472870.9889748, "episode_id": "ep_58", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 66, "ts": 1771472871.008102, "episode_id": "ep_59", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 9, "ts": 1771472871.0124037, "episode_id": "ep_60", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.014423, "episode_id": "ep_61", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 147, "ts": 1771472871.0548801, "episode_id": "ep_62", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472871.0583358, "episode_id": "ep_63", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.0601192, "episode_id": "ep_64", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 145, "ts": 1771472871.0968163, "episode_id": "ep_65", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 16, "ts": 1771472871.1022885, "episode_id": "ep_66", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 224, "ts": 1771472871.161941, "episode_id": "ep_67", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 12, "ts": 1771472871.1656947, "episode_id": "ep_68", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472871.167264, "episode_id": "ep_69", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 23, "ts": 1771472871.1759734, "episode_id": "ep_70", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472871.1819668, "episode_id": "ep_71", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 20, "ts": 1771472871.1875126, "episode_id": "ep_72", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472871.189145, "episode_id": "ep_73", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 23, "ts": 1771472871.1954298, "episode_id": "ep_74", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472871.1974282, "episode_id": "ep_75", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 17, "ts": 1771472871.2030277, "episode_id": "ep_76", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.2046945, "episode_id": "ep_77", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 13, "ts": 1771472871.2094667, "episode_id": "ep_78", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.210994, "episode_id": "ep_79", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 21, "ts": 1771472871.2174153, "episode_id": "ep_80", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 41, "ts": 1771472871.2313423, "episode_id": "ep_81", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.2340944, "episode_id": "ep_82", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.2358708, "episode_id": "ep_83", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 40, "ts": 1771472871.2467127, "episode_id": "ep_84", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 111, "ts": 1771472871.2777436, "episode_id": "ep_85", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 239, "ts": 1771472871.3414893, "episode_id": "ep_86", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 79, "ts": 1771472871.3641012, "episode_id": "ep_87", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 44, "ts": 1771472871.375191, "episode_id": "ep_88", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 18, "ts": 1771472871.3811839, "episode_id": "ep_89", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472871.3826902, "episode_id": "ep_90", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 132, "ts": 1771472871.413017, "episode_id": "ep_91", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 92, "ts": 1771472871.4342246, "episode_id": "ep_92", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 46, "ts": 1771472871.4460976, "episode_id": "ep_93", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 164, "ts": 1771472871.486684, "episode_id": "ep_94", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472871.4887092, "episode_id": "ep_95", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.4903598, "episode_id": "ep_96", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.4918494, "episode_id": "ep_97", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 14, "ts": 1771472871.4962456, "episode_id": "ep_98", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 11, "ts": 1771472871.500086, "episode_id": "ep_99", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.5015874, "episode_id": "ep_100", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 63, "ts": 1771472871.5199003, "episode_id": "ep_101", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.521592, "episode_id": "ep_102", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 31, "ts": 1771472871.5305974, "episode_id": "ep_103", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472871.5337615, "episode_id": "ep_104", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472871.5365343, "episode_id": "ep_105", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472871.5380201, "episode_id": "ep_106", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472871.5409884, "episode_id": "ep_107", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.5424676, "episode_id": "ep_108", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 38, "ts": 1771472871.553965, "episode_id": "ep_109", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 44, "ts": 1771472871.5674055, "episode_id": "ep_110", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 95, "ts": 1771472871.5898485, "episode_id": "ep_111", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472871.5916243, "episode_id": "ep_112", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 12, "ts": 1771472871.5951214, "episode_id": "ep_113", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 14, "ts": 1771472871.59955, "episode_id": "ep_114", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472871.6010318, "episode_id": "ep_115", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 12, "ts": 1771472871.60458, "episode_id": "ep_116", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472871.6061006, "episode_id": "ep_117", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 40, "ts": 1771472871.6170878, "episode_id": "ep_118", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472871.6186388, "episode_id": "ep_119", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 154, "ts": 1771472871.65853, "episode_id": "ep_120", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 36, "ts": 1771472871.668103, "episode_id": "ep_121", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472871.6697145, "episode_id": "ep_122", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.6711693, "episode_id": "ep_123", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 15, "ts": 1771472871.6757998, "episode_id": "ep_124", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.6779478, "episode_id": "ep_125", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472871.6821532, "episode_id": "ep_126", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.6838226, "episode_id": "ep_127", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 167, "ts": 1771472871.7271273, "episode_id": "ep_128", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 24, "ts": 1771472871.7336369, "episode_id": "ep_129", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472871.7351806, "episode_id": "ep_130", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 15, "ts": 1771472871.740305, "episode_id": "ep_131", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 23, "ts": 1771472871.7475257, "episode_id": "ep_132", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 129, "ts": 1771472871.7794402, "episode_id": "ep_133", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 15, "ts": 1771472871.7904847, "episode_id": "ep_134", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.7948482, "episode_id": "ep_135", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.7999287, "episode_id": "ep_136", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 118, "ts": 1771472871.8301454, "episode_id": "ep_137", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 21, "ts": 1771472871.8357275, "episode_id": "ep_138", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 10, "ts": 1771472871.8384852, "episode_id": "ep_139", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 63, "ts": 1771472871.854439, "episode_id": "ep_140", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 29, "ts": 1771472871.8645735, "episode_id": "ep_141", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472871.8661768, "episode_id": "ep_142", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 36, "ts": 1771472871.876206, "episode_id": "ep_143", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472871.8791952, "episode_id": "ep_144", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 45, "ts": 1771472871.8917856, "episode_id": "ep_145", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472871.8938622, "episode_id": "ep_146", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.8956628, "episode_id": "ep_147", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.897724, "episode_id": "ep_148", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472871.8992662, "episode_id": "ep_149", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.0389624, "episode_id": "ep_0", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 168, "ts": 1771472884.0906038, "episode_id": "ep_1", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472884.0961797, "episode_id": "ep_2", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 21, "ts": 1771472884.1022327, "episode_id": "ep_3", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472884.1041262, "episode_id": "ep_4", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.1059163, "episode_id": "ep_5", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.1073778, "episode_id": "ep_6", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 13, "ts": 1771472884.1121874, "episode_id": "ep_7", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 96, "ts": 1771472884.138247, "episode_id": "ep_8", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.1400728, "episode_id": "ep_9", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 11, "ts": 1771472884.144146, "episode_id": "ep_10", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 12, "ts": 1771472884.1488047, "episode_id": "ep_11", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 13, "ts": 1771472884.1541317, "episode_id": "ep_12", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 12, "ts": 1771472884.1582177, "episode_id": "ep_13", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 65, "ts": 1771472884.17601, "episode_id": "ep_14", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 7, "ts": 1771472884.1793873, "episode_id": "ep_15", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472884.1824427, "episode_id": "ep_16", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 7, "ts": 1771472884.185503, "episode_id": "ep_17", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 53, "ts": 1771472884.2001736, "episode_id": "ep_18", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 22, "ts": 1771472884.2069588, "episode_id": "ep_19", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472884.2087421, "episode_id": "ep_20", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472884.211879, "episode_id": "ep_21", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 153, "ts": 1771472884.2548513, "episode_id": "ep_22", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 11, "ts": 1771472884.2589579, "episode_id": "ep_23", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 56, "ts": 1771472884.2735043, "episode_id": "ep_24", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472884.2751994, "episode_id": "ep_25", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 261, "ts": 1771472884.3421376, "episode_id": "ep_26", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 30, "ts": 1771472884.3520508, "episode_id": "ep_27", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 13, "ts": 1771472884.3572626, "episode_id": "ep_28", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 26, "ts": 1771472884.3641875, "episode_id": "ep_29", "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472884.3657205, "episode_id": "ep_30", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.3672051, "episode_id": "ep_31", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.3690531, "episode_id": "ep_32", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.3708725, "episode_id": "ep_33", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.372479, "episode_id": "ep_34", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 141, "ts": 1771472884.414256, "episode_id": "ep_35", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 165, "ts": 1771472884.458534, "episode_id": "ep_36", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472884.4602833, "episode_id": "ep_37", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 102, "ts": 1771472884.4833164, "episode_id": "ep_38", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 67, "ts": 1771472884.501974, "episode_id": "ep_39", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472884.5065289, "episode_id": "ep_40", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 8, "ts": 1771472884.5096931, "episode_id": "ep_41", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.5111887, "episode_id": "ep_42", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 19, "ts": 1771472884.5176399, "episode_id": "ep_43", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 7, "ts": 1771472884.520834, "episode_id": "ep_44", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.5223866, "episode_id": "ep_45", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.5238693, "episode_id": "ep_46", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.525322, "episode_id": "ep_47", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.5268216, "episode_id": "ep_48", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.5283115, "episode_id": "ep_49", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 17, "ts": 1771472884.5344183, "episode_id": "ep_50", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472884.5381918, "episode_id": "ep_51", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 8, "ts": 1771472884.5412376, "episode_id": "ep_52", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.5427177, "episode_id": "ep_53", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472884.5457463, "episode_id": "ep_54", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 9, "ts": 1771472884.5496907, "episode_id": "ep_55", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472884.5524921, "episode_id": "ep_56", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 63, "ts": 1771472884.5698783, "episode_id": "ep_57", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 12, "ts": 1771472884.5746143, "episode_id": "ep_58", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 20, "ts": 1771472884.5802026, "episode_id": "ep_59", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 19, "ts": 1771472884.5860472, "episode_id": "ep_60", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.5876043, "episode_id": "ep_61", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472884.591195, "episode_id": "ep_62", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 95, "ts": 1771472884.6141083, "episode_id": "ep_63", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 157, "ts": 1771472884.6558096, "episode_id": "ep_64", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 45, "ts": 1771472884.6672363, "episode_id": "ep_65", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 57, "ts": 1771472884.6811595, "episode_id": "ep_66", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 26, "ts": 1771472884.6902337, "episode_id": "ep_67", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 58, "ts": 1771472884.7053406, "episode_id": "ep_68", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472884.7070382, "episode_id": "ep_69", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 40, "ts": 1771472884.7210891, "episode_id": "ep_70", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472884.722859, "episode_id": "ep_71", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 56, "ts": 1771472884.7377105, "episode_id": "ep_72", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 60, "ts": 1771472884.752356, "episode_id": "ep_73", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 33, "ts": 1771472884.7617762, "episode_id": "ep_74", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 7, "ts": 1771472884.7650135, "episode_id": "ep_75", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 123, "ts": 1771472884.7934082, "episode_id": "ep_76", "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 22, "ts": 1771472884.800471, "episode_id": "ep_77", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.8020604, "episode_id": "ep_78", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.8039157, "episode_id": "ep_79", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 11, "ts": 1771472884.8079205, "episode_id": "ep_80", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 25, "ts": 1771472884.814736, "episode_id": "ep_81", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.8162603, "episode_id": "ep_82", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472884.8189642, "episode_id": "ep_83", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 201, "ts": 1771472884.8750596, "episode_id": "ep_84", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472884.876867, "episode_id": "ep_85", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 12, "ts": 1771472884.8813653, "episode_id": "ep_86", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 7, "ts": 1771472884.8846428, "episode_id": "ep_87", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.8862479, "episode_id": "ep_88", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 131, "ts": 1771472884.9153666, "episode_id": "ep_89", "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 59, "ts": 1771472884.9300613, "episode_id": "ep_90", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472884.9316614, "episode_id": "ep_91", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 65, "ts": 1771472884.9476492, "episode_id": "ep_92", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 11, "ts": 1771472884.9515858, "episode_id": "ep_93", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472884.9564605, "episode_id": "ep_94", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0, "known_agg_height": 62.0}
+{"outcome": 20, "ts": 1771472884.9634888, "episode_id": "ep_95", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.965074, "episode_id": "ep_96", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.966537, "episode_id": "ep_97", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472884.9680457, "episode_id": "ep_98", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472884.9709978, "episode_id": "ep_99", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 8, "ts": 1771472884.9740837, "episode_id": "ep_100", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 12, "ts": 1771472884.97758, "episode_id": "ep_101", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 10, "ts": 1771472884.980278, "episode_id": "ep_102", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 7, "ts": 1771472884.9832401, "episode_id": "ep_103", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 9, "ts": 1771472884.9871583, "episode_id": "ep_104", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472884.9886525, "episode_id": "ep_105", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472884.991665, "episode_id": "ep_106", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 52, "ts": 1771472885.0057297, "episode_id": "ep_107", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 110, "ts": 1771472885.0316308, "episode_id": "ep_108", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 7, "ts": 1771472885.0347657, "episode_id": "ep_109", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 54, "ts": 1771472885.0505002, "episode_id": "ep_110", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472885.0523136, "episode_id": "ep_111", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 78, "ts": 1771472885.0699868, "episode_id": "ep_112", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 118, "ts": 1771472885.1036284, "episode_id": "ep_113", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 123, "ts": 1771472885.1359937, "episode_id": "ep_114", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 13, "ts": 1771472885.140807, "episode_id": "ep_115", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472885.1423495, "episode_id": "ep_116", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 18, "ts": 1771472885.148579, "episode_id": "ep_117", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 76, "ts": 1771472885.1683667, "episode_id": "ep_118", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 74, "ts": 1771472885.1895735, "episode_id": "ep_119", "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 69, "ts": 1771472885.2177718, "episode_id": "ep_120", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 21, "ts": 1771472885.2252793, "episode_id": "ep_121", "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 111, "ts": 1771472885.2538614, "episode_id": "ep_122", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 31, "ts": 1771472885.2631695, "episode_id": "ep_123", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 1, "ts": 1771472885.2649257, "episode_id": "ep_124", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 15, "ts": 1771472885.2705064, "episode_id": "ep_125", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472885.2722123, "episode_id": "ep_126", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 10, "ts": 1771472885.2760327, "episode_id": "ep_127", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472885.277574, "episode_id": "ep_128", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472885.2791548, "episode_id": "ep_129", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 75, "ts": 1771472885.2985182, "episode_id": "ep_130", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 125, "ts": 1771472885.3302066, "episode_id": "ep_131", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 71, "ts": 1771472885.3484838, "episode_id": "ep_132", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 63.0}
+{"outcome": 142, "ts": 1771472885.3832762, "episode_id": "ep_133", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 11, "ts": 1771472885.3883145, "episode_id": "ep_134", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 143, "ts": 1771472885.4246066, "episode_id": "ep_135", "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 82, "ts": 1771472885.4459817, "episode_id": "ep_136", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472885.4476895, "episode_id": "ep_137", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 49, "ts": 1771472885.460473, "episode_id": "ep_138", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 7, "ts": 1771472885.4658897, "episode_id": "ep_139", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 11, "ts": 1771472885.471206, "episode_id": "ep_140", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 46, "ts": 1771472885.4845095, "episode_id": "ep_141", "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 65.0}
+{"outcome": 1, "ts": 1771472885.486401, "episode_id": "ep_142", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 8, "ts": 1771472885.4894571, "episode_id": "ep_143", "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 1, "ts": 1771472885.4909158, "episode_id": "ep_144", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 34, "ts": 1771472885.501246, "episode_id": "ep_145", "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0, "known_agg_height": 63.0}
+{"outcome": 10, "ts": 1771472885.5047984, "episode_id": "ep_146", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0, "known_agg_height": 64.0}
+{"outcome": 1, "ts": 1771472885.5063052, "episode_id": "ep_147", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 1, "ts": 1771472885.5077832, "episode_id": "ep_148", "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0, "known_agg_height": 61.0}
+{"outcome": 84, "ts": 1771472885.5317295, "episode_id": "ep_149", "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0, "known_agg_height": 62.0}
+{"outcome": 159, "ts": 1771472908.2083774, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 10, "ts": 1771472908.2115736, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 1, "ts": 1771472908.2131004, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472908.2146106, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 342, "ts": 1771472908.3058674, "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 43, "ts": 1771472908.3194828, "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 98, "ts": 1771472908.346774, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 12, "ts": 1771472908.3507657, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 49, "ts": 1771472908.3628623, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 115, "ts": 1771472908.3923295, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 10, "ts": 1771472908.3952637, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 1, "ts": 1771472908.396821, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 109, "ts": 1771472908.424402, "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 8, "ts": 1771472908.4275637, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 13, "ts": 1771472908.4319758, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472908.433472, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 43, "ts": 1771472908.4439006, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 13, "ts": 1771472908.4484231, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 18, "ts": 1771472908.4544287, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472908.4559476, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 127, "ts": 1771472908.4911652, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 37, "ts": 1771472908.5033092, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 11, "ts": 1771472908.5071976, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 140, "ts": 1771472908.544727, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 150, "ts": 1771472908.5855281, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 51, "ts": 1771472908.6026154, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 20, "ts": 1771472908.6077917, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 14, "ts": 1771472908.6123838, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 14, "ts": 1771472908.617153, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472908.6188817, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 77, "ts": 1771472908.638756, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 1, "ts": 1771472908.640669, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472908.6422138, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472908.6437492, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472908.6452074, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 56, "ts": 1771472908.6775756, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 70, "ts": 1771472908.699153, "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 140, "ts": 1771472908.7338824, "known_holes": 19.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 27, "ts": 1771472908.7423997, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 7, "ts": 1771472908.7455676, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 82, "ts": 1771472908.7721915, "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 7, "ts": 1771472908.7759495, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 301, "ts": 1771472908.8555005, "known_holes": 25.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 60, "ts": 1771472908.8719149, "known_holes": 26.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472908.8735907, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 11, "ts": 1771472908.8774047, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472908.8789155, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 33, "ts": 1771472908.889126, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 51, "ts": 1771472908.904272, "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 11, "ts": 1771472908.9081616, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 122, "ts": 1771472908.937618, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472908.939392, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 127, "ts": 1771472908.9757006, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 9, "ts": 1771472908.9799888, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 12, "ts": 1771472908.9837139, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 57, "ts": 1771472908.9987643, "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 24, "ts": 1771472909.006208, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472909.007777, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 10, "ts": 1771472909.0104902, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 17, "ts": 1771472909.0165045, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 1, "ts": 1771472909.0180912, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.0196033, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 73, "ts": 1771472909.039716, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 30, "ts": 1771472909.0497713, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 1, "ts": 1771472909.0515509, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 111, "ts": 1771472909.0809615, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 30, "ts": 1771472909.089643, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.0917184, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.0955608, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.097378, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 15, "ts": 1771472909.10296, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 10, "ts": 1771472909.105787, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 1, "ts": 1771472909.1072676, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 85, "ts": 1771472909.1288118, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 34, "ts": 1771472909.1408224, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 38, "ts": 1771472909.1519444, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472909.153615, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.1551578, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.156695, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 72, "ts": 1771472909.175335, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 10, "ts": 1771472909.1800056, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 45, "ts": 1771472909.1924264, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 1, "ts": 1771472909.1942832, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 14, "ts": 1771472909.1989746, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472909.2009013, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.2027287, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.2042418, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 176, "ts": 1771472909.2504716, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 13, "ts": 1771472909.2553227, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 15, "ts": 1771472909.2607093, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 11, "ts": 1771472909.264398, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 18, "ts": 1771472909.2699609, "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.271667, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 65, "ts": 1771472909.288651, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 33, "ts": 1771472909.2978423, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 57, "ts": 1771472909.31583, "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 285, "ts": 1771472909.385805, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.387549, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 19, "ts": 1771472909.3942053, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 43, "ts": 1771472909.4061906, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 16, "ts": 1771472909.4116113, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 19, "ts": 1771472909.4219704, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 1, "ts": 1771472909.4237378, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.4252474, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 154, "ts": 1771472909.4674587, "known_holes": 12.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 127, "ts": 1771472909.500635, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 130, "ts": 1771472909.5360856, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 137, "ts": 1771472909.5704458, "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.5722058, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 16, "ts": 1771472909.5768354, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 84, "ts": 1771472909.5987287, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 19, "ts": 1771472909.6084006, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472909.6100934, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.6116498, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.613237, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 10, "ts": 1771472909.6173265, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 32, "ts": 1771472909.6272876, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 86, "ts": 1771472909.6477332, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.6494756, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 72, "ts": 1771472909.6681826, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 14, "ts": 1771472909.6728761, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 18, "ts": 1771472909.678944, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 11, "ts": 1771472909.6831963, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 105, "ts": 1771472909.7120724, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 23, "ts": 1771472909.7201252, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 52, "ts": 1771472909.7354696, "known_holes": 18.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.7371929, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 49, "ts": 1771472909.7510993, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 75, "ts": 1771472909.7760873, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 24, "ts": 1771472909.782313, "known_holes": 20.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 1, "ts": 1771472909.7842035, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.7865984, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 19, "ts": 1771472909.793341, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 86, "ts": 1771472909.8128185, "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 80, "ts": 1771472909.8341799, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 8, "ts": 1771472909.8374097, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472909.8389447, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 1, "ts": 1771472909.8404381, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
+{"outcome": 202, "ts": 1771472909.891331, "known_holes": 13.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 98, "ts": 1771472909.9193857, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 19, "ts": 1771472909.9254334, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 4.0}
+{"outcome": 10, "ts": 1771472909.9282362, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 22, "ts": 1771472909.9346428, "known_holes": 15.0, "known_max_height": 11.0, "known_bumpiness": 2.0}
+{"outcome": 33, "ts": 1771472909.943683, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 53, "ts": 1771472909.9577298, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 180, "ts": 1771472910.0026958, "known_holes": 14.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 10, "ts": 1771472910.0057268, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 223, "ts": 1771472910.06916, "known_holes": 16.0, "known_max_height": 11.0, "known_bumpiness": 1.0}
+{"outcome": 22, "ts": 1771472910.0760434, "known_holes": 17.0, "known_max_height": 11.0, "known_bumpiness": 3.0}
+{"outcome": 1, "ts": 1771472910.0775716, "known_holes": 24.0, "known_max_height": 11.0, "known_bumpiness": 5.0}
