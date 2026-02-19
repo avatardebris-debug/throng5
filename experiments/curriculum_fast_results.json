@@ -4,22 +4,82 @@
       "level": 2,
       "game": "tetris",
       "episodes": 500,
-      "mean_lines": 12.49,
-      "final_mean_lines": 5.65,
-      "max_lines": 298,
-      "elapsed_s": 12.0,
-      "eps_per_s": 41.6,
-      "pack_version": 5,
-      "session_id": "1583bf60"
+      "mean_lines": 7.33,
+      "final_mean_lines": 33.45,
+      "max_lines": 110,
+      "elapsed_s": 11.5,
+      "eps_per_s": 43.3,
+      "pack_version": 6,
+      "session_id": "804cc959"
+    },
+    {
+      "level": 3,
+      "game": "tetris",
+      "episodes": 500,
+      "mean_lines": 51.19,
+      "final_mean_lines": 30.65,
+      "max_lines": 291,
+      "elapsed_s": 18.5,
+      "eps_per_s": 27.0,
+      "pack_version": 7,
+      "session_id": "e70a082c"
+    },
+    {
+      "level": 4,
+      "game": "tetris",
+      "episodes": 500,
+      "mean_lines": 10.17,
+      "final_mean_lines": 15.8,
+      "max_lines": 119,
+      "elapsed_s": 16.3,
+      "eps_per_s": 30.8,
+      "pack_version": 8,
+      "session_id": "c827afd0"
+    },
+    {
+      "level": 5,
+      "game": "tetris",
+      "episodes": 500,
+      "mean_lines": 29.97,
+      "final_mean_lines": 28.0,
+      "max_lines": 266,
+      "elapsed_s": 17.9,
+      "eps_per_s": 28.0,
+      "pack_version": 9,
+      "session_id": "a6be48f8"
+    },
+    {
+      "level": 6,
+      "game": "tetris",
+      "episodes": 500,
+      "mean_lines": 11.75,
+      "final_mean_lines": 11.1,
+      "max_lines": 115,
+      "elapsed_s": 19.3,
+      "eps_per_s": 25.9,
+      "pack_version": 10,
+      "session_id": "b5eeb4b7"
+    },
+    {
+      "level": 7,
+      "game": "tetris",
+      "episodes": 5000,
+      "mean_lines": 11.72,
+      "final_mean_lines": 11.9,
+      "max_lines": 197,
+      "elapsed_s": 109.1,
+      "eps_per_s": 45.8,
+      "pack_version": 11,
+      "session_id": "fdf87acf"
     }
   ],
-  "elapsed_s": 12.1,
+  "elapsed_s": 193.3,
   "db_stats": {
-    "total_episodes": 2822,
+    "total_episodes": 10322,
     "total_hypotheses": 34,
     "total_concepts": 8,
-    "total_events": 72,
-    "total_policy_packs": 6,
+    "total_events": 406,
+    "total_policy_packs": 12,
     "episodes_by_level": [
       {
         "game": "breakout",
@@ -31,44 +91,44 @@
       {
         "game": "tetris",
         "level": 2,
-        "n": 944,
-        "avg_lines": 11.172669491525424,
+        "n": 1444,
+        "avg_lines": 9.84349030470914,
         "max_lines": 298
       },
       {
         "game": "tetris",
         "level": 3,
-        "n": 230,
-        "avg_lines": 26.456521739130434,
-        "max_lines": 266
+        "n": 730,
+        "avg_lines": 43.395890410958906,
+        "max_lines": 291
       },
       {
         "game": "tetris",
         "level": 4,
-        "n": 214,
-        "avg_lines": 18.757009345794394,
+        "n": 714,
+        "avg_lines": 12.746498599439775,
         "max_lines": 129
       },
       {
         "game": "tetris",
         "level": 5,
-        "n": 210,
-        "avg_lines": 44.12380952380953,
-        "max_lines": 220
+        "n": 710,
+        "avg_lines": 34.153521126760566,
+        "max_lines": 266
       },
       {
         "game": "tetris",
         "level": 6,
-        "n": 210,
-        "avg_lines": 18.523809523809526,
+        "n": 710,
+        "avg_lines": 13.753521126760564,
         "max_lines": 160
       },
       {
         "game": "tetris",
         "level": 7,
-        "n": 1010,
-        "avg_lines": 12.009900990099009,
-        "max_lines": 152
+        "n": 6010,
+        "avg_lines": 11.765391014975041,
+        "max_lines": 197
       }
     ],
     "hypotheses": [
@@ -105,7 +165,7 @@
         "status": "candidate",
         "win_rate": 0.0,
         "confidence": 0.0,
-        "evidence_count": 1972
+        "evidence_count": 1800
       },
       {
         "name": "minimize_cost",
@@ -119,7 +179,7 @@
         "status": "candidate",
         "win_rate": 1.0,
         "confidence": 1.0,
-        "evidence_count": 23
+        "evidence_count": 12
       },
       {
         "name": "minimize_cost_v2",
@@ -140,7 +200,7 @@
         "status": "candidate",
         "win_rate": 0.0,
         "confidence": 0.0,
-        "evidence_count": 1164
+        "evidence_count": 1046
       },
       {
         "name": "minimize_v3",
@@ -312,5 +372,5 @@
       }
     ]
   },
-  "pack_version": 6
+  "pack_version": 12
 }

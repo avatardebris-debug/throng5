@@ -1,0 +1,658 @@
+{
+  "brief_type": "tetra_hypothesis_brief",
+  "generated_at": "2026-02-18 21:19:02",
+  "game_context": {
+    "game": "tetris",
+    "levels_trained": [
+      {
+        "level": 2,
+        "n": 1444,
+        "avg": 9.84349030470914,
+        "best": 298,
+        "worst": 0,
+        "avg_bump": 0.0,
+        "avg_holes": 0.0,
+        "avg_height": 11.833795013850416
+      },
+      {
+        "level": 3,
+        "n": 730,
+        "avg": 43.395890410958906,
+        "best": 291,
+        "worst": 1,
+        "avg_bump": 0.0,
+        "avg_holes": 0.0,
+        "avg_height": 11.506849315068493
+      },
+      {
+        "level": 4,
+        "n": 714,
+        "avg": 12.746498599439775,
+        "best": 129,
+        "worst": 1,
+        "avg_bump": 0.0,
+        "avg_holes": 0.0,
+        "avg_height": 13.72549019607843
+      },
+      {
+        "level": 5,
+        "n": 710,
+        "avg": 34.153521126760566,
+        "best": 266,
+        "worst": 2,
+        "avg_bump": 0.0,
+        "avg_holes": 0.0,
+        "avg_height": 15.774647887323944
+      },
+      {
+        "level": 6,
+        "n": 710,
+        "avg": 13.753521126760564,
+        "best": 160,
+        "worst": 0,
+        "avg_bump": 0.0,
+        "avg_holes": 0.0,
+        "avg_height": 17.746478873239436
+      },
+      {
+        "level": 7,
+        "n": 6010,
+        "avg": 11.765391014975041,
+        "best": 197,
+        "worst": 1,
+        "avg_bump": 0.0,
+        "avg_holes": 0.0,
+        "avg_height": 19.966722129783694
+      }
+    ],
+    "total_episodes": 10318,
+    "training_span_days": 366.1
+  },
+  "hypothesis_ledger": {
+    "active": [
+      {
+        "name": "maximize_lines",
+        "status": "active",
+        "win_rate": 0.89,
+        "evidence_count": 50,
+        "confidence": 0.58,
+        "description": "Maximize line clears per piece placed",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 50
+            },
+            {
+              "ep": 19,
+              "pct": 63
+            },
+            {
+              "ep": 29,
+              "pct": 58
+            },
+            {
+              "ep": 39,
+              "pct": 53
+            },
+            {
+              "ep": 49,
+              "pct": 58
+            }
+          ]
+        },
+        "created_at": 1771383677.0854716,
+        "updated_at": 1771383688.3529403
+      },
+      {
+        "name": "maximize_lines",
+        "status": "testing",
+        "win_rate": 0.59,
+        "evidence_count": 20,
+        "confidence": 0.59,
+        "description": "Maximize line clears \u2014 HARMFUL on 8-wide board",
+        "metadata": {
+          "transfer_result": "negative",
+          "mean_lines": 4.9,
+          "decline_pct": -41
+        },
+        "created_at": 1771383677.1015906,
+        "updated_at": 1771383688.368111
+      },
+      {
+        "name": "maximize_lines",
+        "status": "active",
+        "win_rate": 0.55,
+        "evidence_count": 100,
+        "confidence": 0.55,
+        "description": "Maximize line clears per piece placed",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 55
+            },
+            {
+              "ep": 49,
+              "pct": 44
+            },
+            {
+              "ep": 88,
+              "pct": 57
+            },
+            {
+              "ep": 99,
+              "pct": 55
+            }
+          ],
+          "best_episode": {
+            "ep": 88,
+            "lines": 88
+          }
+        },
+        "created_at": 1771383677.091728,
+        "updated_at": 1771383688.361109
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.38,
+        "evidence_count": 100,
+        "confidence": 0.38,
+        "description": "Minimize bumpiness, build flat surfaces",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 48
+            },
+            {
+              "ep": 49,
+              "pct": 55
+            },
+            {
+              "ep": 88,
+              "pct": 49
+            },
+            {
+              "ep": 99,
+              "pct": 38
+            }
+          ]
+        },
+        "created_at": 1771383677.0947778,
+        "updated_at": 1771383688.3630245
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.3,
+        "evidence_count": 20,
+        "confidence": 0.3,
+        "description": "Minimize bumpiness",
+        "metadata": null,
+        "created_at": 1771383677.1043575,
+        "updated_at": 1771383688.370529
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.12,
+        "evidence_count": 100,
+        "confidence": 0.12,
+        "description": "Keep max column height low to avoid death",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 8
+            },
+            {
+              "ep": 49,
+              "pct": 14
+            },
+            {
+              "ep": 88,
+              "pct": 9
+            },
+            {
+              "ep": 99,
+              "pct": 12
+            }
+          ]
+        },
+        "created_at": 1771383677.0981226,
+        "updated_at": 1771383688.365174
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.11,
+        "evidence_count": 20,
+        "confidence": 0.11,
+        "description": "Keep max column height low",
+        "metadata": null,
+        "created_at": 1771383677.1071246,
+        "updated_at": 1771383688.374648
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.06,
+        "evidence_count": 50,
+        "confidence": 0.32,
+        "description": "Minimize bumpiness, build flat surfaces",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 11
+            },
+            {
+              "ep": 19,
+              "pct": 42
+            },
+            {
+              "ep": 29,
+              "pct": 30
+            },
+            {
+              "ep": 39,
+              "pct": 50
+            },
+            {
+              "ep": 49,
+              "pct": 32
+            }
+          ]
+        },
+        "created_at": 1771383677.0877273,
+        "updated_at": 1771383688.356483
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.06,
+        "evidence_count": 50,
+        "confidence": 0.09,
+        "description": "Keep max column height low to avoid death",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 9
+            },
+            {
+              "ep": 19,
+              "pct": 17
+            },
+            {
+              "ep": 29,
+              "pct": 8
+            },
+            {
+              "ep": 39,
+              "pct": 9
+            },
+            {
+              "ep": 49,
+              "pct": 9
+            }
+          ]
+        },
+        "created_at": 1771383677.0896487,
+        "updated_at": 1771383688.359017
+      }
+    ],
+    "retired": [
+      {
+        "name": "minimize_cost",
+        "status": "retired",
+        "win_rate": 0.5818639798488665,
+        "evidence_count": 397,
+        "confidence": 0.5818639798488665,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_cost_v1"
+        },
+        "created_at": 1771470099.882014,
+        "updated_at": 1771470445.5620801
+      },
+      {
+        "name": "minimize_v2",
+        "status": "retired",
+        "win_rate": 0.09965635738831616,
+        "evidence_count": 1164,
+        "confidence": 0.09965635738831616,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v3"
+        },
+        "created_at": 1771393074.376001,
+        "updated_at": 1771393074.376001
+      },
+      {
+        "name": "minimize_cost",
+        "status": "retired",
+        "win_rate": 0.09782608695652174,
+        "evidence_count": 184,
+        "confidence": 0.09782608695652174,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_cost_v1"
+        },
+        "created_at": 1771393009.7991378,
+        "updated_at": 1771393009.7991378
+      },
+      {
+        "name": "minimize_variance",
+        "status": "retired",
+        "win_rate": 0.09259259259259259,
+        "evidence_count": 54,
+        "confidence": 0.09259259259259259,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v1"
+        },
+        "created_at": 1771393004.6457043,
+        "updated_at": 1771393004.6457043
+      },
+      {
+        "name": "minimize_v3",
+        "status": "retired",
+        "win_rate": 0.043478260869565216,
+        "evidence_count": 23,
+        "confidence": 0.043478260869565216,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v4"
+        },
+        "created_at": 1771393074.3812811,
+        "updated_at": 1771393075.334034
+      },
+      {
+        "name": "minimize_variance",
+        "status": "retired",
+        "win_rate": 0.0364963503649635,
+        "evidence_count": 137,
+        "confidence": 0.0364963503649635,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v1"
+        },
+        "created_at": 1771470099.8904839,
+        "updated_at": 1771470445.5682242
+      },
+      {
+        "name": "minimize_v3",
+        "status": "retired",
+        "win_rate": 0.021739130434782608,
+        "evidence_count": 46,
+        "confidence": 0.021739130434782608,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v4"
+        },
+        "created_at": 1771470099.8745663,
+        "updated_at": 1771470554.8419247
+      },
+      {
+        "name": "maximize_gain",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 23,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "maximize_gain_v1"
+        },
+        "created_at": 1771393004.0522237,
+        "updated_at": 1771393004.0522237
+      },
+      {
+        "name": "minimize_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 23,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v2"
+        },
+        "created_at": 1771393004.64957,
+        "updated_at": 1771393005.599099
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 23,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_cost_v2"
+        },
+        "created_at": 1771393011.0276873,
+        "updated_at": 1771393011.0276873
+      },
+      {
+        "name": "minimize_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 46,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v2"
+        },
+        "created_at": 1771470099.885922,
+        "updated_at": 1771470445.5649981
+      },
+      {
+        "name": "maximize_gain",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 75,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "maximize_gain_v1"
+        },
+        "created_at": 1771470099.8936832,
+        "updated_at": 1771470445.5717735
+      }
+    ],
+    "untested_candidates": [
+      {
+        "name": "maximize_gain_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "maximize_gain"
+        },
+        "created_at": 1771393004.0558338,
+        "updated_at": 1771393004.0558338
+      },
+      {
+        "name": "minimize_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_v1"
+        },
+        "created_at": 1771393005.6029608,
+        "updated_at": 1771393005.6029608
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_cost"
+        },
+        "created_at": 1771393009.8035433,
+        "updated_at": 1771393009.8035433
+      },
+      {
+        "name": "minimize_cost_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_cost_v1"
+        },
+        "created_at": 1771393011.0317342,
+        "updated_at": 1771393011.0317342
+      },
+      {
+        "name": "minimize_v4",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_v3"
+        },
+        "created_at": 1771393075.3382525,
+        "updated_at": 1771393075.3382525
+      }
+    ],
+    "total": 31,
+    "key_insight": "Top hypothesis 'maximize_lines' wins 89% of the time after 50 evaluations."
+  },
+  "failure_patterns": {
+    "sample_size": 100,
+    "avg_lines": 1.0,
+    "avg_pieces": 1.04,
+    "avg_max_height": 20.0,
+    "avg_holes": 0.0,
+    "avg_bumpiness": 0.0,
+    "common_fail_modes": {
+      "unknown": 100
+    },
+    "active_hypotheses_at_failure": {
+      "unknown": 100
+    },
+    "interpretation": "Failures have avg height=20.0, holes=0.0, bumpiness=0.0. Games end after only 1 pieces."
+  },
+  "success_patterns": {
+    "sample_size": 100,
+    "avg_lines": 46.55,
+    "avg_pieces": 18.37,
+    "avg_max_height": 20.0,
+    "avg_holes": 0.0,
+    "avg_bumpiness": 0.0,
+    "common_hypotheses": {
+      "unknown": 100
+    },
+    "interpretation": "Successes have avg height=20.0, holes=0.0, 47 lines avg.",
+    "delta_vs_failure": {
+      "height_delta": 0.0,
+      "holes_delta": 0.0,
+      "bumpiness_delta": 0.0
+    }
+  },
+  "novelty_events": [
+    {
+      "lines": 72,
+      "surprise": 2.84,
+      "episode": 4985,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 111,
+      "surprise": 4.34,
+      "episode": 4937,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 82,
+      "surprise": 3.25,
+      "episode": 4926,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 94,
+      "surprise": 3.73,
+      "episode": 4875,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 80,
+      "surprise": 3.35,
+      "episode": 4874,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 69,
+      "surprise": 2.82,
+      "episode": 4855,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 68,
+      "surprise": 2.52,
+      "episode": 4823,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 94,
+      "surprise": 3.78,
+      "episode": 4818,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 126,
+      "surprise": 4.97,
+      "episode": 4777,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    },
+    {
+      "lines": 66,
+      "surprise": 2.51,
+      "episode": 4754,
+      "level": 7,
+      "session": "fdf87acf",
+      "timestamp_str": "2026-02-18 21:09"
+    }
+  ],
+  "open_questions": [
+    "12 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
+    "5 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
+  ],
+  "recommended_focus": [
+    "HOLES NOT TRACKED: All episodes show 0 holes \u2014 the hole detection may not be working. Height-based failure patterns may be more reliable.",
+    "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
+  ],
+  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 10318 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and novelty events above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test, (3) recommend which active hypotheses should be retired or refined, and (4) describe each new hypothesis in concrete, testable terms."
+}

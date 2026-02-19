@@ -89,6 +89,8 @@ class ExperimentDB:
                 max_height INTEGER,
                 holes INTEGER,
                 bumpiness REAL,
+                fail_mode TEXT,
+                active_hypothesis TEXT,
                 outcome_tags TEXT,
                 hypothesis_performance TEXT,
                 policy_pack_version INTEGER,
@@ -96,6 +98,13 @@ class ExperimentDB:
                 timestamp REAL NOT NULL
             )
         """)
+
+        # Migrate existing DBs that predate fail_mode/active_hypothesis columns
+        for col, col_type in [('fail_mode', 'TEXT'), ('active_hypothesis', 'TEXT')]:
+            try:
+                c.execute(f"ALTER TABLE episodes ADD COLUMN {col} {col_type}")
+            except Exception:
+                pass  # Column already exists
 
         c.execute("""
             CREATE TABLE IF NOT EXISTS events (
@@ -160,24 +169,27 @@ class ExperimentDB:
     # ────────────────────── Episode logging ──────────────────────
 
     def log_episode(self, game: str, level: int = 0, episode_num: int = 0,
-                    score: float = 0, lines_cleared: int = 0, pieces_placed: int = 0,
-                    max_height: int = 0, holes: int = 0, bumpiness: float = 0,
-                    outcome_tags: Optional[Dict] = None,
-                    hypothesis_performance: Optional[Dict] = None,
-                    policy_pack_version: int = 0,
-                    session_id: Optional[str] = None,
-                    timestamp: Optional[float] = None) -> str:
+                   score: float = 0.0, lines_cleared: int = 0,
+                   pieces_placed: int = 0, max_height: int = 0,
+                   holes: int = 0, bumpiness: float = 0.0,
+                   fail_mode: Optional[str] = None,
+                   active_hypothesis: Optional[str] = None,
+                   outcome_tags: Optional[Dict] = None,
+                   hypothesis_performance: Optional[Dict] = None,
+                   policy_pack_version: Optional[int] = None,
+                   session_id: Optional[str] = None,
+                   timestamp: Optional[float] = None) -> str:
         """Log a single episode result. Returns the episode ID."""
         eid = str(uuid.uuid4())[:8]
         ts = timestamp or time.time()
         c = self.conn.cursor()
         c.execute("""
             INSERT INTO episodes (id, game, level, episode_num, score, lines_cleared,
-                pieces_placed, max_height, holes, bumpiness, outcome_tags,
-                hypothesis_performance, policy_pack_version, session_id, timestamp)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                pieces_placed, max_height, holes, bumpiness, fail_mode, active_hypothesis,
+                outcome_tags, hypothesis_performance, policy_pack_version, session_id, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (eid, game, level, episode_num, score, lines_cleared, pieces_placed,
-              max_height, holes, bumpiness,
+              max_height, holes, bumpiness, fail_mode, active_hypothesis,
               json.dumps(outcome_tags) if outcome_tags else None,
               json.dumps(hypothesis_performance) if hypothesis_performance else None,
               policy_pack_version, session_id, ts))
@@ -458,6 +470,232 @@ class ExperimentDB:
         stats['hypotheses'] = [dict(row) for row in c.fetchall()]
 
         return stats
+
+    def generate_tetra_brief(self, game: str = 'tetris',
+                              last_n_episodes: int = 500) -> Dict[str, Any]:
+        """
+        Generate a rich, structured brief for Tetra to analyze.
+
+        This is the primary interface for LLM-based hypothesis generation.
+        Returns a dict that can be JSON-serialized and sent to Tetra as context.
+
+        Structure:
+            - game_context:       What game, what levels, what actions are possible
+            - learning_summary:   Level-by-level performance over time
+            - hypothesis_ledger:  Full lifecycle of every hypothesis tried
+            - failure_patterns:   What the failing episodes have in common
+            - success_patterns:   What the best episodes have in common
+            - novelty_events:     Surprising episodes that broke expectations
+            - open_questions:     Gaps the current hypotheses don't explain
+            - recommended_focus:  Where Tetra's attention would be most useful
+
+        Usage:
+            brief = db.generate_tetra_brief(game='tetris')
+            tetra_response = call_tetra(json.dumps(brief))
+        """
+        c = self.conn.cursor()
+
+        # ── 1. Game context ───────────────────────────────────────────────
+        game_context = {
+            'game': game,
+            'levels_trained': [],
+            'total_episodes': 0,
+            'training_span_days': 0,
+        }
+        c.execute("SELECT MIN(timestamp), MAX(timestamp), COUNT(*) FROM episodes WHERE game = ?",
+                  (game,))
+        row = c.fetchone()
+        if row[0]:
+            game_context['total_episodes'] = row[2]
+            span = (row[1] - row[0]) / 86400
+            game_context['training_span_days'] = round(span, 1)
+
+        c.execute("""SELECT level, COUNT(*) as n, AVG(lines_cleared) as avg,
+                            MAX(lines_cleared) as best, MIN(lines_cleared) as worst,
+                            AVG(bumpiness) as avg_bump, AVG(holes) as avg_holes,
+                            AVG(max_height) as avg_height
+                     FROM episodes WHERE game = ?
+                     GROUP BY level ORDER BY level""", (game,))
+        game_context['levels_trained'] = [dict(r) for r in c.fetchall()]
+
+        # ── 2. Hypothesis ledger ──────────────────────────────────────────
+        c.execute("""SELECT name, status, win_rate, evidence_count, confidence,
+                            description, metadata, created_at, updated_at
+                     FROM hypotheses WHERE game = ?
+                     ORDER BY win_rate DESC""", (game,))
+        hyp_rows = [dict(r) for r in c.fetchall()]
+
+        # Parse metadata JSON
+        for h in hyp_rows:
+            if h.get('metadata'):
+                try:
+                    h['metadata'] = json.loads(h['metadata'])
+                except Exception:
+                    pass
+
+        # Categorize
+        active   = [h for h in hyp_rows if h['status'] in ('active', 'testing') and h['evidence_count'] >= 10]
+        retired  = [h for h in hyp_rows if h['status'] == 'retired']
+        untested = [h for h in hyp_rows if h['evidence_count'] < 10]
+
+        hypothesis_ledger = {
+            'active': active,
+            'retired': retired,
+            'untested_candidates': untested,
+            'total': len(hyp_rows),
+            'key_insight': (
+                f"Top hypothesis '{active[0]['name']}' wins {active[0]['win_rate']:.0%} "
+                f"of the time after {active[0]['evidence_count']} evaluations."
+                if active else "No active hypotheses yet."
+            ),
+        }
+
+        # ── 3. Failure patterns (recent N episodes, bottom 20%) ───────────
+        c.execute("""SELECT lines_cleared, pieces_placed, max_height, holes, bumpiness,
+                            fail_mode, active_hypothesis
+                     FROM episodes WHERE game = ?
+                     ORDER BY timestamp DESC LIMIT ?""", (game, last_n_episodes))
+        recent = [dict(r) for r in c.fetchall()]
+
+        if recent:
+            sorted_by_lines = sorted(recent, key=lambda x: x['lines_cleared'] or 0)
+            n = len(sorted_by_lines)
+            failures = sorted_by_lines[:max(1, n // 5)]   # bottom 20%
+            successes = sorted_by_lines[-(n // 5):]       # top 20%
+
+            def _avg(lst, key):
+                vals = [r.get(key) or 0 for r in lst]
+                return round(sum(vals) / len(vals), 2) if vals else 0
+
+            failure_patterns = {
+                'sample_size': len(failures),
+                'avg_lines': _avg(failures, 'lines_cleared'),
+                'avg_pieces': _avg(failures, 'pieces_placed'),
+                'avg_max_height': _avg(failures, 'max_height'),
+                'avg_holes': _avg(failures, 'holes'),
+                'avg_bumpiness': _avg(failures, 'bumpiness'),
+                'common_fail_modes': self._count_top(failures, 'fail_mode', 3),
+                'active_hypotheses_at_failure': self._count_top(failures, 'active_hypothesis', 3),
+                'interpretation': (
+                    f"Failures have avg height={_avg(failures,'max_height'):.1f}, "
+                    f"holes={_avg(failures,'holes'):.1f}, "
+                    f"bumpiness={_avg(failures,'bumpiness'):.1f}. "
+                    f"Games end after only {_avg(failures,'pieces_placed'):.0f} pieces."
+                ),
+            }
+
+            success_patterns = {
+                'sample_size': len(successes),
+                'avg_lines': _avg(successes, 'lines_cleared'),
+                'avg_pieces': _avg(successes, 'pieces_placed'),
+                'avg_max_height': _avg(successes, 'max_height'),
+                'avg_holes': _avg(successes, 'holes'),
+                'avg_bumpiness': _avg(successes, 'bumpiness'),
+                'common_hypotheses': self._count_top(successes, 'active_hypothesis', 3),
+                'interpretation': (
+                    f"Successes have avg height={_avg(successes,'max_height'):.1f}, "
+                    f"holes={_avg(successes,'holes'):.1f}, "
+                    f"{_avg(successes,'lines_cleared'):.0f} lines avg."
+                ),
+                'delta_vs_failure': {
+                    'height_delta': round(_avg(failures,'max_height') - _avg(successes,'max_height'), 2),
+                    'holes_delta': round(_avg(failures,'holes') - _avg(successes,'holes'), 2),
+                    'bumpiness_delta': round(_avg(failures,'bumpiness') - _avg(successes,'bumpiness'), 2),
+                },
+            }
+        else:
+            failure_patterns = success_patterns = {'sample_size': 0}
+
+        # ── 4. Novelty events ─────────────────────────────────────────────
+        c.execute("""SELECT data, timestamp FROM events
+                     WHERE event_type = 'novelty'
+                     ORDER BY timestamp DESC LIMIT 20""")
+        novelty_events = []
+        for row in c.fetchall():
+            try:
+                d = json.loads(row['data']) if row['data'] else {}
+                d['timestamp_str'] = time.strftime('%Y-%m-%d %H:%M', time.localtime(row['timestamp']))
+                novelty_events.append(d)
+            except Exception:
+                pass
+
+        # ── 5. Open questions & recommended focus ─────────────────────────
+        open_questions = []
+
+        if failure_patterns.get('sample_size', 0) > 10:
+            fd = failure_patterns.get('delta_vs_failure', {}) if 'delta_vs_failure' in success_patterns else {}
+            h_delta = success_patterns.get('delta_vs_failure', {}).get('height_delta', 0)
+            if h_delta > 2:
+                open_questions.append(
+                    f"Height delta between failures and successes is {h_delta:.1f} — "
+                    "is there a height threshold beyond which recovery is impossible?"
+                )
+            ho_delta = success_patterns.get('delta_vs_failure', {}).get('holes_delta', 0)
+            if ho_delta > 1:
+                open_questions.append(
+                    f"Failures have {ho_delta:.1f} more holes on average — "
+                    "at what hole count does performance collapse?"
+                )
+
+        if len(retired) > len(active):
+            open_questions.append(
+                f"{len(retired)} hypotheses have been retired vs {len(active)} active — "
+                "what do the retired ones have in common? Is there a pattern to what fails?"
+            )
+
+        if untested:
+            open_questions.append(
+                f"{len(untested)} candidate hypotheses have fewer than 10 evaluations — "
+                f"they need more evidence: {[h['name'] for h in untested[:5]]}"
+            )
+
+        # Recommended focus based on data gaps
+        recommended_focus = []
+        if not any(h.get('description') for h in active):
+            recommended_focus.append(
+                "DESCRIPTIONS MISSING: Active hypotheses have no natural language descriptions. "
+                "Please provide a 1-2 sentence description of what each hypothesis means strategically."
+            )
+        if failure_patterns.get('avg_holes', 0) == 0 and failure_patterns.get('sample_size', 0) > 10:
+            recommended_focus.append(
+                "HOLES NOT TRACKED: All episodes show 0 holes — the hole detection may not be working. "
+                "Height-based failure patterns may be more reliable."
+            )
+        recommended_focus.append(
+            "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. "
+            "Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
+        )
+
+        return {
+            'brief_type': 'tetra_hypothesis_brief',
+            'generated_at': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'game_context': game_context,
+            'hypothesis_ledger': hypothesis_ledger,
+            'failure_patterns': failure_patterns,
+            'success_patterns': success_patterns,
+            'novelty_events': novelty_events[:10],   # Top 10 most recent
+            'open_questions': open_questions,
+            'recommended_focus': recommended_focus,
+            'prompt_for_tetra': (
+                f"You are analyzing training data for a {game} AI agent. "
+                f"The agent has run {game_context['total_episodes']} episodes across "
+                f"{len(game_context['levels_trained'])} levels. "
+                f"There are currently {len(active)} active hypotheses guiding its play. "
+                f"Based on the failure patterns, success patterns, and novelty events above, "
+                "please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test, "
+                "(3) recommend which active hypotheses should be retired or refined, and "
+                "(4) describe each new hypothesis in concrete, testable terms."
+            ),
+        }
+
+    @staticmethod
+    def _count_top(rows: list, key: str, n: int) -> Dict[str, int]:
+        """Count top-N values for a key across a list of row dicts."""
+        counts: Dict[str, int] = {}
+        for row in rows:
+            val = row.get(key) or 'unknown'
+            counts[val] = counts.get(val, 0) + 1
+        return dict(sorted(counts.items(), key=lambda x: -x[1])[:n])
 
     # ────────────────────── Lifecycle ──────────────────────
 
