@@ -266,24 +266,24 @@ class TetrisCurriculumEnv:
         reward = (self.heuristic_blend * heuristic_reward 
                  + (1.0 - self.heuristic_blend) * raw_reward)
         
-        # Game over check
+        # Game over: only when next piece has nowhere to go (real Tetris rule)
+        # Do NOT check board[0]/board[1] here — line clearing shifts rows down,
+        # adding empty rows at the top. Checking top rows AFTER a clear can
+        # incorrectly trigger game-over even when space was just made.
         done = False
-        if np.any(self.board[0] > 0) or np.any(self.board[1] > 0):
+        if self.pieces_placed >= self.max_pieces:
             done = True
-            reward -= 1.0  # Penalty for game over
-        elif self.pieces_placed >= self.max_pieces:
-            done = True
-        
+
         self.game_over = done
         self.total_reward += reward
-        
-        # Spawn next piece
+
+        # Spawn next piece and check if any placement is valid
         if not done:
             self._spawn_piece()
-            # Check if any placement is valid
             if len(self.get_valid_actions()) == 0:
                 done = True
                 self.game_over = True
+                reward -= 1.0  # penalty only when truly stuck
         
         info = {
             'lines_cleared': self.lines_cleared,
