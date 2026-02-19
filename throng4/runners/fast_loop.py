@@ -53,6 +53,8 @@ from throng4.storage.experiment_db import ExperimentDB
 from throng4.storage.telemetry_logger import TelemetryLogger
 from throng4.storage.policy_pack import PolicyPack, PromotionGates
 from throng4.storage.auto_metric import AutoMetric
+from throng4.cognition.threat_estimator import ThreatEstimator
+from throng4.cognition.mode_controller import ModeController
 
 
 # ── Novelty detector ───────────────────────────────────────────────────────
@@ -156,7 +158,6 @@ class FastLoop:
         self._novelty = _NoveltyDetector()
 
         # AutoMetric — records raw board observations passively
-        # Runs correlation analysis every auto_metric_interval episodes
         board_h = {1:8, 2:10, 3:12, 4:14, 5:16, 6:18, 7:20}.get(level, 12)
         self._auto_metric = AutoMetric(
             db=self.db,
@@ -166,7 +167,28 @@ class FastLoop:
             min_episodes=100,
             storage_path=f'{log_dir}/auto_metric_{game}_L{level}.jsonl',
         )
-        self._auto_metric_interval = 500  # analyze every N episodes
+        self._auto_metric_interval = 500
+
+        # ThreatEstimator + ModeController
+        # Try level-specific estimator first, then universal, then None
+        self._threat: Optional[ThreatEstimator] = None
+        for path in [f'experiments/threat_estimator_L{level}.npz',
+                     'experiments/threat_estimator_all.npz']:
+            try:
+                self._threat = ThreatEstimator.load(path)
+                if verbose:
+                    print(f"  [amygdala] Loaded {path}  "
+                          f"threshold={self._threat.threshold}")
+                break
+            except Exception:
+                pass
+        if self._threat is None and verbose:
+            print("  [amygdala] No estimator found — mode will stay EXECUTE")
+
+        self._mode_ctrl = ModeController(
+            enter_survive=0.60, exit_survive=0.35,
+            enter_explore=0.20, hysteresis_steps=5,
+        )
 
         # Session ID for this FastLoop run
         import uuid
@@ -177,23 +199,49 @@ class FastLoop:
     def _run_episode(self, episode_num: int) -> Dict[str, Any]:
         """Run one episode. Returns stats dict."""
         self.agent.reset_episode()
+        self._mode_ctrl.reset_episode()
         adapter = TetrisAdapter(level=self.level, max_pieces=self.max_pieces)
         state = adapter.reset()
 
-        done = False
+        done           = False
         episode_reward = 0.0
-        steps = 0
-        pack_nudges = 0
+        steps          = 0
+        pack_nudges    = 0
+        survive_steps  = 0
+        peak_threat    = 0.0
 
         while not done:
             valid_actions = adapter.get_valid_actions()
             if not valid_actions:
                 break
 
-            # feature_fn for this adapter
             feature_fn = adapter.make_features
 
-            # PolicyPack nudge: 30% chance to go greedy when pack is confident
+            # ── Amygdala: threat evaluation from current board state ───────
+            mode = 'EXECUTE'
+            if self._threat is not None:
+                try:
+                    bf = adapter._compute_board_features(adapter.env.board)
+                    threat_feat = ThreatEstimator._episode_to_features({
+                        'level':         self.level,
+                        'max_height':    bf['max_height'],
+                        'holes':         bf['holes'],
+                        'bumpiness':     bf['bumpiness'],
+                        'lines_cleared': adapter.env.lines_cleared,
+                        'pieces_placed': adapter.env.pieces_placed,
+                    })
+                    if threat_feat is not None:
+                        threat     = self._threat.predict(threat_feat)
+                        mode       = self._mode_ctrl.update(threat, step=steps)
+                        peak_threat = max(peak_threat, threat)
+                        if mode == 'SURVIVE':
+                            survive_steps += 1
+                except Exception:
+                    pass
+
+            explore = (mode != 'SURVIVE')  # no random exploration in SURVIVE
+
+            # ── Action selection ──────────────────────────────────────────
             if self.pack and np.random.random() < 0.3:
                 bias = self.pack.get_action_bias(state, valid_actions)
                 if bias and bias['confidence'] > 0.6:
@@ -202,18 +250,21 @@ class FastLoop:
                     )
                     pack_nudges += 1
                 else:
-                    action = self.agent.select_action(valid_actions, feature_fn)
+                    action = self.agent.select_action(
+                        valid_actions, feature_fn, explore=explore
+                    )
             else:
-                action = self.agent.select_action(valid_actions, feature_fn)
+                action = self.agent.select_action(
+                    valid_actions, feature_fn, explore=explore
+                )
 
             features = feature_fn(action)
             next_state, reward, done, info = adapter.step(action)
-
             self.agent.record_step(features, reward)
 
             episode_reward += reward
-            steps += 1
-            state = next_state
+            steps          += 1
+            state           = next_state
 
         ep_info = adapter.get_info()
         lines   = ep_info['lines_cleared']
@@ -247,15 +298,18 @@ class FastLoop:
             pass
 
         return {
-            'episode': episode_num,
-            'lines': lines,
-            'pieces': pieces,
-            'score': round(episode_reward, 2),
-            'steps': steps,
-            'pack_nudges': pack_nudges,
-            'max_height': max_h,
-            'holes': holes,
-            'bumpiness': bumpiness,
+            'episode':      episode_num,
+            'lines':        lines,
+            'pieces':       pieces,
+            'score':        round(episode_reward, 2),
+            'steps':        steps,
+            'pack_nudges':  pack_nudges,
+            'max_height':   max_h,
+            'holes':        holes,
+            'bumpiness':    bumpiness,
+            'survive_steps': survive_steps,
+            'peak_threat':  round(peak_threat, 3),
+            'mode':         self._mode_ctrl.mode,
         }
 
     # ── Main run loop ──────────────────────────────────────────────────────
