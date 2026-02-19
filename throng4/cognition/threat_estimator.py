@@ -191,11 +191,16 @@ class ThreatEstimator:
     @staticmethod
     def _episode_to_features(ep: Dict) -> Optional[np.ndarray]:
         """
-        Build a feature vector from episode DB record.
+        Build a level-aware feature vector from episode DB record.
 
-        Uses the same fields that are available in real-time:
-        max_height, holes, bumpiness, lines_cleared, pieces_placed, level.
-        Normalized to [0, 1] ranges.
+        At high levels (L6-L7), absolute board height is useless (always near max).
+        Instead we use: holes relative to board volume, pieces_placed rate,
+        and lines_per_piece efficiency as the threat discriminators.
+
+        Features that scale by level:
+          - hole density: holes / (board_volume * expected_fill_rate)
+          - expected holes: level-specific baseline
+          - pieces_survival: how long did we survive (key at L7 where pieces ~= 5)
         """
         try:
             level     = float(ep.get('level') or 3)
@@ -205,21 +210,32 @@ class ThreatEstimator:
             lines     = float(ep.get('lines_cleared') or 0)
             pieces    = float(ep.get('pieces_placed') or 1)
 
-            board_h = {1: 8, 2: 10, 3: 12, 4: 14, 5: 16, 6: 18, 7: 20}.get(int(level), 12)
-            board_w = 6.0  # default; level 1-7 all use 6-wide boards
+            board_h = {1:8, 2:10, 3:12, 4:14, 5:16, 6:18, 7:20}.get(int(level), 12)
+            board_w = 6.0
+
+            volume   = board_h * board_w
+            # Expected holes at this level (learned from data: ~4*level^1.5)
+            expected_holes = min(4.0 * (level ** 1.5), volume * 0.7)
+            # Holes relative to level-specific expectation
+            hole_excess    = max(0.0, holes - expected_holes) / (volume * 0.3 + 1.0)
+            # Pieces-per-line efficiency: higher = safer (able to clear while alive)
+            lines_per_piece = lines / max(pieces, 1)
+            # Survival rate: pieces relative to a "good" episode for this level
+            good_pieces = max(10.0, 200.0 / (level ** 1.5))  # decreases with level
+            survival_norm = min(pieces / good_pieces, 1.0)
 
             feat = np.array([
-                max_h   / board_h,                    # height fraction
-                holes   / (board_w * board_h * 0.5),  # hole density
-                bumpiness / (board_h * (board_w - 1)),# bumpiness norm
-                min(lines / 50.0, 1.0),               # lines (proxy for survival)
-                min(pieces / 200.0, 1.0),             # longevity proxy
-                (max_h / board_h) ** 2,               # height danger (quadratic)
-                float(max_h > 0.8 * board_h),         # critical height flag
-                float(holes > 5),                     # many holes flag
-                float(holes > 10),                    # very many holes flag
-                float(bumpiness > 10),                # high bumpiness flag
-                level / 7.0,                          # curriculum level
+                max_h    / board_h,                        # height fraction
+                holes    / volume,                         # hole density (0-1)
+                hole_excess,                               # holes above level expectation
+                bumpiness / (board_h * (board_w - 1)),    # bumpiness norm
+                min(lines / 50.0, 1.0),                    # lines cleared (capped)
+                survival_norm,                             # pieces survived (level-scaled)
+                min(lines_per_piece * 5.0, 1.0),          # lines/piece efficiency
+                (max_h / board_h) ** 2,                   # height danger (quadratic)
+                float(max_h > 0.9 * board_h),             # critical height (90%)
+                float(hole_excess > 0.5),                 # holes way above expectation
+                level / 7.0,                              # curriculum level
             ], dtype=np.float32)
             return feat
         except Exception:
