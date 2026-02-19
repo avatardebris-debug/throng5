@@ -126,8 +126,9 @@ class TetrisAdapter(EnvironmentAdapter):
             if 0 <= r < self.env.height and 0 <= c < self.env.width:
                 board_copy[r][c] = 1.0  # TetrisCurriculumEnv uses float board
         
-        # Count cleared lines
-        cleared = sum(1 for r in board_copy if all(cell is not None for cell in r))
+        # Count cleared lines (a row is full if every cell is truthy / filled)
+        cleared = sum(1 for r in board_copy if all(cell for cell in r))
+
         
         # Compute board features
         features_dict = self._compute_board_features(board_copy)
@@ -171,59 +172,65 @@ class TetrisAdapter(EnvironmentAdapter):
     def _compute_board_features(self, board: List[List]) -> Dict[str, Any]:
         """
         Compute Dellacherie-style board features.
-        
+
         Args:
-            board: Board state (height × width)
-            
+            board: Board state (height × width). Cells are truthy (filled)
+                   or falsy (empty) — numpy.float32 1.0/0.0, or None/value.
+
         Returns:
-            Dict with agg_height, holes, bumpiness, max_height, heights, avg_completeness
+            Dict with agg_height, holes, bumpiness, max_height, heights,
+            avg_completeness, and column_heights.
         """
-        # Column heights
+        board_h = len(board)
+        board_w = len(board[0]) if board_h > 0 else self.board_width
+
+        # Column heights: scan top-to-bottom, first filled cell defines height
         heights = []
-        for c in range(self.board_width):
+        for c in range(board_w):
             h = 0
-            for r in range(self.env.height):
-                if board[r][c] is not None:
-                    h = self.env.height - r
+            for r in range(board_h):
+                if board[r][c]:          # truthy = filled
+                    h = board_h - r
                     break
             heights.append(h)
-        
+
         agg_height = sum(heights)
-        max_height = max(heights)
-        
-        # Holes
+        max_height = max(heights) if heights else 0
+
+        # Holes: empty cell beneath a filled cell in the same column
         holes = 0
-        for c in range(self.board_width):
+        for c in range(board_w):
             found_block = False
-            for r in range(self.env.height):
-                if board[r][c] is not None:
+            for r in range(board_h):
+                if board[r][c]:          # filled cell
                     found_block = True
-                elif found_block:
+                elif found_block:        # empty cell below a filled one
                     holes += 1
-        
-        # Bumpiness
-        bumpiness = sum(abs(heights[i] - heights[i+1]) 
-                       for i in range(self.board_width - 1))
-        
+
+        # Bumpiness: sum of absolute height differences between adjacent cols
+        bumpiness = sum(abs(heights[i] - heights[i + 1])
+                        for i in range(len(heights) - 1))
+
         # Row completeness
         occupied_rows = 0
-        total_fill = 0.0
-        for r in range(self.env.height):
-            filled = sum(1 for cell in board[r] if cell is not None)
+        total_fill    = 0.0
+        for r in range(board_h):
+            filled = sum(1 for c in range(board_w) if board[r][c])
             if filled > 0:
                 occupied_rows += 1
-                total_fill += filled / self.board_width
-        
+                total_fill    += filled / board_w
+
         avg_completeness = total_fill / occupied_rows if occupied_rows > 0 else 0.0
-        
+
         return {
-            'agg_height': agg_height,
-            'holes': holes,
-            'bumpiness': bumpiness,
-            'max_height': max_height,
-            'heights': heights,
-            'avg_completeness': avg_completeness
+            'agg_height':       agg_height,
+            'holes':            holes,
+            'bumpiness':        bumpiness,
+            'max_height':       max_height,
+            'heights':          heights,
+            'avg_completeness': avg_completeness,
         }
+
     
     def get_lookahead_actions(self, action: Tuple[int, int]) -> List[Tuple[int, int]]:
         """
