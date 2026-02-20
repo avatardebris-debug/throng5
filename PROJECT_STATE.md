@@ -55,7 +55,26 @@ Required hypothesis fields:
 Prompt contract location:
 - `experiments/TETRA_PROMPT.md` (Atari Offline Batch Mode v2 section)
 
----
+### DQN Experience Replay — PortableNNAgent (2026-02-20)
+
+`PortableNNAgent` is now fully off-policy DQN. Key API change:
+
+```python
+# OLD (n-step on-policy):
+agent.record_step(features, reward)
+agent.end_episode(final_score)           # training happened here
+
+# NEW (off-policy DQN):
+features = adapter.make_features(action) # MUST be called BEFORE adapter.step()
+obs, reward, done, info = adapter.step(action)
+next_features = [adapter.make_features(a) for a in adapter.get_valid_actions()]
+agent.record_step(features, reward, next_features, done)  # training every N steps
+agent.end_episode(final_score)           # ε-decay + housekeeping only
+```
+
+Critical bug fixed: `make_features` in `TetrisAdapter` simulates placement on the *current* board. Calling it *after* `step()` gave it the post-move board — the features were always one step stale. Now called pre-step everywhere.
+
+
 
 ## 4) Directory Organization (practical working model)
 

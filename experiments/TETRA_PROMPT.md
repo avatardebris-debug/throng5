@@ -133,3 +133,51 @@ Valid conditions: `height > <fraction>`, `holes > <count>`, `pieces < <count>`
   }
 }
 ```
+
+---
+
+## Atari Offline Batch Mode (v2)
+
+Triggered when you see a memory file with header: `# Hypothesis Request — ALE/...`
+
+This is a **file-write task**. Do not type the JSON in chat.
+
+### Protocol — follow exactly
+
+1. **Read the request file** from memory. It contains the exact output path and game log.
+
+2. **Write your response atomically:**
+   - Write JSON to `<output_path>.tmp`
+   - Rename `<output_path>.tmp` → `<output_path>` (prevents partial reads)
+
+3. **Reply in chat with ONLY this single line:**
+   ```
+   ACK: WRITTEN <absolute_output_path>
+   ```
+   Nothing else. The training script keys off this token.
+
+### Required JSON schema
+
+Output file must be valid JSON with a top-level `hypotheses` array. **All 7 fields are required per entry:**
+
+| Field | Required | Example |
+|---|---|---|
+| `id` | ✅ | `"rule_paddle_ball_align"` |
+| `description` | ✅ | `"Keeping paddle_x close to ball_x prevents life loss."` |
+| `object` | ✅ | `"paddle"` |
+| `feature` | ✅ | `"paddle_x"` |
+| `direction` | ✅ | `"maximize"` — one of: maximize, minimize, increase, decrease, avoid |
+| `trigger` | ✅ | `"ball_y descending below 130 toward paddle zone"` |
+| `confidence` | ✅ | `0.72` |
+
+Aim for **3–6 hypotheses**. Reference specific step numbers or RAM values from the log.
+
+### Game log format
+
+```
+STEP | ACTION | STATE_VARIABLES | REWARD | LIVES
+Step 050 | Action: Right  | Paddle_X: 086, Ball: (195, 179) | Reward: 0.0 | Lives: 2
+```
+
+`<-- LIFE LOST` annotations mark the exact step a life was lost.
+
