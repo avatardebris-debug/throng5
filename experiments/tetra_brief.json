@@ -1,6 +1,6 @@
 {
   "brief_type": "tetra_hypothesis_brief",
-  "generated_at": "2026-02-19 22:58:01",
+  "generated_at": "2026-02-19 23:19:51",
   "game_context": {
     "game": "tetris",
     "levels_trained": [
@@ -16,56 +16,56 @@
       },
       {
         "level": 3,
-        "n": 3254,
-        "avg": 67.55070682237246,
+        "n": 3109,
+        "avg": 70.65455130266967,
         "best": 413,
-        "worst": 1,
-        "avg_bump": 2.310079901659496,
-        "avg_holes": 15.602335586969883,
-        "avg_height": 11.598647818070068
+        "worst": 2,
+        "avg_bump": 2.1846252814409777,
+        "avg_holes": 15.210678674815053,
+        "avg_height": 11.626568028304922
       },
       {
         "level": 4,
-        "n": 2420,
-        "avg": 16.351652892561983,
+        "n": 1853,
+        "avg": 20.79546681057744,
         "best": 129,
         "worst": 1,
-        "avg_bump": 1.5640495867768596,
-        "avg_holes": 34.18099173553719,
-        "avg_height": 13.635537190082644
+        "avg_bump": 1.2266594711279006,
+        "avg_holes": 30.635725849973017,
+        "avg_height": 13.730706961683756
       },
       {
         "level": 5,
-        "n": 2689,
-        "avg": 30.715135738192636,
+        "n": 2190,
+        "avg": 37.38493150684931,
         "best": 364,
-        "worst": 1,
-        "avg_bump": 1.3172182967645965,
-        "avg_holes": 37.885087393082934,
-        "avg_height": 15.661956117515805
+        "worst": 2,
+        "avg_bump": 1.160730593607306,
+        "avg_holes": 34.1716894977169,
+        "avg_height": 15.741095890410959
       },
       {
         "level": 6,
-        "n": 3878,
-        "avg": 20.167354306343476,
+        "n": 2680,
+        "avg": 28.736194029850747,
         "best": 240,
-        "worst": 0,
-        "avg_bump": 1.9270242392986074,
-        "avg_holes": 68.66116554925219,
-        "avg_height": 17.584837545126355
+        "worst": 2,
+        "avg_bump": 1.4843283582089553,
+        "avg_holes": 62.507462686567166,
+        "avg_height": 17.665298507462687
       },
       {
         "level": 7,
-        "n": 14632,
-        "avg": 23.77125478403499,
+        "n": 10537,
+        "avg": 32.40485906804593,
         "best": 356,
         "worst": 0,
-        "avg_bump": 1.6314926189174412,
-        "avg_holes": 69.92905959540732,
-        "avg_height": 19.54018589393111
+        "avg_bump": 1.3552244471861061,
+        "avg_holes": 62.27265825187435,
+        "avg_height": 19.634620859827276
       }
     ],
-    "total_episodes": 29725,
+    "total_episodes": 23221,
     "training_span_days": 2.0
   },
   "hypothesis_ledger": {
@@ -947,134 +947,134 @@
   },
   "failure_patterns": {
     "sample_size": 100,
-    "avg_lines": 0.98,
-    "avg_pieces": 1.02,
-    "avg_max_height": 19.02,
-    "avg_holes": 90.42,
-    "avg_bumpiness": 3.15,
+    "avg_lines": 0.0,
+    "avg_pieces": 23.23,
+    "avg_max_height": 20.0,
+    "avg_holes": 99.66,
+    "avg_bumpiness": 7.92,
     "common_fail_modes": {
       "unknown": 100
     },
     "active_hypotheses_at_failure": {
       "unknown": 100
     },
-    "interpretation": "Failures have avg height=19.0, holes=90.4, bumpiness=3.1. Games end after only 1 pieces."
+    "interpretation": "Failures have avg height=20.0, holes=99.7, bumpiness=7.9. Games end after only 23 pieces."
   },
   "success_patterns": {
     "sample_size": 100,
-    "avg_lines": 74.07,
-    "avg_pieces": 31.38,
-    "avg_max_height": 19.62,
-    "avg_holes": 77.05,
-    "avg_bumpiness": 1.36,
+    "avg_lines": 70.32,
+    "avg_pieces": 30.07,
+    "avg_max_height": 19.59,
+    "avg_holes": 75.22,
+    "avg_bumpiness": 1.44,
     "common_hypotheses": {
       "unknown": 100
     },
-    "interpretation": "Successes have avg height=19.6, holes=77.0, 74 lines avg.",
+    "interpretation": "Successes have avg height=19.6, holes=75.2, 70 lines avg.",
     "delta_vs_failure": {
-      "height_delta": -0.6,
-      "holes_delta": 13.37,
-      "bumpiness_delta": 1.79
+      "height_delta": 0.41,
+      "holes_delta": 24.44,
+      "bumpiness_delta": 6.48
     }
   },
   "success_dissection": {
     "outlier_count": 5,
-    "outlier_threshold_lines": 144,
-    "outlier_avg_lines": 181.4,
-    "baseline_avg_lines": 2.72,
-    "outlier_early_holes": 73.6,
-    "outlier_mid_holes": 73.6,
-    "outlier_late_holes": 73.6,
-    "baseline_early_holes": null,
-    "baseline_mid_holes": null,
+    "outlier_threshold_lines": 132,
+    "outlier_avg_lines": 179.0,
+    "baseline_avg_lines": 1.91,
+    "outlier_early_holes": 78.8,
+    "outlier_mid_holes": 78.8,
+    "outlier_late_holes": 78.8,
+    "baseline_early_holes": 85.7,
+    "baseline_mid_holes": 64.68,
     "outlier_early_height": 19.8,
-    "baseline_early_height": null,
-    "interpretation": "Top 1% episodes (5 games, avg 181 lines).\nIf outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\nIf outlier_mid_holes \u2248 baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
+    "baseline_early_height": 19.96,
+    "interpretation": "Top 1% episodes (5 games, avg 179 lines).\nIf outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\nIf outlier_mid_holes \u2248 baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
   },
   "novelty_events": [
     {
-      "lines": 39,
-      "surprise": 4.89,
-      "episode": 18,
+      "lines": 6,
+      "surprise": 5.16,
+      "episode": 168,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 43,
-      "surprise": 6.39,
-      "episode": 14,
+      "lines": 3,
+      "surprise": 2.6,
+      "episode": 153,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 27,
-      "surprise": 4.95,
-      "episode": 13,
+      "lines": 5,
+      "surprise": 4.74,
+      "episode": 146,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 37,
-      "surprise": 8.09,
-      "episode": 8,
+      "lines": 3,
+      "surprise": 3.1,
+      "episode": 126,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 10,
-      "surprise": 2.75,
-      "episode": 7,
+      "lines": 4,
+      "surprise": 4.2,
+      "episode": 89,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 11,
-      "surprise": 3.28,
-      "episode": 4,
+      "lines": 3,
+      "surprise": 3.49,
+      "episode": 62,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 13,
-      "surprise": 4.4,
-      "episode": 3,
+      "lines": 4,
+      "surprise": 4.96,
+      "episode": 51,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 23,
-      "surprise": 9.95,
-      "episode": 1,
+      "lines": 3,
+      "surprise": 4.21,
+      "episode": 44,
       "level": 7,
-      "session": "43717f57",
-      "timestamp_str": "2026-02-19 22:27"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 164,
-      "surprise": 3.81,
-      "episode": 1967,
+      "lines": 2,
+      "surprise": 3.0,
+      "episode": 43,
       "level": 7,
-      "session": "22fa5b15",
-      "timestamp_str": "2026-02-19 21:24"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     },
     {
-      "lines": 127,
-      "surprise": 2.66,
-      "episode": 1929,
+      "lines": 3,
+      "surprise": 4.96,
+      "episode": 39,
       "level": 7,
-      "session": "22fa5b15",
-      "timestamp_str": "2026-02-19 21:24"
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
     }
   ],
   "open_questions": [
-    "Failures have 13.4 more holes on average \u2014 at what hole count does performance collapse?",
+    "Failures have 24.4 more holes on average \u2014 at what hole count does performance collapse?",
     "12 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
     "24 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
   ],
@@ -1171,5 +1171,5 @@
     "file_path": "experiments/tetra_inbox.json",
     "format": "JSON array (even for a single op)"
   },
-  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 29725 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and open questions above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test using ADD ops, (3) recommend which candidates should be RETIRE'd, (4) optionally MUTATE a weak hypothesis into a stronger variant. Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. See inbox_schema for the exact format."
+  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 23221 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and open questions above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test using ADD ops, (3) recommend which candidates should be RETIRE'd, (4) optionally MUTATE a weak hypothesis into a stronger variant. Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. See inbox_schema for the exact format."
 }

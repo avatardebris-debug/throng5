@@ -116,7 +116,9 @@ class TetrisAdapter(EnvironmentAdapter):
         rotation, column = action
         
         # Simulate placement to get resulting board state
-        board_copy = [row[:] for row in self.env.board]
+        # IMPORTANT: use .copy() not [:] — numpy row slices are views, not copies.
+        # Using [:] would mutate self.env.board through the view.
+        board_copy = [row.copy() for row in self.env.board]
         piece_cells = self.env._get_piece_cells(rotation)
         
         # Find drop row

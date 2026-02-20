@@ -316,6 +316,7 @@ class FastLoop:
         except Exception:
             max_h = holes = 0; bumpiness = 0.0
 
+
         # AutoMetric: record raw board snapshot passively
         try:
             raw_board = np.array(adapter.env.board, dtype=np.float32)

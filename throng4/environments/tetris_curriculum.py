@@ -240,7 +240,7 @@ class TetrisCurriculumEnv:
             r, c = row + dr, col + dc
             if 0 <= r < self.height and 0 <= c < self.width:
                 self.board[r, c] = 1.0
-        
+
         self.pieces_placed += 1
         
         # Clear lines
