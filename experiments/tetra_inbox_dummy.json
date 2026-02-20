@@ -1,0 +1,93 @@
+[
+    {
+        "op": "_TEMPLATE",
+        "_readme": [
+            "HOW TO USE THIS FILE:",
+            "1. Copy this file and rename the copy to 'tetra_inbox.json' (same folder).",
+            "2. Delete this _TEMPLATE block and the example ops below.",
+            "3. Add your own ops (as many as you want in one file).",
+            "4. Save as tetra_inbox.json — SlowLoop picks it up on the next nightly run,",
+            "   applies all ops, then moves the file to tetra_archive/ automatically.",
+            "",
+            "ONE FILE = AS MANY OPS AS YOU WANT.",
+            "Each op is one object in the array. Mix and match ADD / UPDATE / RETIRE / MUTATE."
+        ],
+        "_ops_available": {
+            "ADD": "Create a brand-new hypothesis candidate.",
+            "UPDATE": "Change llm_score / llm_priority / llm_notes on an existing hypothesis.",
+            "RETIRE": "Mark an existing hypothesis as retired (stops it being promoted).",
+            "MUTATE": "Create a new hypothesis derived from a parent — generation counter increments."
+        },
+        "_llm_priority_values": {
+            "explore": "New idea, low confidence — worth a quick test run.",
+            "test": "Promising — allocate evidence budget to this one.",
+            "retire": "Flag for deprecation after this cycle."
+        },
+        "_required_fields": {
+            "ADD": [
+                "op",
+                "name",
+                "description"
+            ],
+            "UPDATE": [
+                "op",
+                "name"
+            ],
+            "RETIRE": [
+                "op",
+                "name"
+            ],
+            "MUTATE": [
+                "op",
+                "parent",
+                "name",
+                "description"
+            ]
+        }
+    },
+    {
+        "_comment": "EXAMPLE: Add a brand new hypothesis",
+        "op": "ADD",
+        "name": "your_hypothesis_name_here",
+        "description": "One or two sentences describing what this hypothesis means strategically.",
+        "llm_score": 0.75,
+        "llm_priority": "explore",
+        "llm_notes": "Why you think this is worth testing — reference failure clusters, trends, etc.",
+        "game": "tetris"
+    },
+    {
+        "_comment": "EXAMPLE: Add a second hypothesis — you can have as many ADDs as you want",
+        "op": "ADD",
+        "name": "second_hypothesis_name",
+        "description": "Another hypothesis. Put as many of these blocks in the array as you need.",
+        "llm_score": 0.65,
+        "llm_priority": "test",
+        "llm_notes": "Rationale for why this is promising.",
+        "game": "tetris"
+    },
+    {
+        "_comment": "EXAMPLE: Update an existing hypothesis's score/priority/notes (no win_rate change)",
+        "op": "UPDATE",
+        "name": "exact_name_of_existing_hypothesis",
+        "llm_score": 0.4,
+        "llm_priority": "retire",
+        "llm_notes": "Explanation of why this needs re-prioritising."
+    },
+    {
+        "_comment": "EXAMPLE: Retire an existing hypothesis outright",
+        "op": "RETIRE",
+        "name": "exact_name_of_hypothesis_to_retire",
+        "llm_notes": "One sentence reason for retirement."
+    },
+    {
+        "_comment": "EXAMPLE: Mutate an existing hypothesis into a new variant",
+        "op": "MUTATE",
+        "parent": "name_of_existing_hypothesis_to_mutate_from",
+        "name": "new_mutated_hypothesis_name",
+        "description": "What changed vs the parent hypothesis.",
+        "llm_score": 0.70,
+        "llm_priority": "test",
+        "llm_notes": "Why this mutation is an improvement over the parent.",
+        "game": "tetris"
+    }
+]

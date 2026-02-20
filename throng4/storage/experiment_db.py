@@ -811,6 +811,10 @@ class ExperimentDB:
             try:
                 op = op_dict.get('op', '').upper()
 
+                # Skip template/comment markers (used in tetra_inbox_dummy.json)
+                if op.startswith('_'):
+                    continue
+
                 if op == 'ADD':
                     name = op_dict['name']
                     existing = c.execute(

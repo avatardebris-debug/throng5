@@ -1,72 +1,72 @@
 {
   "brief_type": "tetra_hypothesis_brief",
-  "generated_at": "2026-02-18 21:19:02",
+  "generated_at": "2026-02-19 20:07:31",
   "game_context": {
     "game": "tetris",
     "levels_trained": [
       {
         "level": 2,
-        "n": 1444,
-        "avg": 9.84349030470914,
-        "best": 298,
+        "n": 2944,
+        "avg": 34.8984375,
+        "best": 307,
         "worst": 0,
-        "avg_bump": 0.0,
-        "avg_holes": 0.0,
-        "avg_height": 11.833795013850416
+        "avg_bump": 1.634850543478261,
+        "avg_holes": 8.567934782608695,
+        "avg_height": 11.511548913043478
       },
       {
         "level": 3,
-        "n": 730,
-        "avg": 43.395890410958906,
-        "best": 291,
+        "n": 3030,
+        "avg": 58.814851485148516,
+        "best": 395,
         "worst": 1,
-        "avg_bump": 0.0,
-        "avg_holes": 0.0,
-        "avg_height": 11.506849315068493
+        "avg_bump": 2.42013201320132,
+        "avg_holes": 14.703630363036304,
+        "avg_height": 11.476237623762376
       },
       {
         "level": 4,
-        "n": 714,
-        "avg": 12.746498599439775,
+        "n": 2214,
+        "avg": 15.37082204155375,
         "best": 129,
         "worst": 1,
-        "avg_bump": 0.0,
-        "avg_holes": 0.0,
-        "avg_height": 13.72549019607843
+        "avg_bump": 1.2601626016260163,
+        "avg_holes": 28.05103884372177,
+        "avg_height": 13.631436314363144
       },
       {
         "level": 5,
-        "n": 710,
-        "avg": 34.153521126760566,
+        "n": 2301,
+        "avg": 29.222077357670578,
         "best": 266,
-        "worst": 2,
-        "avg_bump": 0.0,
-        "avg_holes": 0.0,
-        "avg_height": 15.774647887323944
+        "worst": 1,
+        "avg_bump": 1.193394176445024,
+        "avg_holes": 33.79574098218166,
+        "avg_height": 15.61625380269448
       },
       {
         "level": 6,
-        "n": 710,
-        "avg": 13.753521126760564,
-        "best": 160,
+        "n": 3710,
+        "avg": 19.0722371967655,
+        "best": 240,
         "worst": 0,
-        "avg_bump": 0.0,
-        "avg_holes": 0.0,
-        "avg_height": 17.746478873239436
+        "avg_bump": 1.6964959568733153,
+        "avg_holes": 61.533153638814014,
+        "avg_height": 17.57708894878706
       },
       {
         "level": 7,
-        "n": 6010,
-        "avg": 11.765391014975041,
-        "best": 197,
-        "worst": 1,
-        "avg_bump": 0.0,
-        "avg_holes": 0.0,
-        "avg_height": 19.966722129783694
+        "n": 19010,
+        "avg": 16.40410310362967,
+        "best": 356,
+        "worst": 0,
+        "avg_bump": 1.4868490268279853,
+        "avg_holes": 57.424513413992635,
+        "avg_height": 19.580589163598106
       }
     ],
-    "total_episodes": 10318,
-    "training_span_days": 366.1
+    "total_episodes": 33209,
+    "training_span_days": 367.1
   },
   "hypothesis_ledger": {
     "active": [
@@ -394,7 +394,7 @@
           "evolved_into": "minimize_v4"
         },
         "created_at": 1771470099.8745663,
-        "updated_at": 1771470554.8419247
+        "updated_at": 1771475466.0611854
       },
       {
         "name": "maximize_gain",
@@ -460,6 +460,24 @@
         },
         "created_at": 1771470099.8936832,
         "updated_at": 1771470445.5717735
+      },
+      {
+        "name": "auto_top_fill",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 501,
+        "confidence": 0.70455,
+        "description": "Auto-discovered: moderately positively correlated with outcome (r=+0.409) \u2014 density of filled cells in the top half of the board. Requires validation.",
+        "metadata": {
+          "source": "auto_metric",
+          "correlation": 0.4091,
+          "mean_val": 0.67,
+          "std_val": 0.093,
+          "discovered_at": "2026-02-19 19:55",
+          "positive_signal": true
+        },
+        "created_at": 1771475991.749805,
+        "updated_at": 1771553018.7839253
       }
     ],
     "untested_candidates": [
@@ -527,132 +545,369 @@
         },
         "created_at": 1771393075.3382525,
         "updated_at": 1771393075.3382525
+      },
+      {
+        "name": "reduce_holes_v58",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 82.9 vs success 20.2 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 62.7
+        },
+        "created_at": 1771476058.760544,
+        "updated_at": 1771476058.760544
+      },
+      {
+        "name": "reduce_holes_v535",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 90.8 vs success 76.3 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 14.5
+        },
+        "created_at": 1771550535.3984466,
+        "updated_at": 1771550535.3984466
+      },
+      {
+        "name": "reduce_holes_v978",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 89.9 vs success 69.2 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 20.700000000000003
+        },
+        "created_at": 1771551978.0401523,
+        "updated_at": 1771551978.0401523
+      },
+      {
+        "name": "reduce_holes_v601",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 81.7 vs success 34.9 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 46.800000000000004
+        },
+        "created_at": 1771552601.8049533,
+        "updated_at": 1771552601.8049533
+      },
+      {
+        "name": "control_height_v601",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Control height: failure cluster had 17.8 vs success 13.8 avg max height",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "height_delta": 4.0
+        },
+        "created_at": 1771552601.8078332,
+        "updated_at": 1771552601.8078332
+      },
+      {
+        "name": "tetra_holes_early_game",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.72,
+        "description": "Penalise holes created in the first 8 pieces more heavily.",
+        "metadata": {
+          "llm_score": 0.72,
+          "llm_priority": "explore",
+          "llm_notes": "Failure clusters show hole count at piece 8 strongly predicts final lines.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553018.7841725,
+        "updated_at": 1771553018.7839253
+      },
+      {
+        "name": "tetra_reduce_holes_height_gated",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.68,
+        "description": "Reduce holes only when board height exceeds 60% of max.",
+        "metadata": {
+          "llm_score": 0.68,
+          "llm_priority": "test",
+          "llm_notes": "Adds height gate \u2014 hole avoidance matters most when already tall.",
+          "source": "tetra_mutation",
+          "parent_name": "reduce_holes_v601"
+        },
+        "created_at": 1771553018.7873375,
+        "updated_at": 1771553018.7839253
+      },
+      {
+        "name": "tetra_survive_tall_boards",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.8,
+        "description": "When height > 75%, enter conservative mode: prefer flat placements over lines.",
+        "metadata": {
+          "llm_score": 0.8,
+          "llm_priority": "test",
+          "llm_notes": "Amygdala A/B data shows max_lines advantage at L7 when SURVIVE active.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553048.7064037,
+        "updated_at": 1771553048.7060874
+      },
+      {
+        "name": "reduce_holes_v48",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 81.7 vs success 34.9 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 46.800000000000004
+        },
+        "created_at": 1771553048.7249591,
+        "updated_at": 1771553048.7249591
+      },
+      {
+        "name": "control_height_v48",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Control height: failure cluster had 17.8 vs success 13.8 avg max height",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "height_delta": 4.0
+        },
+        "created_at": 1771553048.728848,
+        "updated_at": 1771553048.728848
       }
     ],
-    "total": 31,
+    "total": 113,
     "key_insight": "Top hypothesis 'maximize_lines' wins 89% of the time after 50 evaluations."
   },
   "failure_patterns": {
     "sample_size": 100,
     "avg_lines": 1.0,
-    "avg_pieces": 1.04,
-    "avg_max_height": 20.0,
-    "avg_holes": 0.0,
-    "avg_bumpiness": 0.0,
+    "avg_pieces": 1.0,
+    "avg_max_height": 19.0,
+    "avg_holes": 90.76,
+    "avg_bumpiness": 3.09,
     "common_fail_modes": {
       "unknown": 100
     },
     "active_hypotheses_at_failure": {
       "unknown": 100
     },
-    "interpretation": "Failures have avg height=20.0, holes=0.0, bumpiness=0.0. Games end after only 1 pieces."
+    "interpretation": "Failures have avg height=19.0, holes=90.8, bumpiness=3.1. Games end after only 1 pieces."
   },
   "success_patterns": {
     "sample_size": 100,
-    "avg_lines": 46.55,
-    "avg_pieces": 18.37,
-    "avg_max_height": 20.0,
-    "avg_holes": 0.0,
-    "avg_bumpiness": 0.0,
+    "avg_lines": 64.99,
+    "avg_pieces": 27.35,
+    "avg_max_height": 19.56,
+    "avg_holes": 76.44,
+    "avg_bumpiness": 1.51,
     "common_hypotheses": {
       "unknown": 100
     },
-    "interpretation": "Successes have avg height=20.0, holes=0.0, 47 lines avg.",
+    "interpretation": "Successes have avg height=19.6, holes=76.4, 65 lines avg.",
     "delta_vs_failure": {
-      "height_delta": 0.0,
-      "holes_delta": 0.0,
-      "bumpiness_delta": 0.0
+      "height_delta": -0.56,
+      "holes_delta": 14.32,
+      "bumpiness_delta": 1.58
     }
   },
   "novelty_events": [
     {
-      "lines": 72,
-      "surprise": 2.84,
-      "episode": 4985,
+      "lines": 104,
+      "surprise": 2.99,
+      "episode": 1491,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     },
     {
-      "lines": 111,
-      "surprise": 4.34,
-      "episode": 4937,
+      "lines": 115,
+      "surprise": 3.56,
+      "episode": 1483,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     },
     {
-      "lines": 82,
-      "surprise": 3.25,
-      "episode": 4926,
+      "lines": 97,
+      "surprise": 2.77,
+      "episode": 1415,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     },
     {
-      "lines": 94,
-      "surprise": 3.73,
-      "episode": 4875,
+      "lines": 131,
+      "surprise": 3.97,
+      "episode": 1374,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     },
     {
-      "lines": 80,
-      "surprise": 3.35,
-      "episode": 4874,
+      "lines": 103,
+      "surprise": 3.12,
+      "episode": 1364,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     },
     {
-      "lines": 69,
-      "surprise": 2.82,
-      "episode": 4855,
+      "lines": 88,
+      "surprise": 2.76,
+      "episode": 1355,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     },
     {
-      "lines": 68,
-      "surprise": 2.52,
-      "episode": 4823,
-      "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
-    },
-    {
-      "lines": 94,
-      "surprise": 3.78,
-      "episode": 4818,
-      "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
-    },
-    {
-      "lines": 126,
-      "surprise": 4.97,
-      "episode": 4777,
-      "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
-    },
-    {
-      "lines": 66,
+      "lines": 110,
       "surprise": 2.51,
-      "episode": 4754,
+      "episode": 1200,
       "level": 7,
-      "session": "fdf87acf",
-      "timestamp_str": "2026-02-18 21:09"
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
+    },
+    {
+      "lines": 192,
+      "surprise": 4.75,
+      "episode": 1172,
+      "level": 7,
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
+    },
+    {
+      "lines": 119,
+      "surprise": 3.02,
+      "episode": 1164,
+      "level": 7,
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
+    },
+    {
+      "lines": 250,
+      "surprise": 6.73,
+      "episode": 1128,
+      "level": 7,
+      "session": "a45ba2ad",
+      "timestamp_str": "2026-02-19 19:56"
     }
   ],
   "open_questions": [
-    "12 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
-    "5 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
+    "Failures have 14.3 more holes on average \u2014 at what hole count does performance collapse?",
+    "13 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
+    "15 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
   ],
   "recommended_focus": [
-    "HOLES NOT TRACKED: All episodes show 0 holes \u2014 the hole detection may not be working. Height-based failure patterns may be more reliable.",
     "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
   ],
-  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 10318 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and novelty events above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test, (3) recommend which active hypotheses should be retired or refined, and (4) describe each new hypothesis in concrete, testable terms."
+  "inbox_schema": {
+    "description": "To update the hypothesis list, write a JSON array to experiments/tetra_inbox.json. The SlowLoop will ingest it at next nightly consolidation and archive the file.",
+    "supported_ops": [
+      {
+        "op": "ADD",
+        "required": [
+          "name",
+          "description"
+        ],
+        "optional": [
+          "llm_score",
+          "llm_priority",
+          "llm_notes",
+          "game"
+        ],
+        "example": {
+          "op": "ADD",
+          "name": "reduce_holes_early",
+          "description": "Prioritise avoiding holes in first 10 pieces.",
+          "llm_score": 0.75,
+          "llm_priority": "explore",
+          "llm_notes": "Failure data shows holes at piece 10 predict outcome.",
+          "game": "tetris"
+        }
+      },
+      {
+        "op": "UPDATE",
+        "required": [
+          "name"
+        ],
+        "optional": [
+          "llm_score",
+          "llm_priority",
+          "llm_notes"
+        ],
+        "example": {
+          "op": "UPDATE",
+          "name": "reduce_holes_v58",
+          "llm_score": 0.4,
+          "llm_priority": "retire",
+          "llm_notes": "Win rate plateaued; superseded by reduce_holes_early."
+        }
+      },
+      {
+        "op": "RETIRE",
+        "required": [
+          "name"
+        ],
+        "optional": [
+          "llm_notes"
+        ],
+        "example": {
+          "op": "RETIRE",
+          "name": "auto_top_fill",
+          "llm_notes": "AutoMetric shows no correlation with outcome."
+        }
+      },
+      {
+        "op": "MUTATE",
+        "required": [
+          "parent",
+          "name",
+          "description"
+        ],
+        "optional": [
+          "llm_score",
+          "llm_priority",
+          "llm_notes",
+          "game"
+        ],
+        "note": "Creates new hypothesis derived from parent; increments generation.",
+        "example": {
+          "op": "MUTATE",
+          "parent": "reduce_holes_v58",
+          "name": "reduce_holes_v59_height_gated",
+          "description": "Reduce holes only when height > 60% of board.",
+          "llm_score": 0.7,
+          "llm_priority": "test",
+          "llm_notes": "Adds height gate based on failure cluster analysis."
+        }
+      }
+    ],
+    "llm_priority_values": {
+      "explore": "New idea, low confidence, worth a quick test.",
+      "test": "Promising \u2014 allocate evidence budget to this.",
+      "retire": "Mark for deprecation after current cycle."
+    },
+    "file_path": "experiments/tetra_inbox.json",
+    "format": "JSON array (even for a single op)"
+  },
+  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 33209 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and open questions above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test using ADD ops, (3) recommend which candidates should be RETIRE'd, (4) optionally MUTATE a weak hypothesis into a stronger variant. Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. See inbox_schema for the exact format."
 }
