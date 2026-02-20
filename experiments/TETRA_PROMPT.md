@@ -85,3 +85,51 @@ Supported operations (see `inbox_schema` in the brief for full field list):
 - Prefer 2–4 focused ops over many low-quality ones
 - Your `llm_notes` should reference specific numbers from the brief (e.g. "failure cluster shows avg_holes=81")
 - Output ONLY the JSON array. The system will reject anything else.
+
+### Enaction schemas (IMPORTANT — include these in every ADD and MUTATE)
+
+Every hypothesis you add or mutate should include a `metadata.enaction` field that
+tells the training system **how to mechanically implement it**. Without this field,
+the hypothesis is tracked but never changes agent behavior.
+
+Three supported types:
+
+**reward_weight** — scales an existing reward component globally every episode:
+```json
+"metadata": {
+  "enaction": {"type": "reward_weight", "target": "bumpiness", "multiplier": 1.8}
+}
+```
+Valid targets: `holes`, `aggregate_height`, `bumpiness`, `lines_cleared`
+
+**piece_phase** — applies a reward multiplier only during a piece count window:
+```json
+"metadata": {
+  "enaction": {"type": "piece_phase", "range": [0, 12], "target": "holes", "multiplier": 2.0}
+}
+```
+Use this for opening-phase (pieces 0–12), mid-game (13–40), or late-game (40+) strategies.
+
+**mode_gate** — switches strategy based on board state condition:
+```json
+"metadata": {
+  "enaction": {"type": "mode_gate", "condition": "height > 0.75", "strategy": "survive"}
+}
+```
+Valid conditions: `height > <fraction>`, `holes > <count>`, `pieces < <count>`
+
+**Full ADD example with enaction:**
+```json
+{
+  "op": "ADD",
+  "name": "l7_opening_hole_cap_v2",
+  "description": "Penalise hole creation 2x during the opening 12 pieces on L7.",
+  "llm_score": 0.78,
+  "llm_priority": "test",
+  "llm_notes": "Success dissection shows outlier_early_holes << baseline_early_holes.",
+  "game": "tetris",
+  "metadata": {
+    "enaction": {"type": "piece_phase", "range": [0, 12], "target": "holes", "multiplier": 2.0}
+  }
+}
+```
