@@ -1,5 +1,7 @@
 # Throng3 — Current State & Resume Guide
 
+> Quick restart pointer: read `PROJECT_STATE.md` first for the current source-of-truth paths/workflow.
+
 ## 🎯 Where We Are
 
 **Project**: AI agent learning via curriculum + meta-learning with Tetra integration
