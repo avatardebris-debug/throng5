@@ -167,6 +167,21 @@ class SlowLoop:
 
         print(f"  [SlowLoop/{mode}] Processing {len(episodes)} episodes...")
 
+        # 0. Ingest Tetra inbox if present (any mode)
+        inbox_summary = self.db.ingest_tetra_inbox()
+        if not inbox_summary.get('skipped'):
+            added   = inbox_summary.get('added', 0)
+            updated = inbox_summary.get('updated', 0)
+            retired = inbox_summary.get('retired', 0)
+            mutated = inbox_summary.get('mutated', 0)
+            errs    = inbox_summary.get('errors', [])
+            print(f"  [tetra] Inbox ingested: "
+                  f"+{added} added  ~{updated} updated  "
+                  f"-{retired} retired  ↺{mutated} mutated"
+                  + (f"  ⚠ {len(errs)} errors" if errs else ""))
+            for e in errs:
+                print(f"    ↳ {e}")
+
         # 2. Update hypothesis win_rates from episode hypothesis_performance
         updated = self._update_hypothesis_stats(episodes)
         report.hypotheses_updated = updated

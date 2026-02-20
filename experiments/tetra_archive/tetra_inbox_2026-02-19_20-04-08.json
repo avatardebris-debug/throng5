@@ -1,0 +1,11 @@
+[
+  {
+    "op": "ADD",
+    "name": "tetra_survive_tall_boards",
+    "description": "When height > 75%, enter conservative mode: prefer flat placements over lines.",
+    "llm_score": 0.8,
+    "llm_priority": "test",
+    "llm_notes": "Amygdala A/B data shows max_lines advantage at L7 when SURVIVE active.",
+    "game": "tetris"
+  }
+]

@@ -99,10 +99,22 @@ class ExperimentDB:
             )
         """)
 
-        # Migrate existing DBs that predate fail_mode/active_hypothesis columns
+        # Migrate existing DBs: episodes columns
         for col, col_type in [('fail_mode', 'TEXT'), ('active_hypothesis', 'TEXT')]:
             try:
                 c.execute(f"ALTER TABLE episodes ADD COLUMN {col} {col_type}")
+            except Exception:
+                pass  # Column already exists
+
+        # Migrate existing DBs: hypothesis LLM columns
+        for col, col_type in [
+            ('llm_score',    'REAL'),
+            ('llm_priority', 'TEXT'),   # 'explore' | 'test' | 'retire' | None
+            ('generation',   'INTEGER DEFAULT 0'),
+            ('llm_notes',    'TEXT'),
+        ]:
+            try:
+                c.execute(f"ALTER TABLE hypotheses ADD COLUMN {col} {col_type}")
             except Exception:
                 pass  # Column already exists
 
@@ -666,6 +678,68 @@ class ExperimentDB:
             "Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
         )
 
+        # ── 6. Inbox schema doc (instructions for LLM to write back) ─────
+        inbox_schema = {
+            'description': (
+                'To update the hypothesis list, write a JSON array to '
+                'experiments/tetra_inbox.json. The SlowLoop will ingest it '
+                'at next nightly consolidation and archive the file.'
+            ),
+            'supported_ops': [
+                {
+                    'op': 'ADD',
+                    'required': ['name', 'description'],
+                    'optional': ['llm_score', 'llm_priority', 'llm_notes', 'game'],
+                    'example': {
+                        'op': 'ADD', 'name': 'reduce_holes_early',
+                        'description': 'Prioritise avoiding holes in first 10 pieces.',
+                        'llm_score': 0.75, 'llm_priority': 'explore',
+                        'llm_notes': 'Failure data shows holes at piece 10 predict outcome.',
+                        'game': 'tetris'
+                    }
+                },
+                {
+                    'op': 'UPDATE',
+                    'required': ['name'],
+                    'optional': ['llm_score', 'llm_priority', 'llm_notes'],
+                    'example': {
+                        'op': 'UPDATE', 'name': 'reduce_holes_v58',
+                        'llm_score': 0.4, 'llm_priority': 'retire',
+                        'llm_notes': 'Win rate plateaued; superseded by reduce_holes_early.'
+                    }
+                },
+                {
+                    'op': 'RETIRE',
+                    'required': ['name'],
+                    'optional': ['llm_notes'],
+                    'example': {
+                        'op': 'RETIRE', 'name': 'auto_top_fill',
+                        'llm_notes': 'AutoMetric shows no correlation with outcome.'
+                    }
+                },
+                {
+                    'op': 'MUTATE',
+                    'required': ['parent', 'name', 'description'],
+                    'optional': ['llm_score', 'llm_priority', 'llm_notes', 'game'],
+                    'note': 'Creates new hypothesis derived from parent; increments generation.',
+                    'example': {
+                        'op': 'MUTATE', 'parent': 'reduce_holes_v58',
+                        'name': 'reduce_holes_v59_height_gated',
+                        'description': 'Reduce holes only when height > 60% of board.',
+                        'llm_score': 0.7, 'llm_priority': 'test',
+                        'llm_notes': 'Adds height gate based on failure cluster analysis.'
+                    }
+                },
+            ],
+            'llm_priority_values': {
+                'explore': 'New idea, low confidence, worth a quick test.',
+                'test':    'Promising — allocate evidence budget to this.',
+                'retire':  'Mark for deprecation after current cycle.',
+            },
+            'file_path': 'experiments/tetra_inbox.json',
+            'format':    'JSON array (even for a single op)',
+        }
+
         return {
             'brief_type': 'tetra_hypothesis_brief',
             'generated_at': time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -673,20 +747,169 @@ class ExperimentDB:
             'hypothesis_ledger': hypothesis_ledger,
             'failure_patterns': failure_patterns,
             'success_patterns': success_patterns,
-            'novelty_events': novelty_events[:10],   # Top 10 most recent
+            'novelty_events': novelty_events[:10],
             'open_questions': open_questions,
             'recommended_focus': recommended_focus,
+            'inbox_schema': inbox_schema,
             'prompt_for_tetra': (
                 f"You are analyzing training data for a {game} AI agent. "
                 f"The agent has run {game_context['total_episodes']} episodes across "
                 f"{len(game_context['levels_trained'])} levels. "
                 f"There are currently {len(active)} active hypotheses guiding its play. "
-                f"Based on the failure patterns, success patterns, and novelty events above, "
-                "please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test, "
-                "(3) recommend which active hypotheses should be retired or refined, and "
-                "(4) describe each new hypothesis in concrete, testable terms."
+                f"Based on the failure patterns, success patterns, and open questions above, "
+                "please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses "
+                "to test using ADD ops, (3) recommend which candidates should be RETIRE'd, "
+                "(4) optionally MUTATE a weak hypothesis into a stronger variant. "
+                "Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. "
+                "See inbox_schema for the exact format."
             ),
         }
+
+    def ingest_tetra_inbox(self,
+                            inbox_path: str = 'experiments/tetra_inbox.json',
+                            archive_dir: str = 'experiments/tetra_archive') -> Dict[str, Any]:
+        """
+        Ingest a Tetra-written inbox file and apply hypothesis updates.
+
+        The inbox file is a JSON array of operation objects. Supported ops:
+
+            {"op": "ADD",    "name": "...", "description": "...",
+             "llm_score": 0.8, "llm_priority": "explore",
+             "llm_notes": "why this is worth trying", "game": "tetris"}
+
+            {"op": "UPDATE", "name": "...",
+             "llm_score": 0.6, "llm_priority": "test", "llm_notes": "..."}
+
+            {"op": "RETIRE", "name": "...", "llm_notes": "reason"}
+
+            {"op": "MUTATE", "parent": "...", "name": "...",
+             "description": "...", "llm_notes": "what changed"}
+
+        After ingestion, the inbox file is moved to the archive directory
+        with a timestamp suffix so nothing is ever lost.
+
+        Returns a summary dict: {added, updated, retired, mutated, errors}
+        """
+        import shutil
+        inbox = Path(inbox_path)
+        if not inbox.exists():
+            return {'skipped': True, 'reason': 'no inbox file'}
+
+        try:
+            ops = json.loads(inbox.read_text(encoding='utf-8'))
+        except Exception as e:
+            return {'error': f'Failed to parse inbox JSON: {e}'}
+
+        if not isinstance(ops, list):
+            ops = [ops]  # tolerate single-op dict
+
+        summary = {'added': 0, 'updated': 0, 'retired': 0, 'mutated': 0, 'errors': []}
+        c = self.conn.cursor()
+        now = time.time()
+
+        for op_dict in ops:
+            try:
+                op = op_dict.get('op', '').upper()
+
+                if op == 'ADD':
+                    name = op_dict['name']
+                    existing = c.execute(
+                        'SELECT id FROM hypotheses WHERE name=? AND game=?',
+                        (name, op_dict.get('game', 'tetris'))
+                    ).fetchone()
+                    if existing:
+                        summary['errors'].append(f'ADD skipped: {name} already exists')
+                        continue
+                    self.upsert_hypothesis(
+                        name=name,
+                        game=op_dict.get('game', 'tetris'),
+                        description=op_dict.get('description', ''),
+                        confidence=op_dict.get('llm_score', 0.5),
+                        win_rate=0.0, evidence_count=0, status='candidate',
+                        metadata={
+                            'llm_score':    op_dict.get('llm_score'),
+                            'llm_priority': op_dict.get('llm_priority', 'explore'),
+                            'llm_notes':    op_dict.get('llm_notes', ''),
+                            'source':       'tetra_inbox',
+                        },
+                    )
+                    c.execute(
+                        '''UPDATE hypotheses SET llm_score=?, llm_priority=?,
+                           llm_notes=?, generation=0, updated_at=?
+                           WHERE name=? AND game=?''',
+                        (op_dict.get('llm_score'), op_dict.get('llm_priority', 'explore'),
+                         op_dict.get('llm_notes', ''), now,
+                         name, op_dict.get('game', 'tetris'))
+                    )
+                    summary['added'] += 1
+
+                elif op == 'UPDATE':
+                    name = op_dict['name']
+                    c.execute(
+                        '''UPDATE hypotheses SET llm_score=?, llm_priority=?,
+                           llm_notes=?, updated_at=?
+                           WHERE name=?''',
+                        (op_dict.get('llm_score'), op_dict.get('llm_priority'),
+                         op_dict.get('llm_notes'), now, name)
+                    )
+                    summary['updated'] += 1
+
+                elif op == 'RETIRE':
+                    name = op_dict['name']
+                    c.execute(
+                        '''UPDATE hypotheses SET status='retired', llm_priority='retire',
+                           llm_notes=?, updated_at=? WHERE name=?''',
+                        (op_dict.get('llm_notes', 'Retired by Tetra'), now, name)
+                    )
+                    summary['retired'] += 1
+
+                elif op == 'MUTATE':
+                    parent_name = op_dict['parent']
+                    parent = c.execute(
+                        'SELECT id, generation FROM hypotheses WHERE name=?',
+                        (parent_name,)
+                    ).fetchone()
+                    parent_id  = parent['id']   if parent else None
+                    parent_gen = parent['generation'] if parent else 0
+                    self.upsert_hypothesis(
+                        name=op_dict['name'],
+                        game=op_dict.get('game', 'tetris'),
+                        description=op_dict.get('description', ''),
+                        confidence=op_dict.get('llm_score', 0.5),
+                        win_rate=0.0, evidence_count=0, status='candidate',
+                        parent_id=parent_id,
+                        metadata={
+                            'llm_score':    op_dict.get('llm_score'),
+                            'llm_priority': op_dict.get('llm_priority', 'explore'),
+                            'llm_notes':    op_dict.get('llm_notes', ''),
+                            'source':       'tetra_mutation',
+                            'parent_name':  parent_name,
+                        },
+                    )
+                    c.execute(
+                        '''UPDATE hypotheses SET llm_score=?, llm_priority=?,
+                           llm_notes=?, generation=?, updated_at=?
+                           WHERE name=?''',
+                        (op_dict.get('llm_score'), op_dict.get('llm_priority', 'explore'),
+                         op_dict.get('llm_notes', ''), (parent_gen or 0) + 1, now,
+                         op_dict['name'])
+                    )
+                    summary['mutated'] += 1
+
+                else:
+                    summary['errors'].append(f'Unknown op: {op}')
+
+            except Exception as e:
+                summary['errors'].append(f"{op_dict.get('op','?')} failed: {e}")
+
+        self.conn.commit()
+
+        # Archive the inbox so it isn't re-processed
+        Path(archive_dir).mkdir(parents=True, exist_ok=True)
+        ts = time.strftime('%Y-%m-%d_%H-%M-%S')
+        shutil.move(str(inbox), f'{archive_dir}/tetra_inbox_{ts}.json')
+
+        return summary
 
     @staticmethod
     def _count_top(rows: list, key: str, n: int) -> Dict[str, int]:

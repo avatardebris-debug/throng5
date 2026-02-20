@@ -1,0 +1,25 @@
+[
+  {
+    "op": "ADD",
+    "name": "tetra_holes_early_game",
+    "description": "Penalise holes created in the first 8 pieces more heavily.",
+    "llm_score": 0.72,
+    "llm_priority": "explore",
+    "llm_notes": "Failure clusters show hole count at piece 8 strongly predicts final lines.",
+    "game": "tetris"
+  },
+  {
+    "op": "MUTATE",
+    "parent": "reduce_holes_v601",
+    "name": "tetra_reduce_holes_height_gated",
+    "description": "Reduce holes only when board height exceeds 60% of max.",
+    "llm_score": 0.68,
+    "llm_priority": "test",
+    "llm_notes": "Adds height gate \u2014 hole avoidance matters most when already tall."
+  },
+  {
+    "op": "RETIRE",
+    "name": "auto_top_fill",
+    "llm_notes": "AutoMetric shows no correlation with outcome across all levels."
+  }
+]
