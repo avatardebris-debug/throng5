@@ -1,6 +1,6 @@
 {
   "brief_type": "tetra_hypothesis_brief",
-  "generated_at": "2026-02-19 20:22:50",
+  "generated_at": "2026-02-19 21:13:22",
   "game_context": {
     "game": "tetris",
     "levels_trained": [
@@ -102,7 +102,9 @@
           ]
         },
         "created_at": 1771383677.0854716,
-        "updated_at": 1771383688.3529403
+        "updated_at": 1771383688.3529403,
+        "bayesian_score": 0.7737,
+        "prior_weight": 0.375
       },
       {
         "name": "maximize_lines",
@@ -117,7 +119,9 @@
           "decline_pct": -41
         },
         "created_at": 1771383677.1015906,
-        "updated_at": 1771383688.368111
+        "updated_at": 1771383688.368111,
+        "bayesian_score": 0.59,
+        "prior_weight": 0.6
       },
       {
         "name": "maximize_lines",
@@ -151,7 +155,9 @@
           }
         },
         "created_at": 1771383677.091728,
-        "updated_at": 1771383688.361109
+        "updated_at": 1771383688.361109,
+        "bayesian_score": 0.55,
+        "prior_weight": 0.231
       },
       {
         "name": "build_flat",
@@ -181,7 +187,9 @@
           ]
         },
         "created_at": 1771383677.0947778,
-        "updated_at": 1771383688.3630245
+        "updated_at": 1771383688.3630245,
+        "bayesian_score": 0.38,
+        "prior_weight": 0.231
       },
       {
         "name": "build_flat",
@@ -192,7 +200,9 @@
         "description": "Minimize bumpiness",
         "metadata": null,
         "created_at": 1771383677.1043575,
-        "updated_at": 1771383688.370529
+        "updated_at": 1771383688.370529,
+        "bayesian_score": 0.3,
+        "prior_weight": 0.6
       },
       {
         "name": "minimize_height",
@@ -222,7 +232,9 @@
           ]
         },
         "created_at": 1771383677.0981226,
-        "updated_at": 1771383688.365174
+        "updated_at": 1771383688.365174,
+        "bayesian_score": 0.12,
+        "prior_weight": 0.231
       },
       {
         "name": "minimize_height",
@@ -233,7 +245,9 @@
         "description": "Keep max column height low",
         "metadata": null,
         "created_at": 1771383677.1071246,
-        "updated_at": 1771383688.374648
+        "updated_at": 1771383688.374648,
+        "bayesian_score": 0.11,
+        "prior_weight": 0.6
       },
       {
         "name": "build_flat",
@@ -267,7 +281,9 @@
           ]
         },
         "created_at": 1771383677.0877273,
-        "updated_at": 1771383688.356483
+        "updated_at": 1771383688.356483,
+        "bayesian_score": 0.1575,
+        "prior_weight": 0.375
       },
       {
         "name": "minimize_height",
@@ -301,7 +317,9 @@
           ]
         },
         "created_at": 1771383677.0896487,
-        "updated_at": 1771383688.359017
+        "updated_at": 1771383688.359017,
+        "bayesian_score": 0.0712,
+        "prior_weight": 0.375
       }
     ],
     "retired": [
@@ -316,7 +334,9 @@
           "evolved_into": "minimize_cost_v1"
         },
         "created_at": 1771470099.882014,
-        "updated_at": 1771470445.5620801
+        "updated_at": 1771470445.5620801,
+        "bayesian_score": 0.5819,
+        "prior_weight": 0.07
       },
       {
         "name": "minimize_v2",
@@ -329,7 +349,9 @@
           "evolved_into": "minimize_v3"
         },
         "created_at": 1771393074.376001,
-        "updated_at": 1771393074.376001
+        "updated_at": 1771393074.376001,
+        "bayesian_score": 0.0997,
+        "prior_weight": 0.025
       },
       {
         "name": "minimize_cost",
@@ -342,7 +364,9 @@
           "evolved_into": "minimize_cost_v1"
         },
         "created_at": 1771393009.7991378,
-        "updated_at": 1771393009.7991378
+        "updated_at": 1771393009.7991378,
+        "bayesian_score": 0.0978,
+        "prior_weight": 0.14
       },
       {
         "name": "minimize_variance",
@@ -355,7 +379,9 @@
           "evolved_into": "minimize_v1"
         },
         "created_at": 1771393004.6457043,
-        "updated_at": 1771393004.6457043
+        "updated_at": 1771393004.6457043,
+        "bayesian_score": 0.0926,
+        "prior_weight": 0.357
       },
       {
         "name": "minimize_v3",
@@ -368,7 +394,9 @@
           "evolved_into": "minimize_v4"
         },
         "created_at": 1771393074.3812811,
-        "updated_at": 1771393075.334034
+        "updated_at": 1771393075.334034,
+        "bayesian_score": 0.0435,
+        "prior_weight": 0.566
       },
       {
         "name": "minimize_variance",
@@ -381,7 +409,9 @@
           "evolved_into": "minimize_v1"
         },
         "created_at": 1771470099.8904839,
-        "updated_at": 1771470445.5682242
+        "updated_at": 1771470445.5682242,
+        "bayesian_score": 0.0365,
+        "prior_weight": 0.18
       },
       {
         "name": "minimize_v3",
@@ -394,7 +424,9 @@
           "evolved_into": "minimize_v4"
         },
         "created_at": 1771470099.8745663,
-        "updated_at": 1771475466.0611854
+        "updated_at": 1771475466.0611854,
+        "bayesian_score": 0.0217,
+        "prior_weight": 0.395
       },
       {
         "name": "maximize_gain",
@@ -407,7 +439,9 @@
           "evolved_into": "maximize_gain_v1"
         },
         "created_at": 1771393004.0522237,
-        "updated_at": 1771393004.0522237
+        "updated_at": 1771393004.0522237,
+        "bayesian_score": 0.283,
+        "prior_weight": 0.566
       },
       {
         "name": "minimize_v1",
@@ -420,7 +454,9 @@
           "evolved_into": "minimize_v2"
         },
         "created_at": 1771393004.64957,
-        "updated_at": 1771393005.599099
+        "updated_at": 1771393005.599099,
+        "bayesian_score": 0.283,
+        "prior_weight": 0.566
       },
       {
         "name": "minimize_cost_v1",
@@ -433,7 +469,9 @@
           "evolved_into": "minimize_cost_v2"
         },
         "created_at": 1771393011.0276873,
-        "updated_at": 1771393011.0276873
+        "updated_at": 1771393011.0276873,
+        "bayesian_score": 0.283,
+        "prior_weight": 0.566
       },
       {
         "name": "minimize_v1",
@@ -446,7 +484,9 @@
           "evolved_into": "minimize_v2"
         },
         "created_at": 1771470099.885922,
-        "updated_at": 1771470445.5649981
+        "updated_at": 1771470445.5649981,
+        "bayesian_score": 0.1974,
+        "prior_weight": 0.395
       },
       {
         "name": "maximize_gain",
@@ -459,7 +499,9 @@
           "evolved_into": "maximize_gain_v1"
         },
         "created_at": 1771470099.8936832,
-        "updated_at": 1771470445.5717735
+        "updated_at": 1771470445.5717735,
+        "bayesian_score": 0.1429,
+        "prior_weight": 0.286
       },
       {
         "name": "auto_top_fill",
@@ -477,7 +519,9 @@
           "positive_signal": true
         },
         "created_at": 1771475991.749805,
-        "updated_at": 1771553018.7839253
+        "updated_at": 1771553018.7839253,
+        "bayesian_score": 0.0398,
+        "prior_weight": 0.056
       }
     ],
     "untested_candidates": [
@@ -492,7 +536,9 @@
           "evolved_from": "maximize_gain"
         },
         "created_at": 1771393004.0558338,
-        "updated_at": 1771393004.0558338
+        "updated_at": 1771393004.0558338,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
       },
       {
         "name": "minimize_v2",
@@ -505,7 +551,9 @@
           "evolved_from": "minimize_v1"
         },
         "created_at": 1771393005.6029608,
-        "updated_at": 1771393005.6029608
+        "updated_at": 1771393005.6029608,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
       },
       {
         "name": "minimize_cost_v1",
@@ -518,7 +566,9 @@
           "evolved_from": "minimize_cost"
         },
         "created_at": 1771393009.8035433,
-        "updated_at": 1771393009.8035433
+        "updated_at": 1771393009.8035433,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
       },
       {
         "name": "minimize_cost_v2",
@@ -531,7 +581,9 @@
           "evolved_from": "minimize_cost_v1"
         },
         "created_at": 1771393011.0317342,
-        "updated_at": 1771393011.0317342
+        "updated_at": 1771393011.0317342,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
       },
       {
         "name": "minimize_v4",
@@ -544,7 +596,9 @@
           "evolved_from": "minimize_v3"
         },
         "created_at": 1771393075.3382525,
-        "updated_at": 1771393075.3382525
+        "updated_at": 1771393075.3382525,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
       },
       {
         "name": "reduce_holes_v58",
@@ -558,7 +612,9 @@
           "hole_delta": 62.7
         },
         "created_at": 1771476058.760544,
-        "updated_at": 1771476058.760544
+        "updated_at": 1771476058.760544,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "reduce_holes_v535",
@@ -572,7 +628,9 @@
           "hole_delta": 14.5
         },
         "created_at": 1771550535.3984466,
-        "updated_at": 1771550535.3984466
+        "updated_at": 1771550535.3984466,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "reduce_holes_v978",
@@ -586,7 +644,9 @@
           "hole_delta": 20.700000000000003
         },
         "created_at": 1771551978.0401523,
-        "updated_at": 1771551978.0401523
+        "updated_at": 1771551978.0401523,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "reduce_holes_v601",
@@ -600,7 +660,9 @@
           "hole_delta": 46.800000000000004
         },
         "created_at": 1771552601.8049533,
-        "updated_at": 1771552601.8049533
+        "updated_at": 1771552601.8049533,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "control_height_v601",
@@ -614,7 +676,9 @@
           "height_delta": 4.0
         },
         "created_at": 1771552601.8078332,
-        "updated_at": 1771552601.8078332
+        "updated_at": 1771552601.8078332,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "tetra_holes_early_game",
@@ -630,7 +694,9 @@
           "source": "tetra_inbox"
         },
         "created_at": 1771553018.7841725,
-        "updated_at": 1771553018.7839253
+        "updated_at": 1771553018.7839253,
+        "bayesian_score": 0.72,
+        "prior_weight": 1.0
       },
       {
         "name": "tetra_reduce_holes_height_gated",
@@ -647,7 +713,9 @@
           "parent_name": "reduce_holes_v601"
         },
         "created_at": 1771553018.7873375,
-        "updated_at": 1771553018.7839253
+        "updated_at": 1771553018.7839253,
+        "bayesian_score": 0.68,
+        "prior_weight": 1.0
       },
       {
         "name": "tetra_survive_tall_boards",
@@ -663,7 +731,9 @@
           "source": "tetra_inbox"
         },
         "created_at": 1771553048.7064037,
-        "updated_at": 1771553048.7060874
+        "updated_at": 1771553048.7060874,
+        "bayesian_score": 0.8,
+        "prior_weight": 1.0
       },
       {
         "name": "reduce_holes_v48",
@@ -677,7 +747,9 @@
           "hole_delta": 46.800000000000004
         },
         "created_at": 1771553048.7249591,
-        "updated_at": 1771553048.7249591
+        "updated_at": 1771553048.7249591,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "control_height_v48",
@@ -691,7 +763,9 @@
           "height_delta": 4.0
         },
         "created_at": 1771553048.728848,
-        "updated_at": 1771553048.728848
+        "updated_at": 1771553048.728848,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
       },
       {
         "name": "your_hypothesis_name_here",
@@ -707,7 +781,9 @@
           "source": "tetra_inbox"
         },
         "created_at": 1771553463.1613212,
-        "updated_at": 1771553463.1599874
+        "updated_at": 1771553463.1599874,
+        "bayesian_score": 0.75,
+        "prior_weight": 1.0
       },
       {
         "name": "second_hypothesis_name",
@@ -723,7 +799,9 @@
           "source": "tetra_inbox"
         },
         "created_at": 1771553463.16556,
-        "updated_at": 1771553463.1599874
+        "updated_at": 1771553463.1599874,
+        "bayesian_score": 0.65,
+        "prior_weight": 1.0
       },
       {
         "name": "new_mutated_hypothesis_name",
@@ -740,7 +818,9 @@
           "parent_name": "name_of_existing_hypothesis_to_mutate_from"
         },
         "created_at": 1771553463.1678743,
-        "updated_at": 1771553463.1599874
+        "updated_at": 1771553463.1599874,
+        "bayesian_score": 0.7,
+        "prior_weight": 1.0
       }
     ],
     "total": 116,
@@ -777,6 +857,20 @@
       "holes_delta": 14.32,
       "bumpiness_delta": 1.58
     }
+  },
+  "success_dissection": {
+    "outlier_count": 5,
+    "outlier_threshold_lines": 115,
+    "outlier_avg_lines": 161.4,
+    "baseline_avg_lines": 2.64,
+    "outlier_early_holes": 74.4,
+    "outlier_mid_holes": 74.4,
+    "outlier_late_holes": 85.67,
+    "baseline_early_holes": null,
+    "baseline_mid_holes": null,
+    "outlier_early_height": 19.4,
+    "baseline_early_height": null,
+    "interpretation": "Top 1% episodes (5 games, avg 161 lines).\nIf outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\nIf outlier_mid_holes \u2248 baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
   },
   "novelty_events": [
     {

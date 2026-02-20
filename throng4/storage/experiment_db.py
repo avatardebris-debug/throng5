@@ -616,10 +616,61 @@ class ExperimentDB:
                     'bumpiness_delta': round(_avg(failures,'bumpiness') - _avg(successes,'bumpiness'), 2),
                 },
             }
+        # ── 3b. Success dissection — phase-gated outlier analysis ────────
+        # Tetra's recommendation: sample top 1% episodes, compute board state
+        # at piece 10 / 20 / 50 to distinguish "winning from opening" vs
+        # "recovering mid-game". Directly feeds piece_phase hypothesis targets.
+        success_dissection: dict = {}
+        if recent:
+            all_sorted = sorted(recent, key=lambda x: x['lines_cleared'] or 0)
+            cutoff_idx  = max(1, len(all_sorted) - max(1, len(all_sorted) // 100))
+            outliers    = all_sorted[cutoff_idx:]   # top 1%
+            baseline    = all_sorted[: len(all_sorted) // 2]   # bottom 50%
+
+            if outliers:
+                def _phase_avg(rows, key, pieces_max):
+                    """Avg of key across rows that ended after pieces_max pieces."""
+                    # We only have episode-end stats — use pieces_placed as proxy
+                    sub = [r for r in rows if (r.get('pieces_placed') or 0) >= pieces_max]
+                    vals = [r.get(key) or 0 for r in sub]
+                    return round(sum(vals) / len(vals), 2) if vals else None
+
+                success_dissection = {
+                    'outlier_count': len(outliers),
+                    'outlier_threshold_lines': all_sorted[cutoff_idx]['lines_cleared'],
+                    'outlier_avg_lines': _avg(outliers, 'lines_cleared'),
+                    'baseline_avg_lines': _avg(baseline, 'lines_cleared'),
+                    # Board state at different game phases (proxied by pieces_placed)
+                    'outlier_early_holes':  _phase_avg(outliers,  'holes', 10),
+                    'outlier_mid_holes':    _phase_avg(outliers,  'holes', 20),
+                    'outlier_late_holes':   _phase_avg(outliers,  'holes', 50),
+                    'baseline_early_holes': _phase_avg(baseline,  'holes', 10),
+                    'baseline_mid_holes':   _phase_avg(baseline,  'holes', 20),
+                    'outlier_early_height': _phase_avg(outliers,  'max_height', 10),
+                    'baseline_early_height': _phase_avg(baseline, 'max_height', 10),
+                    'interpretation': (
+                        f"Top 1% episodes ({len(outliers)} games, avg {_avg(outliers,'lines_cleared'):.0f} lines).\n"
+                        f"If outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\n"
+                        f"If outlier_mid_holes ≈ baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
+                    ),
+                }
+
         else:
             failure_patterns = success_patterns = {'sample_size': 0}
+            success_dissection = {}
 
-        # ── 4. Novelty events ─────────────────────────────────────────────
+        # ── 3c. Bayesian scoring on hypothesis ledger ─────────────────────
+        # Tetra's formula: score = α * prior + (1-α) * win_rate
+        # where α = 1 / (1 + evidence_count / k), k = prior_strength (30 eps).
+        # α=1.0 at 0 evidence (pure prior), α=0.5 at 30 eps, α→0 at 100+ eps.
+        _k = 30.0
+        for h in hyp_rows:
+            n = h.get('evidence_count', 0) or 0
+            alpha = 1.0 / (1.0 + n / _k)
+            prior = h.get('llm_score') or h.get('confidence') or 0.5
+            h['bayesian_score'] = round(alpha * prior + (1.0 - alpha) * h.get('win_rate', 0.0), 4)
+            h['prior_weight']   = round(alpha, 3)  # how much prior still dominates
+
         c.execute("""SELECT data, timestamp FROM events
                      WHERE event_type = 'novelty'
                      ORDER BY timestamp DESC LIMIT 20""")
@@ -748,6 +799,7 @@ class ExperimentDB:
             'hypothesis_ledger': hypothesis_ledger,
             'failure_patterns': failure_patterns,
             'success_patterns': success_patterns,
+            'success_dissection': success_dissection,
             'novelty_events': novelty_events[:10],
             'open_questions': open_questions,
             'recommended_focus': recommended_focus,

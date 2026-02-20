@@ -53,6 +53,11 @@ try:
     _THREAT_AVAILABLE = True
 except ImportError:
     _THREAT_AVAILABLE = False
+try:
+    from throng4.cognition.enaction_engine import EnactionEngine
+    _ENACTION_AVAILABLE = True
+except ImportError:
+    _ENACTION_AVAILABLE = False
 
 
 # ── ConsolidationReport ────────────────────────────────────────────────────
@@ -203,6 +208,14 @@ class SlowLoop:
         # Count rejections (all hypotheses - promoted)
         all_hyps = self.db.get_hypotheses(game=self.game or None)
         report.pack_rejected = len(all_hyps) - len(pack.hypotheses)
+
+        # 5b. Write active_enactions.json from promoted hypotheses with enaction metadata
+        if _ENACTION_AVAILABLE:
+            promoted_dicts = [dict(h) if not isinstance(h, dict) else h
+                              for h in pack.hypotheses]
+            n_enacted = EnactionEngine.write_from_hypotheses(promoted_dicts)
+            if n_enacted:
+                print(f'  [enaction] {n_enacted} hypothesis program(s) written to active_enactions.json')
 
         # 5b. Auto-retrain ThreatEstimator (nightly/full only)
         if mode in ('nightly', 'full') and _THREAT_AVAILABLE:
@@ -371,33 +384,62 @@ class SlowLoop:
         # Heuristic rules
         hole_delta   = worst['avg_holes']  - best['avg_holes']
         height_delta = worst['avg_height'] - best['avg_height']
-        score_delta  = best['avg_score']   - worst['avg_score']
+
+        # Candidate triage (Tetra's recommendation):
+        # Each mechanical archetype owns exactly ONE slot in the candidate pool.
+        # If an untested candidate of that archetype exists, overwrite it with
+        # fresh cluster stats. If not, create it. This keeps the queue at most
+        # one candidate per archetype per cycle — no unbounded vNNN growth.
+        all_hyps = self.db.get_hypotheses(game=self.game or None)
+
+        def _upsert_archetype(archetype: str, description: str, metadata: dict):
+            """Overwrite the freshest untested slot, or create a new one."""
+            # Find untested candidates for this archetype (name starts with archetype)
+            untested = [h for h in all_hyps
+                        if h['name'].startswith(archetype)
+                        and h.get('evidence_count', 999) < 10
+                        and h.get('status') == 'candidate']
+            if untested:
+                # Overwrite the one with the highest version suffix (most recent)
+                slot = sorted(untested, key=lambda h: h['name'])[-1]
+                self.db.upsert_hypothesis(
+                    name=slot['name'], game=self.game,
+                    description=description,
+                    confidence=0.4, win_rate=0.0, evidence_count=0,
+                    status='candidate', metadata=metadata,
+                )
+                return slot['name']   # refreshed, not a new name
+            else:
+                # Create a fresh slot with a compact version number
+                existing_count = sum(1 for h in all_hyps if h['name'].startswith(archetype))
+                name = f"{archetype}_v{existing_count + 1}"
+                self.db.upsert_hypothesis(
+                    name=name, game=self.game,
+                    description=description,
+                    confidence=0.4, win_rate=0.0, evidence_count=0,
+                    status='candidate', metadata=metadata,
+                )
+                return name
 
         if hole_delta > 2.0:
-            name = f"reduce_holes_v{int(time.time()) % 1000}"
-            if name not in existing_names:
-                self.db.upsert_hypothesis(
-                    name=name, game=self.game,
-                    description=f"Reduce holes: failure cluster had {worst['avg_holes']:.1f} "
-                                f"vs success {best['avg_holes']:.1f} avg holes",
-                    confidence=0.4, win_rate=0.0, evidence_count=0,
-                    status='candidate',
-                    metadata={'generated_by': 'slow_loop', 'hole_delta': hole_delta},
-                )
-                candidates.append(name)
+            name = _upsert_archetype(
+                archetype='reduce_holes',
+                description=(f"Reduce holes: failure cluster had {worst['avg_holes']:.1f} "
+                             f"vs success {best['avg_holes']:.1f} avg holes "
+                             f"(delta={hole_delta:.1f})"),
+                metadata={'generated_by': 'slow_loop', 'hole_delta': round(hole_delta, 2)},
+            )
+            candidates.append(name)
 
         if height_delta > 3.0:
-            name = f"control_height_v{int(time.time()) % 1000}"
-            if name not in existing_names:
-                self.db.upsert_hypothesis(
-                    name=name, game=self.game,
-                    description=f"Control height: failure cluster had {worst['avg_height']:.1f} "
-                                f"vs success {best['avg_height']:.1f} avg max height",
-                    confidence=0.4, win_rate=0.0, evidence_count=0,
-                    status='candidate',
-                    metadata={'generated_by': 'slow_loop', 'height_delta': height_delta},
-                )
-                candidates.append(name)
+            name = _upsert_archetype(
+                archetype='control_height',
+                description=(f"Control height: failure cluster had {worst['avg_height']:.1f} "
+                             f"vs success {best['avg_height']:.1f} avg max height "
+                             f"(delta={height_delta:.1f})"),
+                metadata={'generated_by': 'slow_loop', 'height_delta': round(height_delta, 2)},
+            )
+            candidates.append(name)
 
         # Optional LLM enrichment (non-blocking — if it fails, skip)
         if self.llm_callback and clusters:
