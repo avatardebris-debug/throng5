@@ -1,0 +1,120 @@
+﻿
+≡ƒÄ« Tetris Curriculum Learning Experiment
+======================================================================
+
+  Auditor enabled: checking every 10th episode
+
+  Agent: 18 features ΓåÆ [128] ΓåÆ value
+  Learning rate: 0.005, Gamma: 0.95, Epsilon: 0.2
+
+
+======================================================================
+Level 2: O + I blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I']
+  Episodes: 50, Max pieces: 100
+======================================================================
+
+  Episode  10/50: Lines=4.80┬▒8.16, Reward=-36.60┬▒5.91
+  Episode  20/50: Lines=6.30┬▒6.83, Reward=-39.64┬▒6.10
+  Episode  30/50: Lines=3.70┬▒4.10, Reward=-41.29┬▒5.94
+  Episode  40/50: Lines=2.30┬▒3.58, Reward=-39.94┬▒6.47
+  Episode  50/50: Lines=6.50┬▒6.53, Reward=-34.76┬▒9.06
+
+  Level 2 Summary:
+    Mean lines: 4.72 ┬▒ 6.29
+    Max lines: 28
+    Mean reward: -38.45
+
+  Γ£à Threshold met (4.72 >= 2.00) ΓÇö advancing to level 3
+
+======================================================================
+Level 3: O + I + T blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I', 'T']
+  Episodes: 100, Max pieces: 150
+======================================================================
+
+  Episode  10/100: Lines=1.30┬▒1.85, Reward=-42.55┬▒5.83
+  Episode  20/100: Lines=3.70┬▒4.47, Reward=-42.00┬▒6.91
+  Episode  30/100: Lines=1.80┬▒2.36, Reward=-40.07┬▒5.75
+  Episode  40/100: Lines=2.10┬▒4.78, Reward=-42.76┬▒7.48
+  Episode  50/100: Lines=4.40┬▒4.20, Reward=-39.89┬▒7.00
+  Episode  60/100: Lines=3.90┬▒3.51, Reward=-39.06┬▒8.19
+  Episode  70/100: Lines=3.30┬▒3.16, Reward=-39.87┬▒7.52
+  Episode  80/100: Lines=1.50┬▒1.28, Reward=-44.07┬▒6.20
+  Episode  90/100: Lines=3.90┬▒6.99, Reward=-41.82┬▒9.05
+  Episode 100/100: Lines=4.40┬▒4.82, Reward=-41.63┬▒6.75
+
+  Level 3 Summary:
+    Mean lines: 3.03 ┬▒ 4.23
+    Max lines: 23
+    Mean reward: -41.37
+
+  Γ£à Threshold met (3.03 >= 3.00) ΓÇö advancing to level 4
+
+======================================================================
+Level 4: + S, Z blocks
+  Board: 8├ù14
+  Pieces: ['O', 'I', 'T', 'S', 'Z']
+  Episodes: 150, Max pieces: 200
+======================================================================
+
+  Episode  10/150: Lines=0.50┬▒0.67, Reward=-67.31┬▒7.29
+  Episode  20/150: Lines=0.80┬▒1.17, Reward=-70.35┬▒7.36
+  Episode  30/150: Lines=0.20┬▒0.40, Reward=-72.73┬▒7.36
+  Episode  40/150: Lines=1.00┬▒1.41, Reward=-68.92┬▒9.40
+  Episode  50/150: Lines=0.60┬▒1.20, Reward=-74.00┬▒7.99
+  Episode  60/150: Lines=1.10┬▒1.14, Reward=-68.28┬▒9.11
+  Episode  70/150: Lines=0.50┬▒0.67, Reward=-70.54┬▒7.13
+  Episode  80/150: Lines=0.40┬▒0.49, Reward=-71.92┬▒6.97
+  Episode  90/150: Lines=1.10┬▒1.04, Reward=-63.52┬▒8.95
+  Episode 100/150: Lines=0.50┬▒0.50, Reward=-70.70┬▒9.12
+  Episode 110/150: Lines=0.60┬▒0.92, Reward=-69.73┬▒8.18
+  Episode 120/150: Lines=0.50┬▒0.92, Reward=-69.04┬▒10.52
+  Episode 130/150: Lines=1.40┬▒2.37, Reward=-69.71┬▒9.58
+  Episode 140/150: Lines=0.70┬▒1.00, Reward=-71.58┬▒6.42
+  Episode 150/150: Lines=0.60┬▒0.92, Reward=-69.31┬▒7.59
+
+  Level 4 Summary:
+    Mean lines: 0.70 ┬▒ 1.14
+    Max lines: 8
+    Mean reward: -69.84
+
+  Γ¥î Threshold not met (0.70 < 4.00) ΓÇö stopping at level 4
+
+======================================================================
+TETRIS CURRICULUM vs DELLACHERIE COMPARISON
+======================================================================
+
+Level    Curriculum      Dellacherie     Gap       
+-------- --------------- --------------- ----------
+2           4.72 ( 28)     0.00           +4.72
+3           3.03 ( 23)     0.00           +3.03
+4           0.70 (  8)     0.00           +0.70
+
+======================================================================
+
+  Results saved to: tetris_curriculum_results.json
+
+  Audit saved to: eval_audits\tetris_audit_2_to_7.json
+
+======================================================================
+≡ƒôï EVAL AUDIT REPORT
+======================================================================
+Session ID: 20260220_010044
+Total episodes audited: 30
+Discrepancies found: 0
+Total anomalies: 0
+
+Metric verification:
+  Mean reported lines: 2.40
+  Mean verified lines: 2.40
+  Mean reward gap: 0.000
+
+Γ£à No discrepancies or anomalies detected!
+======================================================================
+
+
+≡ƒÄ« Training complete!
+

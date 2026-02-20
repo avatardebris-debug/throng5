@@ -20,16 +20,43 @@ from dataclasses import dataclass
 @dataclass
 class AgentConfig:
     """Configuration for portable agent."""
-    n_hidden: int = 48
+    n_hidden: int = 256       # First hidden layer size
+    n_hidden2: int = 128      # Second hidden layer size (0 = single-layer mode)
+    n_step: int = 5           # N-step return horizon (1 = REINFORCE)
     epsilon: float = 0.20
     epsilon_decay: float = 0.995
     epsilon_min: float = 0.02
     gamma: float = 0.95
     learning_rate: float = 0.005
-    replay_buffer_size: int = 5000
-    batch_size: int = 128
+    replay_buffer_size: int = 50000
+    batch_size: int = 64
     lookahead_depth: int = 3
     lookahead_threshold: int = 30  # Use depth-2 if >30 actions
+    target_update_freq: int = 1000 # network sync freq
+    train_freq: int = 4            # train every N steps
+
+class ReplayBuffer:
+    """Experience replay buffer for off-policy Q-learning."""
+    def __init__(self, capacity: int, rng: np.random.RandomState):
+        self.capacity = capacity
+        self.rng = rng
+        self.buffer = []
+        self.pos = 0
+
+    def push(self, x: np.ndarray, reward: float, next_x_list: List[np.ndarray], done: bool):
+        transition = (x, reward, next_x_list, done)
+        if len(self.buffer) < self.capacity:
+            self.buffer.append(transition)
+        else:
+            self.buffer[self.pos] = transition
+        self.pos = (self.pos + 1) % self.capacity
+
+    def sample(self, batch_size: int) -> List[Any]:
+        indices = self.rng.choice(len(self.buffer), batch_size, replace=False)
+        return [self.buffer[i] for i in indices]
+
+    def __len__(self) -> int:
+        return len(self.buffer)
 
 
 class PortableNNAgent:
@@ -44,23 +71,32 @@ class PortableNNAgent:
     - How to score actions via a feature function
     """
     
-    def __init__(self, n_features: int, config: Optional[AgentConfig] = None):
+    def __init__(self, n_features: int, config: Optional[AgentConfig] = None, seed: Optional[int] = None):
         """
         Initialize agent.
         
         Args:
             n_features: Size of feature vector
             config: Agent configuration
+            seed: Random seed for internal operations
         """
         self.n_features = n_features
         self.config = config or AgentConfig()
         
-        # Network weights (He initialization)
+        # Isolated random state
+        self.rng = np.random.RandomState(seed)
+        
+        # Network weights — two hidden layers (He initialization)
         n_hidden = self.config.n_hidden
-        self.W1 = np.random.randn(n_hidden, n_features) * np.sqrt(2.0 / n_features)
+        n_hidden2 = self.config.n_hidden2
+        self.W1 = self.rng.randn(n_hidden, n_features) * np.sqrt(2.0 / n_features)
         self.b1 = np.zeros(n_hidden)
-        self.W2 = np.random.randn(1, n_hidden) * np.sqrt(2.0 / n_hidden)
-        self.b2 = np.zeros(1)
+        # Second hidden layer (256 → 128)
+        self.W2 = self.rng.randn(n_hidden2, n_hidden) * np.sqrt(2.0 / n_hidden)
+        self.b2 = np.zeros(n_hidden2)
+        # Output layer (128 → 1)
+        self.W3 = self.rng.randn(1, n_hidden2) * np.sqrt(2.0 / n_hidden2)
+        self.b3 = np.zeros(1)
         
         # Apply heuristic bias (warm start)
         self._apply_heuristic_bias()
@@ -71,52 +107,81 @@ class PortableNNAgent:
         self.best_score = 0
         self.recent_scores = []
         
-        # Replay buffer: list of {x: features, target: G}
-        self.replay_buffer = []
-        
-        # Episode buffer: list of {x: features, reward: r}
-        self.episode_buffer = []
+        # Replay buffer (Q-learning)
+        self.replay_buffer = ReplayBuffer(self.config.replay_buffer_size, self.rng)
         
         # Metrics
         self.total_updates = 0
+        self.step_counter = 0
         self.recent_loss = []
+        
+        # Target network
+        self.sync_target_network()
         
         # Cache for forward pass
         self._last_x = None
-        self._last_h = None
+        self._last_h1 = None
+        self._last_h2 = None
+    
+    def sync_target_network(self):
+        """Synchronize target network with live weights."""
+        self.target_W1 = self.W1.copy()
+        self.target_b1 = self.b1.copy()
+        self.target_W2 = self.W2.copy()
+        self.target_b2 = self.b2.copy()
+        self.target_W3 = self.W3.copy()
+        self.target_b3 = self.b3.copy()
     
     def _apply_heuristic_bias(self):
-        """Add small heuristic-aligned bias to hidden layer."""
+        """Add small heuristic-aligned bias to first hidden layer."""
         bias_strength = 0.3
         for i in range(self.config.n_hidden):
-            self.b1[i] += bias_strength * (np.random.rand() * 0.1)
+            self.b1[i] += bias_strength * (self.rng.rand() * 0.1)
     
+    def forward_target(self, x: np.ndarray) -> float:
+        """Forward pass using target network."""
+        if len(x) > self.n_features:
+            x = x[:self.n_features]
+        elif len(x) < self.n_features:
+            x = np.pad(x, (0, self.n_features - len(x)), mode='constant')
+
+        z1 = self.target_W1 @ x + self.target_b1
+        h1 = np.maximum(0, z1)
+
+        z2 = self.target_W2 @ h1 + self.target_b2
+        h2 = np.maximum(0, z2)
+
+        out = self.target_W3 @ h2 + self.target_b3
+        return float(out[0])
+
     def forward(self, x: np.ndarray) -> float:
         """
-        Forward pass through network.
-        
+        Forward pass: Input → 256 ReLU → 128 ReLU → scalar.
+
         Args:
             x: Feature vector (n_features,) or larger
-            
+
         Returns:
             Scalar value prediction
         """
         # Handle variable input size via padding/truncation
         if len(x) > self.n_features:
-            # Pad weights with zeros for extra features (smooth adaptation)
-            x = x[:self.n_features]  # Truncate for now (simple approach)
+            x = x[:self.n_features]
         elif len(x) < self.n_features:
-            # Pad input with zeros
             x = np.pad(x, (0, self.n_features - len(x)), mode='constant')
-        
+
         self._last_x = x
-        
-        # Hidden layer with ReLU
+
+        # First hidden layer
         z1 = self.W1 @ x + self.b1
-        self._last_h = np.maximum(0, z1)
-        
+        self._last_h1 = np.maximum(0, z1)
+
+        # Second hidden layer
+        z2 = self.W2 @ self._last_h1 + self.b2
+        self._last_h2 = np.maximum(0, z2)
+
         # Output layer
-        out = self.W2 @ self._last_h + self.b2
+        out = self.W3 @ self._last_h2 + self.b3
         return float(out[0])
     
     def select_action(
@@ -142,8 +207,8 @@ class PortableNNAgent:
             return None
         
         # Epsilon-greedy exploration
-        if explore and np.random.rand() < self.epsilon:
-            return valid_actions[np.random.randint(len(valid_actions))]
+        if explore and self.rng.rand() < self.epsilon:
+            return valid_actions[self.rng.randint(len(valid_actions))]
         
         # Determine lookahead depth
         depth = self.config.lookahead_depth
@@ -199,7 +264,7 @@ class PortableNNAgent:
             if not third_actions:
                 third_avg = -10
             else:
-                third_samples = np.random.choice(
+                third_samples = self.rng.choice(
                     len(third_actions),
                     size=min(3, len(third_actions)),
                     replace=False
@@ -215,90 +280,86 @@ class PortableNNAgent:
         
         return score + 0.5 * best_next
     
-    def record_step(self, features: np.ndarray, reward: float):
+    def record_step(self, features: np.ndarray, reward: float, next_features_list: List[np.ndarray], done: bool):
         """
-        Record a step in the current episode.
+        Record a step in the replay buffer.
         
         Args:
             features: Feature vector for the action taken
-            reward: Immediate reward received
+            reward: Immediate reward received after transition
+            next_features_list: List of feature vectors for all available next actions
+            done: Whether the episode ended
         """
-        self.episode_buffer.append({'x': features.copy(), 'reward': reward})
+        self.replay_buffer.push(features.copy(), reward, next_features_list, done)
+        self.step_counter += 1
+        
+        # Train periodically
+        if self.step_counter % self.config.train_freq == 0:
+            self._train_batch()
+            
+        # Update target network
+        if self.step_counter % self.config.target_update_freq == 0:
+            self.sync_target_network()
     
     def end_episode(self, final_score: float):
-        """
-        End episode and train on accumulated experience.
-        
-        Args:
-            final_score: Final score/lines for this episode
-        """
+        """End episode updates (only house-keeping, training happens during record_step)."""
         self.episode_count += 1
         self.recent_scores.append(final_score)
         if len(self.recent_scores) > 20:
             self.recent_scores.pop(0)
-        
+
         if final_score > self.best_score:
             self.best_score = final_score
-        
-        # Compute discounted returns (G)
-        if self.episode_buffer:
-            G = 0
-            for i in range(len(self.episode_buffer) - 1, -1, -1):
-                G = self.episode_buffer[i]['reward'] + self.config.gamma * G
-                self.replay_buffer.append({
-                    'x': self.episode_buffer[i]['x'],
-                    'target': G
-                })
-            
-            # Limit buffer size
-            if len(self.replay_buffer) > self.config.replay_buffer_size:
-                self.replay_buffer = self.replay_buffer[-self.config.replay_buffer_size:]
-            
-            # Train on batch
-            self._train_batch()
-        
-        # Clear episode buffer
-        self.episode_buffer = []
-        
+
         # Decay epsilon
         self.epsilon = max(self.config.epsilon_min, self.epsilon * self.config.epsilon_decay)
     
     def _train_batch(self):
-        """Train network on a batch from replay buffer."""
+        """Train 2-layer network on a batch from replay buffer doing Q-learning."""
         if len(self.replay_buffer) < self.config.batch_size:
             return
-        
-        # Sample batch
-        indices = np.random.choice(
-            len(self.replay_buffer),
-            size=self.config.batch_size,
-            replace=False
-        )
-        batch = [self.replay_buffer[i] for i in indices]
-        
+
+        batch = self.replay_buffer.sample(self.config.batch_size)
         total_loss = 0.0
-        
-        for sample in batch:
-            # Forward pass
-            pred = self.forward(sample['x'])
-            target = sample['target']
-            
-            # Compute error (clipped for stability)
+
+        for x, r, next_x_list, done in batch:
+            # Calculate target via Bellman equation
+            if done:
+                target = r
+            else:
+                if not next_x_list:
+                    target = r - 10.0  # Penalize terminal dead ends
+                else:
+                    max_q = max(self.forward_target(nx) for nx in next_x_list)
+                    target = r + self.config.gamma * max_q
+
+            # Forward pass to cache activations (_last_x, _last_h1, etc)
+            pred = self.forward(x)
+
             error = pred - target
             clipped_error = np.clip(error, -5, 5)
             total_loss += error ** 2
-            
-            # Backprop output layer
-            self.W2 -= self.config.learning_rate * clipped_error * self._last_h
-            self.b2 -= self.config.learning_rate * clipped_error
-            
-            # Backprop hidden layer (only active neurons)
-            for i in range(self.config.n_hidden):
-                if self._last_h[i] > 0:
-                    dh = clipped_error * self.W2[0, i]
-                    self.W1[i] -= self.config.learning_rate * dh * self._last_x
-                    self.b1[i] -= self.config.learning_rate * dh
-        
+
+            # Backprop through output layer (W3, b3)
+            self.W3 -= self.config.learning_rate * clipped_error * self._last_h2
+            self.b3 -= self.config.learning_rate * clipped_error
+
+            # Gradient into h2 (second hidden layer)
+            dh2 = clipped_error * self.W3[0]  # shape (n_hidden2,)
+            dh2 *= (self._last_h2 > 0)        # ReLU derivative
+
+            # Backprop second hidden layer (W2, b2)
+            self.W2 -= self.config.learning_rate * np.outer(dh2, self._last_h1)
+            self.b2 -= self.config.learning_rate * dh2
+
+            # Gradient into h1 (first hidden layer)
+            dh1 = self.W2.T @ dh2             # shape (n_hidden,)
+            dh1 *= (self._last_h1 > 0)        # ReLU derivative
+
+            # Backprop first hidden layer (W1, b1)
+            self.W1 -= self.config.learning_rate * np.outer(dh1, self._last_x)
+            self.b1 -= self.config.learning_rate * dh1
+
         self.total_updates += 1
         avg_loss = total_loss / self.config.batch_size
         self.recent_loss.append(avg_loss)
@@ -308,7 +369,7 @@ class PortableNNAgent:
     def save_weights(self, path: str):
         """
         Save agent weights to file.
-        
+
         Args:
             path: Path to save weights (will add .npz extension)
         """
@@ -318,9 +379,12 @@ class PortableNNAgent:
             b1=self.b1,
             W2=self.W2,
             b2=self.b2,
+            W3=self.W3,
+            b3=self.b3,
             n_features=self.n_features,
             config_dict={
                 'n_hidden': self.config.n_hidden,
+                'n_hidden2': self.config.n_hidden2,
                 'epsilon': self.epsilon,
                 'episode_count': self.episode_count,
                 'best_score': self.best_score
@@ -330,25 +394,25 @@ class PortableNNAgent:
     def load_weights(self, path: str):
         """
         Load agent weights from file.
-        
+
         Args:
             path: Path to weights file
         """
         data = np.load(path, allow_pickle=True)
-        
-        # Verify feature count matches
+
         if data['n_features'] != self.n_features:
             raise ValueError(
                 f"Feature mismatch: saved={data['n_features']}, "
                 f"current={self.n_features}"
             )
-        
+
         self.W1 = data['W1']
         self.b1 = data['b1']
         self.W2 = data['W2']
         self.b2 = data['b2']
-        
-        # Restore training state
+        self.W3 = data['W3']
+        self.b3 = data['b3']
+
         config_dict = data['config_dict'].item()
         self.epsilon = config_dict.get('epsilon', self.epsilon)
         self.episode_count = config_dict.get('episode_count', 0)
@@ -362,7 +426,7 @@ class PortableNNAgent:
         avg_loss = (
             np.mean(self.recent_loss) if self.recent_loss else 0
         )
-        
+
         return {
             'episode': self.episode_count,
             'epsilon': self.epsilon,
@@ -373,10 +437,10 @@ class PortableNNAgent:
             'buffer_size': len(self.replay_buffer),
             'n_params': (
                 self.W1.size + self.b1.size +
-                self.W2.size + self.b2.size
+                self.W2.size + self.b2.size +
+                self.W3.size + self.b3.size
             )
         }
-    
     def reset_episode(self):
         """Reset episode-specific state (called at episode start)."""
-        self.episode_buffer = []
+        pass

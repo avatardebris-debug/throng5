@@ -1,0 +1,49 @@
+{
+    "hypotheses": [
+        {
+            "id": "rule_avoid_ball_y_zero",
+            "description": "Life losses tend to occur when the ball y-position reaches zero, suggesting this state marks a miss or reset after failing to return the ball.",
+            "object": "ball",
+            "feature": "ball_y",
+            "direction": "avoid",
+            "trigger": "ball_y becomes 0 near a life decrement",
+            "confidence": 0.9
+        },
+        {
+            "id": "rule_align_paddle_with_ball_x",
+            "description": "Keeping paddle x close to ball x appears to increase the chance of surviving volleys and enabling later rewards.",
+            "object": "paddle",
+            "feature": "paddle_x",
+            "direction": "maximize",
+            "trigger": "ball descending toward paddle zone",
+            "confidence": 0.68
+        },
+        {
+            "id": "rule_seek_brick_hit_states",
+            "description": "Rewards occur when the ball is in active mid-screen trajectories, consistent with brick-hit opportunities during rally play.",
+            "object": "ball",
+            "feature": "ball_y",
+            "direction": "increase",
+            "trigger": "ball in active non-reset flight with y above reset level",
+            "confidence": 0.63
+        },
+        {
+            "id": "rule_limit_fire_to_serve_context",
+            "description": "Using Fire outside clear serve/reset contexts correlates with no reward and multiple nearby life losses, so unnecessary Fire actions should be avoided.",
+            "object": "paddle",
+            "feature": "action_fire",
+            "direction": "avoid",
+            "trigger": "fire action during active rally states",
+            "confidence": 0.58
+        },
+        {
+            "id": "rule_reduce_life_loss_events",
+            "description": "The core survival objective is to minimize transitions where lives decrease, as these cluster around failed return sequences.",
+            "object": "game",
+            "feature": "lives",
+            "direction": "minimize",
+            "trigger": "pre-miss sequence before life counter drops",
+            "confidence": 0.86
+        }
+    ]
+}

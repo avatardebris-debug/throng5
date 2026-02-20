@@ -1,0 +1,52 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_holes_collapse_gate_90",
+    "description": "Trigger survival mode when hole count exceeds 90 to prevent terminal collapse trajectories on wide-board runs.",
+    "llm_score": 0.84,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), while height differs by only 0.41 (20.00 vs 19.59), so hole-threshold gating should separate collapse states earlier.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "holes > 90",
+        "strategy": "survive"
+      }
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "l7_opening_hole_penalty_20",
+    "description": "Extend strong hole suppression through the first 20 pieces to reduce early-board damage before midgame stabilization.",
+    "llm_score": 0.79,
+    "llm_priority": "test",
+    "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and success dissection shows lower outlier early holes (78.8) than baseline early holes (85.7), so a longer opening discipline window is justified.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "piece_phase",
+        "range": [0, 20],
+        "target": "holes",
+        "multiplier": 2.2
+      }
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "l7_surface_volatility_brake",
+    "name": "l7_surface_volatility_brake_height_gate",
+    "description": "Keep bumpiness control but activate a stronger survive-mode gate once stack height enters the danger band.",
+    "llm_score": 0.76,
+    "llm_priority": "explore",
+    "llm_notes": "Bumpiness is a large separator (7.92 failure vs 1.44 success), but level-7 average height is already high (19.63), so gating a survival switch at high height should focus anti-volatility behavior where it matters most.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "height > 0.75",
+        "strategy": "survive"
+      }
+    }
+  }
+]

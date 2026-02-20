@@ -1,6 +1,6 @@
 {
   "brief_type": "tetra_hypothesis_brief",
-  "generated_at": "2026-02-19 23:19:51",
+  "generated_at": "2026-02-20 10:08:17",
   "game_context": {
     "game": "tetris",
     "levels_trained": [
@@ -618,13 +618,13 @@
         "win_rate": 0.0,
         "evidence_count": 0,
         "confidence": 0.4,
-        "description": "Reduce holes: failure cluster had 80.0 vs success 43.4 avg holes (delta=36.6)",
+        "description": "Reduce holes: failure cluster had 58.3 vs success 30.5 avg holes (delta=27.8)",
         "metadata": {
           "generated_by": "slow_loop",
-          "hole_delta": 36.6
+          "hole_delta": 27.8
         },
         "created_at": 1771551978.0401523,
-        "updated_at": 1771561664.1848378,
+        "updated_at": 1771571014.7081757,
         "bayesian_score": 0.4,
         "prior_weight": 1.0
       },
@@ -940,9 +940,64 @@
         "updated_at": 1771561650.2682548,
         "bayesian_score": 0.79,
         "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_collapse_gate_85",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.84,
+        "description": "On level-7 style states, switch immediately to survive mode when hole count exceeds collapse territory so the policy prioritizes stabilizing the board over greedy clears.",
+        "metadata": {
+          "llm_score": 0.84,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), with both near terminal height (~20), so a hole-triggered mode gate should separate collapse trajectories better than height-only control.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771581643.2908056,
+        "updated_at": 1771581643.290303,
+        "bayesian_score": 0.84,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.79,
+        "description": "Apply a stronger global penalty to bumpiness so placements favor smoother surfaces and reduce the jagged stacks associated with immediate deaths.",
+        "metadata": {
+          "llm_score": 0.79,
+          "llm_priority": "test",
+          "llm_notes": "Bumpiness is the strongest separator in this brief: failures are 7.92 vs successes 1.44 (delta 6.48), while height differs by only 0.41, indicating surface volatility control is high leverage.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771581643.305308,
+        "updated_at": 1771581643.290303,
+        "bayesian_score": 0.79,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_cap_20",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.76,
+        "description": "Extend the opening anti-hole window from the first 12 pieces to 20 pieces so early-board discipline persists through the fragile transition into midgame.",
+        "metadata": {
+          "llm_score": 0.76,
+          "llm_priority": "explore",
+          "llm_notes": "Failures still end very early (avg_pieces 23.23) with extreme holes (99.66), and success dissection shows outlier early holes are lower than baseline (78.8 vs 85.7), so extending the early hole cap should test whether stability needs a longer runway.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_opening_hole_cap_12"
+        },
+        "created_at": 1771581643.3078845,
+        "updated_at": 1771581643.290303,
+        "bayesian_score": 0.76,
+        "prior_weight": 1.0
       }
     ],
-    "total": 122,
+    "total": 125,
     "key_insight": "Top hypothesis 'maximize_lines' wins 89% of the time after 50 evaluations."
   },
   "failure_patterns": {
@@ -1076,7 +1131,7 @@
   "open_questions": [
     "Failures have 24.4 more holes on average \u2014 at what hole count does performance collapse?",
     "12 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
-    "24 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
+    "27 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
   ],
   "recommended_focus": [
     "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."

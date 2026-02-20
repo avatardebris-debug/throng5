@@ -1,0 +1,37 @@
+{
+  "game": "Breakout",
+  "dreamer_enabled": true,
+  "episodes": 30,
+  "elapsed_s": 5.746321439743042,
+  "mean_reward": 4.1,
+  "std_reward": 2.9478805945967346,
+  "max_reward": 11.0,
+  "final_mean_reward": 4.65,
+  "final_max_reward": 11.0,
+  "dreamer": {
+    "final_reliance": 0.9,
+    "dreamer_needed": true,
+    "signals_generated": 53,
+    "signals_followed": 8925,
+    "active_options": 3,
+    "promoted_options": 0,
+    "hypothesis_profiles": {
+      "maximize_hits": {
+        "win_rate": 0.8,
+        "avg_reward": 0.3340423558229809,
+        "specialization": 0.8005429764517006
+      },
+      "track_ball": {
+        "win_rate": 0.1,
+        "avg_reward": 0.1684902515119602,
+        "specialization": 1.0
+      },
+      "aim_center": {
+        "win_rate": 0.1,
+        "avg_reward": 0.21677901774920325,
+        "specialization": 0.969473266375188
+      }
+    },
+    "amygdala_overrides": 3
+  }
+}

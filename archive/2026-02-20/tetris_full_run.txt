@@ -1,0 +1,226 @@
+﻿
+≡ƒÄ« Tetris Curriculum Learning Experiment
+======================================================================
+
+  Auditor enabled: checking every 10th episode
+
+  Agent: 18 features ΓåÆ [128] ΓåÆ value
+  Learning rate: 0.005, Gamma: 0.95, Epsilon: 0.2
+
+
+======================================================================
+Level 2: O + I blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I']
+  Episodes: 50, Max pieces: 100
+======================================================================
+
+  Episode  10/50: Lines=15.80┬▒19.32, Reward=-26.35┬▒21.92
+  Episode  20/50: Lines=18.30┬▒16.03, Reward=-28.73┬▒13.55
+  Episode  30/50: Lines=9.30┬▒7.56, Reward=-35.69┬▒7.37
+  Episode  40/50: Lines=7.00┬▒6.99, Reward=-36.79┬▒5.67
+  Episode  50/50: Lines=5.20┬▒5.83, Reward=-38.51┬▒5.04
+
+  Level 2 Summary:
+    Mean lines: 11.12 ┬▒ 13.41
+    Max lines: 64
+    Mean reward: -33.21
+
+  Γ£à Threshold met (11.12 >= 2.00) ΓÇö advancing to level 3
+
+======================================================================
+Level 3: O + I + T blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I', 'T']
+  Episodes: 100, Max pieces: 150
+======================================================================
+
+  Episode  10/100: Lines=1.10┬▒1.37, Reward=-42.75┬▒3.70
+  Episode  20/100: Lines=1.70┬▒1.55, Reward=-43.92┬▒2.49
+  Episode  30/100: Lines=1.10┬▒2.70, Reward=-44.09┬▒3.40
+  Episode  40/100: Lines=1.60┬▒2.50, Reward=-44.01┬▒4.00
+  Episode  50/100: Lines=0.70┬▒0.90, Reward=-45.33┬▒2.73
+  Episode  60/100: Lines=1.60┬▒1.80, Reward=-42.73┬▒2.48
+  Episode  70/100: Lines=1.20┬▒1.54, Reward=-43.43┬▒2.43
+  Episode  80/100: Lines=1.90┬▒2.95, Reward=-43.46┬▒4.34
+  Episode  90/100: Lines=1.30┬▒1.90, Reward=-43.17┬▒3.14
+  Episode 100/100: Lines=0.70┬▒1.19, Reward=-42.39┬▒1.91
+
+  Level 3 Summary:
+    Mean lines: 1.29 ┬▒ 1.99
+    Max lines: 9
+    Mean reward: -43.53
+
+  ΓÜá∩╕Å  Below threshold (1.29 < 3.00) ΓÇö continuing anyway
+
+======================================================================
+Level 4: + S, Z blocks
+  Board: 8├ù14
+  Pieces: ['O', 'I', 'T', 'S', 'Z']
+  Episodes: 150, Max pieces: 200
+======================================================================
+
+  Episode  10/150: Lines=0.50┬▒0.67, Reward=-72.62┬▒5.02
+  Episode  20/150: Lines=0.30┬▒0.46, Reward=-71.64┬▒2.64
+  Episode  30/150: Lines=0.50┬▒0.67, Reward=-71.82┬▒1.41
+  Episode  40/150: Lines=0.30┬▒0.46, Reward=-72.34┬▒1.43
+  Episode  50/150: Lines=0.50┬▒0.92, Reward=-72.26┬▒3.59
+  Episode  60/150: Lines=0.00┬▒0.00, Reward=-72.41┬▒3.63
+  Episode  70/150: Lines=0.40┬▒0.49, Reward=-72.40┬▒3.71
+  Episode  80/150: Lines=0.20┬▒0.40, Reward=-72.95┬▒3.86
+  Episode  90/150: Lines=0.40┬▒0.80, Reward=-72.51┬▒3.37
+  Episode 100/150: Lines=0.20┬▒0.40, Reward=-69.70┬▒4.32
+  Episode 110/150: Lines=0.60┬▒0.66, Reward=-71.80┬▒2.49
+  Episode 120/150: Lines=0.30┬▒0.64, Reward=-71.75┬▒3.29
+  Episode 130/150: Lines=0.20┬▒0.40, Reward=-74.40┬▒4.25
+  Episode 140/150: Lines=0.50┬▒0.67, Reward=-73.24┬▒2.66
+  Episode 150/150: Lines=0.40┬▒0.80, Reward=-72.48┬▒3.33
+
+  Level 4 Summary:
+    Mean lines: 0.35 ┬▒ 0.62
+    Max lines: 3
+    Mean reward: -72.29
+
+  ΓÜá∩╕Å  Below threshold (0.35 < 4.00) ΓÇö continuing anyway
+
+======================================================================
+Level 5: All blocks, 8-wide
+  Board: 8├ù16
+  Pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J']
+  Episodes: 200, Max pieces: 300
+======================================================================
+
+  Episode  10/200: Lines=0.70┬▒0.46, Reward=-80.10┬▒6.36
+  Episode  20/200: Lines=0.70┬▒1.00, Reward=-82.76┬▒5.71
+  Episode  30/200: Lines=0.50┬▒0.67, Reward=-82.68┬▒2.99
+  Episode  40/200: Lines=0.50┬▒0.92, Reward=-85.47┬▒2.55
+  Episode  50/200: Lines=0.80┬▒0.87, Reward=-81.03┬▒2.88
+  Episode  60/200: Lines=0.80┬▒0.87, Reward=-83.16┬▒3.77
+  Episode  70/200: Lines=0.80┬▒0.87, Reward=-84.49┬▒5.25
+  Episode  80/200: Lines=0.40┬▒0.49, Reward=-83.76┬▒5.43
+  Episode  90/200: Lines=0.70┬▒1.00, Reward=-83.51┬▒4.20
+  Episode 100/200: Lines=0.50┬▒0.50, Reward=-83.43┬▒3.94
+  Episode 110/200: Lines=0.60┬▒0.66, Reward=-82.48┬▒1.86
+  Episode 120/200: Lines=0.40┬▒0.92, Reward=-83.72┬▒2.61
+  Episode 130/200: Lines=0.30┬▒0.64, Reward=-84.00┬▒2.83
+  Episode 140/200: Lines=0.30┬▒0.64, Reward=-81.68┬▒3.74
+  Episode 150/200: Lines=0.30┬▒0.46, Reward=-83.22┬▒3.67
+  Episode 160/200: Lines=0.70┬▒1.27, Reward=-83.79┬▒6.00
+  Episode 170/200: Lines=0.70┬▒0.78, Reward=-83.84┬▒4.43
+  Episode 180/200: Lines=0.70┬▒0.46, Reward=-80.75┬▒3.71
+  Episode 190/200: Lines=0.40┬▒0.66, Reward=-82.57┬▒4.23
+  Episode 200/200: Lines=0.30┬▒0.64, Reward=-81.30┬▒5.13
+
+  Level 5 Summary:
+    Mean lines: 0.56 ┬▒ 0.79
+    Max lines: 4
+    Mean reward: -82.89
+
+  ΓÜá∩╕Å  Below threshold (0.56 < 5.00) ΓÇö continuing anyway
+
+======================================================================
+Level 6: All blocks, 10-wide
+  Board: 10├ù18
+  Pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J']
+  Episodes: 200, Max pieces: 400
+======================================================================
+
+  Episode  10/200: Lines=0.30┬▒0.64, Reward=-119.98┬▒8.38
+  Episode  20/200: Lines=0.10┬▒0.30, Reward=-121.69┬▒5.13
+  Episode  30/200: Lines=0.40┬▒0.92, Reward=-118.69┬▒3.67
+  Episode  40/200: Lines=0.60┬▒0.66, Reward=-117.37┬▒5.15
+  Episode  50/200: Lines=0.40┬▒0.92, Reward=-121.61┬▒4.04
+  Episode  60/200: Lines=0.20┬▒0.40, Reward=-119.13┬▒5.56
+  Episode  70/200: Lines=0.30┬▒0.64, Reward=-118.93┬▒4.55
+  Episode  80/200: Lines=0.30┬▒0.46, Reward=-119.70┬▒4.57
+  Episode  90/200: Lines=0.40┬▒0.49, Reward=-123.10┬▒4.63
+  Episode 100/200: Lines=0.40┬▒0.66, Reward=-119.59┬▒4.47
+  Episode 110/200: Lines=0.20┬▒0.40, Reward=-119.43┬▒7.10
+  Episode 120/200: Lines=0.40┬▒0.49, Reward=-119.67┬▒4.76
+  Episode 130/200: Lines=0.40┬▒0.66, Reward=-120.69┬▒5.12
+  Episode 140/200: Lines=0.00┬▒0.00, Reward=-122.48┬▒5.80
+  Episode 150/200: Lines=0.20┬▒0.40, Reward=-120.57┬▒6.85
+  Episode 160/200: Lines=0.10┬▒0.30, Reward=-119.34┬▒5.43
+  Episode 170/200: Lines=0.00┬▒0.00, Reward=-122.18┬▒4.40
+  Episode 180/200: Lines=0.20┬▒0.60, Reward=-120.53┬▒4.83
+  Episode 190/200: Lines=0.50┬▒0.50, Reward=-119.47┬▒4.80
+  Episode 200/200: Lines=0.20┬▒0.40, Reward=-117.61┬▒6.17
+
+  Level 6 Summary:
+    Mean lines: 0.28 ┬▒ 0.57
+    Max lines: 3
+    Mean reward: -120.09
+
+  ΓÜá∩╕Å  Below threshold (0.28 < 6.00) ΓÇö continuing anyway
+
+======================================================================
+Level 7: Standard Tetris
+  Board: 10├ù20
+  Pieces: ['I', 'O', 'T', 'S', 'Z', 'L', 'J']
+  Episodes: 200, Max pieces: 500
+======================================================================
+
+  Episode  10/200: Lines=0.20┬▒0.40, Reward=-133.96┬▒7.08
+  Episode  20/200: Lines=0.40┬▒0.66, Reward=-137.10┬▒6.56
+  Episode  30/200: Lines=0.60┬▒0.66, Reward=-136.55┬▒3.87
+  Episode  40/200: Lines=0.30┬▒0.46, Reward=-135.26┬▒2.46
+  Episode  50/200: Lines=0.30┬▒0.64, Reward=-132.89┬▒4.31
+  Episode  60/200: Lines=0.50┬▒0.67, Reward=-133.90┬▒5.21
+  Episode  70/200: Lines=0.20┬▒0.40, Reward=-135.02┬▒3.63
+  Episode  80/200: Lines=0.20┬▒0.60, Reward=-133.63┬▒5.31
+  Episode  90/200: Lines=0.30┬▒0.46, Reward=-134.31┬▒3.94
+  Episode 100/200: Lines=0.30┬▒0.46, Reward=-134.79┬▒6.61
+  Episode 110/200: Lines=0.40┬▒0.66, Reward=-133.17┬▒5.95
+  Episode 120/200: Lines=0.50┬▒0.67, Reward=-133.44┬▒6.29
+  Episode 130/200: Lines=0.40┬▒0.66, Reward=-135.48┬▒6.18
+  Episode 140/200: Lines=0.10┬▒0.30, Reward=-136.30┬▒3.16
+  Episode 150/200: Lines=0.40┬▒0.80, Reward=-134.92┬▒3.86
+  Episode 160/200: Lines=0.30┬▒0.46, Reward=-134.31┬▒4.37
+  Episode 170/200: Lines=0.20┬▒0.60, Reward=-136.66┬▒6.56
+  Episode 180/200: Lines=0.20┬▒0.40, Reward=-131.76┬▒5.45
+  Episode 190/200: Lines=0.30┬▒0.64, Reward=-132.08┬▒2.18
+  Episode 200/200: Lines=0.90┬▒0.94, Reward=-135.41┬▒6.65
+
+  Level 7 Summary:
+    Mean lines: 0.35 ┬▒ 0.62
+    Max lines: 3
+    Mean reward: -134.55
+
+======================================================================
+TETRIS CURRICULUM vs DELLACHERIE COMPARISON
+======================================================================
+
+Level    Curriculum      Dellacherie     Gap       
+-------- --------------- --------------- ----------
+2          11.12 ( 64)     0.00          +11.12
+3           1.29 (  9)     0.00           +1.29
+4           0.35 (  3)     0.00           +0.35
+5           0.56 (  4)     0.00           +0.56
+6           0.28 (  3)     0.00           +0.28
+7           0.35 (  3)     0.00           +0.35
+
+======================================================================
+
+  Results saved to: tetris_curriculum_results.json
+
+  Audit saved to: eval_audits\tetris_audit_2_to_7.json
+
+======================================================================
+≡ƒôï EVAL AUDIT REPORT
+======================================================================
+Session ID: 20260220_012733
+Total episodes audited: 90
+Discrepancies found: 0
+Total anomalies: 0
+
+Metric verification:
+  Mean reported lines: 1.42
+  Mean verified lines: 1.42
+  Mean reward gap: 0.000
+
+Γ£à No discrepancies or anomalies detected!
+======================================================================
+
+
+≡ƒÄ« Training complete!
+

@@ -9,7 +9,7 @@ Provides:
 
 import numpy as np
 from typing import List, Tuple, Dict, Any, Optional
-from throng4.environments.tetris_curriculum import TetrisCurriculumEnv
+from throng4.environments.tetris_curriculum import TetrisCurriculumEnv, TETROMINOES
 from throng4.environments.adapter import EnvironmentAdapter
 
 
@@ -31,7 +31,7 @@ class TetrisAdapter(EnvironmentAdapter):
     """
     
     def __init__(self, level: int = 1, max_pieces: int = 500,
-                 weights=None):
+                 weights=None, seed: Optional[int] = None):
         """
         Initialize Tetris adapter.
 
@@ -39,10 +39,11 @@ class TetrisAdapter(EnvironmentAdapter):
             level:      Curriculum level (1-7)
             max_pieces: Max pieces per episode
             weights:    Optional DellacherieWeights — pass enacted weights here
+            seed:       Random seed for the environment
         """
         super().__init__()
         self.env = TetrisCurriculumEnv(level=level, max_pieces=max_pieces,
-                                       weights=weights)
+                                       weights=weights, seed=seed)
         self.level = level
         self.max_pieces = max_pieces
 
@@ -56,14 +57,14 @@ class TetrisAdapter(EnvironmentAdapter):
         self.valid_actions = []
         self.done = False
     
-    def reset(self) -> np.ndarray:
+    def reset(self, seed: Optional[int] = None) -> np.ndarray:
         """
         Reset environment.
         
         Returns:
             Initial state (not used by PortableNNAgent, which uses features)
         """
-        state = self.env.reset()
+        state = self.env.reset(seed=seed)
         self.current_piece = self.env.current_piece
         self.valid_actions = self.env.get_valid_actions()
         self.done = False
@@ -240,20 +241,151 @@ class TetrisAdapter(EnvironmentAdapter):
     
     def get_lookahead_actions(self, action: Tuple[int, int]) -> List[Tuple[int, int]]:
         """
-        Get valid actions for the next piece after placing current action.
-        
-        This enables multi-move lookahead in PortableNNAgent.
-        
+        Enumerate valid placements for a sampled next piece, after placing `action`.
+
+        Simulates the board state that results from placing the current piece,
+        clears any completed lines on the copy, then samples one random next piece
+        from the level's piece set and returns every valid (rotation, col) for it.
+
         Args:
-            action: Current (rotation, column) placement
-            
+            action: (rotation, column) of the current piece placement
+
         Returns:
-            List of valid actions for next piece
+            List of (rotation, col) tuples valid for the simulated next state.
         """
-        # We'd need to simulate the placement and get next piece's valid actions
-        # For now, return empty list (lookahead disabled)
-        # TODO: Implement full simulation if lookahead is critical
-        return []
+        rotation, column = action
+
+        # — Simulate current placement on a board copy (no mutation) —
+        board_copy = self.env.board.copy()
+        piece_cells = self.env._get_piece_cells(rotation)
+
+        row = 0
+        while self.env._can_place_at(row + 1, column, rotation):
+            row += 1
+        for dr, dc in piece_cells:
+            r, c = row + dr, column + dc
+            if 0 <= r < self.env.height and 0 <= c < self.env.width:
+                board_copy[r, c] = 1.0
+
+        # — Clear completed lines on copy —
+        full_rows = np.where(np.all(board_copy > 0, axis=1))[0]
+        if len(full_rows):
+            mask = np.ones(self.env.height, dtype=bool)
+            mask[full_rows] = False
+            remaining = board_copy[mask]
+            empty = np.zeros((len(full_rows), self.env.width), dtype=np.float32)
+            board_copy = np.vstack([empty, remaining])
+
+        # — Enumerate valid placements for ALL level pieces (no rng sampling) —
+        # We avoid calling self.env.rng here so that audit replays see the same
+        # piece sequence as the original episode.
+        lookahead_actions = []
+        for piece in self.env.piece_types:
+            lookahead_actions.extend(self._enumerate_actions_on_board(board_copy, piece))
+        # Deduplicate while preserving order
+        seen = set()
+        unique = []
+        for a in lookahead_actions:
+            if a not in seen:
+                seen.add(a)
+                unique.append(a)
+        return unique
+
+    def _enumerate_actions_on_board(
+        self, board: np.ndarray, piece: str
+    ) -> List[Tuple[int, int]]:
+        """
+        Return valid (rotation, col) placements for `piece` on `board`.
+
+        Used by get_lookahead_actions to enumerate future valid actions without
+        advancing the live environment state.
+        """
+        rotations_def = TETROMINOES[piece]
+        actions = []
+        for rot_idx, cells in enumerate(rotations_def):
+            min_c = min(dc for _, dc in cells)
+            max_c = max(dc for _, dc in cells)
+            for col in range(-min_c, self.env.width - max_c):
+                row = 0
+                while self._can_place_on(board, row + 1, col, cells):
+                    row += 1
+                if self._can_place_on(board, row, col, cells):
+                    actions.append((rot_idx, col))
+        return actions
+
+    def _can_place_on(
+        self, board: np.ndarray, row: int, col: int,
+        cells: List[Tuple[int, int]]
+    ) -> bool:
+        """
+        Check whether `cells` (relative offsets) fit at (row, col) on `board`.
+
+        Equivalent to TetrisCurriculumEnv._can_place_at but works on an arbitrary
+        board array rather than self.env.board.
+        """
+        for dr, dc in cells:
+            r, c = row + dr, col + dc
+            if r < 0 or r >= self.env.height or c < 0 or c >= self.env.width:
+                return False
+            if board[r, c] > 0:
+                return False
+        return True
+
+    def make_features_for(
+        self, board: np.ndarray, piece: str, action: Tuple[int, int]
+    ) -> np.ndarray:
+        """
+        Build a feature vector for (board, piece, action) without touching live state.
+
+        Used during lookahead scoring so the agent can evaluate future placements
+        with the correct piece type encoded, rather than the current live piece.
+
+        Args:
+            board:  Board state (height × width) to evaluate against.
+            piece:  Piece type string, e.g. 'I', 'O', 'T'.
+            action: (rotation, column) placement to evaluate.
+
+        Returns:
+            Feature vector of size (boardW + 12,)
+        """
+        rotation, column = action
+        cells = TETROMINOES[piece][rotation % len(TETROMINOES[piece])]
+
+        # Find drop row on this board
+        row = 0
+        while self._can_place_on(board, row + 1, column, cells):
+            row += 1
+
+        # Simulate placement on a copy
+        board_copy = [r_.copy() for r_ in board]
+        for dr, dc in cells:
+            r_, c_ = row + dr, column + dc
+            if 0 <= r_ < self.env.height and 0 <= c_ < self.env.width:
+                board_copy[r_][c_] = 1.0
+
+        cleared = sum(1 for r_ in board_copy if all(cell for cell in r_))
+        features_dict = self._compute_board_features(board_copy)
+
+        features = []
+        features.append(features_dict['agg_height'] / (self.board_width * self.env.height))
+        features.append(features_dict['holes'] / (self.board_width * self.env.height * 0.5))
+        features.append(features_dict['bumpiness'] / (self.env.height * (self.board_width - 1)))
+        features.append(features_dict['max_height'] / self.env.height)
+        for h in features_dict['heights']:
+            features.append(h / self.env.height)
+        features.append(cleared / 4.0)
+        features.append(row / self.env.height)
+        features.append(column / self.board_width)
+        features.append(rotation / 4.0)
+
+        all_pieces = ['I', 'O', 'T', 'S', 'Z', 'L', 'J']
+        piece_idx = all_pieces.index(piece)
+        features.append(1.0 if piece_idx == 0 else 0.0)       # I
+        features.append(1.0 if piece_idx == 1 else 0.0)       # O
+        features.append(1.0 if 2 <= piece_idx <= 4 else 0.0)  # T/S/Z
+        features.append(features_dict['avg_completeness'])
+
+        return np.array(features, dtype=np.float32)
     
     def preprocess_obs(self, obs: Any) -> np.ndarray:
         """

@@ -828,7 +828,7 @@ class DreamerTetrisRunner:
                 for r in range(start_row, min(start_row + 6, self.adapter.env.height)):
                     row_str = '  |'
                     for c in range(self.adapter.board_width):
-                        row_str += '#' if board[r][c] is not None else '.'
+                        row_str += '#' if board[r][c] > 0 else '.'
                     row_str += '|'
                     lines.append(row_str)
             

@@ -48,7 +48,7 @@ MAX_PIECES_PER_LEVEL = {
 EPISODES_PER_LEVEL = {
     1: 10,     # Quick sanity check
     2: 50,     # Warmup
-    3: 100,    # Moderate training
+    3: 400,    # More training to adapt to T-piece after O+I warmup
     4: 150,
     5: 200,
     6: 200,
@@ -71,7 +71,9 @@ ADVANCE_THRESHOLD_PER_LEVEL = {
 def run_episode(agent: PortableNNAgent, adapter: TetrisAdapter, log_actions: bool = False) -> Dict[str, Any]:
     """Run a single Tetris episode."""
     agent.reset_episode()
-    state = adapter.reset()
+    # Generate an episode seed so we can replay exactly the same piece sequence
+    episode_seed = int(np.random.randint(0, 1000000))
+    state = adapter.reset(seed=episode_seed)
     done = False
     episode_reward = 0.0
     steps = 0
@@ -87,18 +89,27 @@ def run_episode(agent: PortableNNAgent, adapter: TetrisAdapter, log_actions: boo
         action = agent.select_action(
             valid_actions=valid_actions,
             feature_fn=adapter.make_features,
-            explore=True
+            explore=True,
+            lookahead_fn=adapter.get_lookahead_actions
         )
         
         if log_actions:
             action_log.append(action)
+        # Record features BEFORE taking the step 
+        # (make_features simulates placement on current board)
+        features = adapter.make_features(action)
         
         # Take step
         next_state, reward, done, info = adapter.step(action)
         
-        # Record step for training
-        features = adapter.make_features(action)
-        agent.record_step(features, reward)
+        # Record step for training with off-policy next_features
+        next_valid_actions = adapter.get_valid_actions()
+        if not done and next_valid_actions:
+            next_features = [adapter.make_features(a) for a in next_valid_actions]
+        else:
+            next_features = []
+            
+        agent.record_step(features, reward, next_features, done)
         
         episode_reward += reward
         steps += 1
@@ -113,6 +124,7 @@ def run_episode(agent: PortableNNAgent, adapter: TetrisAdapter, log_actions: boo
         'pieces': info['pieces_placed'],
         'reward': episode_reward,
         'steps': steps,
+        'seed': episode_seed,
     }
     
     if log_actions:
@@ -153,7 +165,8 @@ def train_level(
         # Audit episode if enabled
         if log_actions and auditor:
             # CRITICAL: Create fresh adapter for audit to avoid corrupting training state
-            audit_adapter = TetrisAdapter(level=level, max_pieces=max_pieces)
+            # Pass the episode seed to guarantee the same piece sequence
+            audit_adapter = TetrisAdapter(level=level, seed=result['seed'])
             audit_report = auditor.audit_episode(
                 episode_id=ep + 1,
                 level=level,
@@ -245,8 +258,7 @@ def train_curriculum(
                         }
                     )
             else:
-                print(f"\n  ❌ Threshold not met ({stats['mean_lines']:.2f} < {threshold:.2f}) — stopping at level {level}")
-                break
+                print(f"\n  ⚠️  Below threshold ({stats['mean_lines']:.2f} < {threshold:.2f}) — continuing anyway")
     
     return all_stats
 
@@ -254,22 +266,28 @@ def train_curriculum(
 # ─── Comparison ──────────────────────────────────────────────────────
 
 def load_dellacherie_baseline(filepath: str = "dellacherie_results.txt") -> Dict[int, float]:
-    """Load Dellacherie baseline results."""
+    """Load Dellacherie baseline results from benchmark output file."""
     baseline = {}
-    
+
     if not os.path.exists(filepath):
         print(f"⚠️ Baseline file not found: {filepath}")
         return baseline
-    
-    # Parse simple text format (Level, Lines)
+
+    current_level = None
     with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
         for line in f:
-            parts = line.strip().split()
-            if len(parts) >= 2 and parts[0].isdigit():
-                level = int(parts[0])
-                lines = float(parts[1])
-                baseline[level] = lines
-    
+            line = line.strip()
+            # Detect "Level N" header
+            if line.startswith('Level ') and line[6:].isdigit():
+                current_level = int(line[6:])
+            # Detect "Final: X.XX lines/episode"
+            elif line.startswith('Final:') and current_level is not None:
+                try:
+                    lines_val = float(line.split()[1])
+                    baseline[current_level] = lines_val
+                except (IndexError, ValueError):
+                    pass
+
     return baseline
 
 

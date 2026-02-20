@@ -144,7 +144,8 @@ class TetrisCurriculumEnv:
     
     def __init__(self, level: int = 1, max_pieces: int = 500,
                  weights: Optional[DellacherieWeights] = None,
-                 heuristic_blend: float = 1.0):
+                 heuristic_blend: float = 1.0,
+                 seed: Optional[int] = None):
         """
         Args:
             level: Curriculum level (1-7)
@@ -165,6 +166,9 @@ class TetrisCurriculumEnv:
         self.weights = weights or DellacherieWeights()
         self.heuristic_blend = heuristic_blend  # Curriculum: reduce over time
         
+        # Isolated RNG
+        self.rng = np.random.RandomState(seed)
+        
         # State
         self.board = None
         self.current_piece = None
@@ -179,8 +183,10 @@ class TetrisCurriculumEnv:
         self.feature_dim = 3  # agg_height, holes, bumpiness (normalized)
         self.state_dim = self.board_dim + self.piece_dim + self.feature_dim
     
-    def reset(self) -> np.ndarray:
+    def reset(self, seed: Optional[int] = None) -> np.ndarray:
         """Reset environment."""
+        if seed is not None:
+            self.rng = np.random.RandomState(seed)
         self.board = np.zeros((self.height, self.width), dtype=np.float32)
         self.lines_cleared = 0
         self.pieces_placed = 0
@@ -299,7 +305,7 @@ class TetrisCurriculumEnv:
     
     def _spawn_piece(self):
         """Spawn a random piece."""
-        idx = np.random.randint(len(self.piece_types))
+        idx = self.rng.randint(len(self.piece_types))
         self.current_piece = self.piece_types[idx]
     
     def _get_piece_cells(self, rotation: int) -> List[Tuple[int, int]]:

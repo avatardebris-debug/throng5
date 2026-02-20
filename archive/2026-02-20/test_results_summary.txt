@@ -1,0 +1,26 @@
+============================================================
+TRANSFER TEST RESULTS
+============================================================
+Task A final loss: 3.1638
+Task B (transfer): 4.1487
+Task B (fresh):    4.7019
+Transfer improvement: 11.8%
+
+Meta-level comparison:
+  1 layers: 5.5323
+  2 layers: 6.4273
+  3 layers: 5.4914
+
+============================================================
+SUPEREXPONENTIAL TEST RESULTS
+============================================================
+1 layers: loss=3.3668, signals=0
+2 layers: loss=3.4101, signals=100
+3 layers: loss=3.1539, signals=129
+4 layers: loss=3.6332, signals=229
+5 layers: loss=4.3271, signals=339
+6 layers: loss=4.1730, signals=369
+
+Improvements: ['-0.013', '0.075', '-0.152', '-0.191', '0.036']
+Acceleration: ['0.088', '-0.227', '-0.039', '0.227']
+Superexponential: not yet

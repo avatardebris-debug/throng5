@@ -1,0 +1,382 @@
+﻿{
+  "session_id": "20260220_005404",
+  "timestamp": "2026-02-20T00:54:13.622700",
+  "summary": {
+    "total_episodes": 15,
+    "discrepancies_found": 15,
+    "total_anomalies": 25,
+    "anomaly_types": {
+      "LINE_MISMATCH": 10,
+      "REWARD_MISMATCH": 15
+    },
+    "mean_reported_lines": 4.533333333333333,
+    "mean_verified_lines": 1.0666666666666667,
+    "mean_reward_gap": 12.865333333333334,
+    "suspicious_episodes": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      90,
+      100
+    ]
+  },
+  "episodes": [
+    {
+      "episode_id": 10,
+      "level": 2,
+      "reported_lines": 0,
+      "verified_lines": 1,
+      "reported_reward": -44.32,
+      "verified_reward": -14.990000000000002,
+      "pieces_placed": 8,
+      "action_distribution": {
+        "(0, 0)": 4,
+        "(0, 2)": 2,
+        "(1, 4)": 1,
+        "(0, 1)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 0 vs verified 1",
+        "REWARD_MISMATCH: gap=29.330"
+      ],
+      "timestamp": "2026-02-20T00:54:04.732454"
+    },
+    {
+      "episode_id": 20,
+      "level": 2,
+      "reported_lines": 6,
+      "verified_lines": 3,
+      "reported_reward": -43.87,
+      "verified_reward": -39.76,
+      "pieces_placed": 17,
+      "action_distribution": {
+        "(1, 1)": 1,
+        "(1, 0)": 5,
+        "(1, 2)": 2,
+        "(0, 1)": 3,
+        "(0, 2)": 2,
+        "(1, 4)": 3,
+        "(1, 3)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 6 vs verified 3",
+        "REWARD_MISMATCH: gap=4.110"
+      ],
+      "timestamp": "2026-02-20T00:54:05.162903"
+    },
+    {
+      "episode_id": 30,
+      "level": 2,
+      "reported_lines": 15,
+      "verified_lines": 1,
+      "reported_reward": -28.989999999999977,
+      "verified_reward": -48.0,
+      "pieces_placed": 13,
+      "action_distribution": {
+        "(1, 0)": 2,
+        "(0, 1)": 2,
+        "(1, 3)": 2,
+        "(1, 1)": 1,
+        "(0, 0)": 3,
+        "(1, 2)": 2,
+        "(0, 4)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 15 vs verified 1",
+        "REWARD_MISMATCH: gap=19.010"
+      ],
+      "timestamp": "2026-02-20T00:54:05.652646"
+    },
+    {
+      "episode_id": 40,
+      "level": 2,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -42.46,
+      "verified_reward": -31.380000000000003,
+      "pieces_placed": 8,
+      "action_distribution": {
+        "(1, 4)": 1,
+        "(0, 1)": 1,
+        "(0, 2)": 2,
+        "(1, 2)": 1,
+        "(1, 3)": 1,
+        "(1, 5)": 1,
+        "(1, 1)": 1
+      },
+      "anomalies": [
+        "REWARD_MISMATCH: gap=11.080"
+      ],
+      "timestamp": "2026-02-20T00:54:06.279851"
+    },
+    {
+      "episode_id": 50,
+      "level": 2,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -44.88999999999999,
+      "verified_reward": -35.94,
+      "pieces_placed": 7,
+      "action_distribution": {
+        "(1, 4)": 3,
+        "(1, 3)": 1,
+        "(0, 0)": 1,
+        "(1, 5)": 1,
+        "(0, 1)": 1
+      },
+      "anomalies": [
+        "REWARD_MISMATCH: gap=8.950"
+      ],
+      "timestamp": "2026-02-20T00:54:06.938657"
+    },
+    {
+      "episode_id": 10,
+      "level": 3,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -51.31,
+      "verified_reward": -40.980000000000004,
+      "pieces_placed": 7,
+      "action_distribution": {
+        "(3, 3)": 2,
+        "(3, 4)": 1,
+        "(2, 1)": 1,
+        "(2, 0)": 1,
+        "(2, 2)": 1,
+        "(0, 2)": 1
+      },
+      "anomalies": [
+        "REWARD_MISMATCH: gap=10.330"
+      ],
+      "timestamp": "2026-02-20T00:54:07.654954"
+    },
+    {
+      "episode_id": 20,
+      "level": 3,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -36.279999999999994,
+      "verified_reward": -48.809999999999995,
+      "pieces_placed": 13,
+      "action_distribution": {
+        "(2, 0)": 3,
+        "(0, 0)": 4,
+        "(1, 2)": 1,
+        "(0, 4)": 2,
+        "(3, 2)": 1,
+        "(1, 4)": 2
+      },
+      "anomalies": [
+        "REWARD_MISMATCH: gap=12.530"
+      ],
+      "timestamp": "2026-02-20T00:54:08.246680"
+    },
+    {
+      "episode_id": 30,
+      "level": 3,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -34.480000000000004,
+      "verified_reward": -43.410000000000004,
+      "pieces_placed": 8,
+      "action_distribution": {
+        "(0, 1)": 3,
+        "(2, 1)": 2,
+        "(0, 4)": 1,
+        "(3, 1)": 1,
+        "(0, 3)": 1
+      },
+      "anomalies": [
+        "REWARD_MISMATCH: gap=8.930"
+      ],
+      "timestamp": "2026-02-20T00:54:08.841680"
+    },
+    {
+      "episode_id": 40,
+      "level": 3,
+      "reported_lines": 4,
+      "verified_lines": 1,
+      "reported_reward": -36.09,
+      "verified_reward": -38.19,
+      "pieces_placed": 11,
+      "action_distribution": {
+        "(1, 0)": 3,
+        "(0, 1)": 3,
+        "(3, 4)": 1,
+        "(1, 1)": 1,
+        "(1, 3)": 1,
+        "(1, 2)": 1,
+        "(0, 2)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 4 vs verified 1",
+        "REWARD_MISMATCH: gap=2.100"
+      ],
+      "timestamp": "2026-02-20T00:54:09.498271"
+    },
+    {
+      "episode_id": 50,
+      "level": 3,
+      "reported_lines": 3,
+      "verified_lines": 0,
+      "reported_reward": -36.25,
+      "verified_reward": -44.589999999999996,
+      "pieces_placed": 16,
+      "action_distribution": {
+        "(1, 0)": 3,
+        "(0, 1)": 1,
+        "(1, 1)": 3,
+        "(0, 3)": 1,
+        "(0, 2)": 3,
+        "(1, 2)": 1,
+        "(3, 2)": 1,
+        "(3, 4)": 1,
+        "(1, 5)": 1,
+        "(2, 4)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 3 vs verified 0",
+        "REWARD_MISMATCH: gap=8.340"
+      ],
+      "timestamp": "2026-02-20T00:54:10.175615"
+    },
+    {
+      "episode_id": 60,
+      "level": 3,
+      "reported_lines": 10,
+      "verified_lines": 5,
+      "reported_reward": -29.639999999999993,
+      "verified_reward": -37.489999999999995,
+      "pieces_placed": 23,
+      "action_distribution": {
+        "(1, 0)": 4,
+        "(2, 1)": 1,
+        "(1, 1)": 1,
+        "(0, 3)": 2,
+        "(2, 2)": 1,
+        "(1, 2)": 1,
+        "(0, 1)": 3,
+        "(2, 0)": 1,
+        "(0, 4)": 2,
+        "(3, 4)": 1,
+        "(1, 3)": 2,
+        "(1, 4)": 1,
+        "(0, 0)": 1,
+        "(1, 5)": 1,
+        "(3, 2)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 10 vs verified 5",
+        "REWARD_MISMATCH: gap=7.850"
+      ],
+      "timestamp": "2026-02-20T00:54:10.911876"
+    },
+    {
+      "episode_id": 70,
+      "level": 3,
+      "reported_lines": 18,
+      "verified_lines": 1,
+      "reported_reward": -19.659999999999986,
+      "verified_reward": -42.51,
+      "pieces_placed": 16,
+      "action_distribution": {
+        "(1, 0)": 3,
+        "(1, 2)": 2,
+        "(1, 1)": 2,
+        "(0, 1)": 2,
+        "(2, 3)": 1,
+        "(0, 4)": 1,
+        "(1, 4)": 2,
+        "(3, 4)": 1,
+        "(1, 3)": 1,
+        "(0, 0)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 18 vs verified 1",
+        "REWARD_MISMATCH: gap=22.850"
+      ],
+      "timestamp": "2026-02-20T00:54:11.633554"
+    },
+    {
+      "episode_id": 80,
+      "level": 3,
+      "reported_lines": 7,
+      "verified_lines": 3,
+      "reported_reward": -29.57999999999999,
+      "verified_reward": -44.67999999999999,
+      "pieces_placed": 19,
+      "action_distribution": {
+        "(0, 0)": 5,
+        "(1, 0)": 2,
+        "(0, 2)": 2,
+        "(0, 1)": 1,
+        "(1, 2)": 1,
+        "(0, 4)": 4,
+        "(1, 3)": 2,
+        "(2, 0)": 1,
+        "(2, 2)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 7 vs verified 3",
+        "REWARD_MISMATCH: gap=15.100"
+      ],
+      "timestamp": "2026-02-20T00:54:12.290907"
+    },
+    {
+      "episode_id": 90,
+      "level": 3,
+      "reported_lines": 0,
+      "verified_lines": 1,
+      "reported_reward": -49.09,
+      "verified_reward": -28.970000000000002,
+      "pieces_placed": 6,
+      "action_distribution": {
+        "(3, 3)": 2,
+        "(3, 4)": 1,
+        "(2, 1)": 1,
+        "(2, 0)": 1,
+        "(2, 2)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 0 vs verified 1",
+        "REWARD_MISMATCH: gap=20.120"
+      ],
+      "timestamp": "2026-02-20T00:54:12.942553"
+    },
+    {
+      "episode_id": 100,
+      "level": 3,
+      "reported_lines": 5,
+      "verified_lines": 0,
+      "reported_reward": -33.319999999999986,
+      "verified_reward": -45.669999999999995,
+      "pieces_placed": 11,
+      "action_distribution": {
+        "(1, 0)": 2,
+        "(2, 1)": 1,
+        "(0, 1)": 1,
+        "(2, 0)": 1,
+        "(0, 0)": 1,
+        "(0, 3)": 1,
+        "(3, 3)": 2,
+        "(1, 2)": 1,
+        "(1, 3)": 1
+      },
+      "anomalies": [
+        "LINE_MISMATCH: reported 5 vs verified 0",
+        "REWARD_MISMATCH: gap=12.350"
+      ],
+      "timestamp": "2026-02-20T00:54:13.606972"
+    }
+  ]
+}

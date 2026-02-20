@@ -1,0 +1,55 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_hole_collapse_gate_85",
+    "description": "On level-7 style states, switch immediately to survive mode when hole count exceeds collapse territory so the policy prioritizes stabilizing the board over greedy clears.",
+    "llm_score": 0.84,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), with both near terminal height (~20), so a hole-triggered mode gate should separate collapse trajectories better than height-only control.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "holes > 85",
+        "strategy": "survive"
+      }
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "l7_surface_volatility_brake",
+    "description": "Apply a stronger global penalty to bumpiness so placements favor smoother surfaces and reduce the jagged stacks associated with immediate deaths.",
+    "llm_score": 0.79,
+    "llm_priority": "test",
+    "llm_notes": "Bumpiness is the strongest separator in this brief: failures are 7.92 vs successes 1.44 (delta 6.48), while height differs by only 0.41, indicating surface volatility control is high leverage.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "reward_weight",
+        "target": "bumpiness",
+        "multiplier": 2.2
+      }
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "l7_opening_hole_cap_12",
+    "name": "l7_opening_hole_cap_20",
+    "description": "Extend the opening anti-hole window from the first 12 pieces to 20 pieces so early-board discipline persists through the fragile transition into midgame.",
+    "llm_score": 0.76,
+    "llm_priority": "explore",
+    "llm_notes": "Failures still end very early (avg_pieces 23.23) with extreme holes (99.66), and success dissection shows outlier early holes are lower than baseline (78.8 vs 85.7), so extending the early hole cap should test whether stability needs a longer runway.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "piece_phase",
+        "range": [
+          0,
+          20
+        ],
+        "target": "holes",
+        "multiplier": 2.0
+      }
+    }
+  }
+]

@@ -164,11 +164,10 @@ class FastLoop:
         self._novelty = _NoveltyDetector()
 
         # AutoMetric — records raw board observations passively
-        board_h = {1:8, 2:10, 3:12, 4:14, 5:16, 6:18, 7:20}.get(level, 12)
         self._auto_metric = AutoMetric(
             db=self.db,
             game=game,
-            obs_shape=(board_h, _tmp_adapter.board_width),
+            obs_shape=(_tmp_adapter.env.height, _tmp_adapter.board_width),
             min_correlation=0.35,
             min_episodes=100,
             storage_path=f'{log_dir}/auto_metric_{game}_L{level}.jsonl',

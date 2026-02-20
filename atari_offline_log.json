@@ -1,0 +1,758 @@
+{
+  "game_id": "Breakout",
+  "episodes": 1,
+  "trajectory": [
+    {
+      "step": 0,
+      "obs": "Step 001 | Action: Right  | Paddle_X: 158, Ball: (000, 000) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 1,
+      "obs": "Step 002 | Action: Right  | Paddle_X: 181, Ball: (000, 000) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 2,
+      "obs": "Step 003 | Action: Left   | Paddle_X: 179, Ball: (000, 000) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 3,
+      "obs": "Step 004 | Action: Right  | Paddle_X: 171, Ball: (000, 000) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 4,
+      "obs": "Step 005 | Action: Fire   | Paddle_X: 180, Ball: (124, 116) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 5,
+      "obs": "Step 006 | Action: Right  | Paddle_X: 183, Ball: (120, 120) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 6,
+      "obs": "Step 007 | Action: Right  | Paddle_X: 191, Ball: (116, 124) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 7,
+      "obs": "Step 008 | Action: No-Op  | Paddle_X: 191, Ball: (112, 128) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 8,
+      "obs": "Step 009 | Action: Right  | Paddle_X: 191, Ball: (108, 132) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 9,
+      "obs": "Step 010 | Action: No-Op  | Paddle_X: 191, Ball: (104, 136) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 10,
+      "obs": "Step 011 | Action: Left   | Paddle_X: 191, Ball: (100, 140) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 11,
+      "obs": "Step 012 | Action: Left   | Paddle_X: 191, Ball: (096, 144) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 12,
+      "obs": "Step 013 | Action: Left   | Paddle_X: 174, Ball: (092, 148) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 13,
+      "obs": "Step 014 | Action: Left   | Paddle_X: 152, Ball: (088, 152) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 14,
+      "obs": "Step 015 | Action: No-Op  | Paddle_X: 141, Ball: (084, 156) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 15,
+      "obs": "Step 016 | Action: Fire   | Paddle_X: 141, Ball: (080, 160) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 16,
+      "obs": "Step 017 | Action: Fire   | Paddle_X: 141, Ball: (076, 164) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 17,
+      "obs": "Step 018 | Action: Left   | Paddle_X: 133, Ball: (072, 168) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 18,
+      "obs": "Step 019 | Action: Right  | Paddle_X: 136, Ball: (068, 172) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 19,
+      "obs": "Step 020 | Action: No-Op  | Paddle_X: 146, Ball: (064, 176) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 20,
+      "obs": "Step 021 | Action: Left   | Paddle_X: 134, Ball: (060, 180) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 21,
+      "obs": "Step 022 | Action: No-Op  | Paddle_X: 123, Ball: (056, 184) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 22,
+      "obs": "Step 023 | Action: No-Op  | Paddle_X: 123, Ball: (060, 188) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 23,
+      "obs": "Step 024 | Action: Fire   | Paddle_X: 123, Ball: (064, 192) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 24,
+      "obs": "Step 025 | Action: No-Op  | Paddle_X: 123, Ball: (068, 196) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 25,
+      "obs": "Step 026 | Action: No-Op  | Paddle_X: 123, Ball: (072, 200) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 26,
+      "obs": "Step 027 | Action: No-Op  | Paddle_X: 123, Ball: (076, 204) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 27,
+      "obs": "Step 028 | Action: Fire   | Paddle_X: 123, Ball: (080, 208) | Reward: 0.0 | Lives: 5"
+    },
+    {
+      "step": 28,
+      "obs": "Step 029 | Action: Right  | Paddle_X: 135, Ball: (080, 000) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 29,
+      "obs": "Step 030 | Action: Left   | Paddle_X: 133, Ball: (080, 000) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 30,
+      "obs": "Step 031 | Action: Left   | Paddle_X: 112, Ball: (080, 000) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 31,
+      "obs": "Step 032 | Action: No-Op  | Paddle_X: 101, Ball: (080, 000) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 32,
+      "obs": "Step 033 | Action: No-Op  | Paddle_X: 101, Ball: (080, 000) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 33,
+      "obs": "Step 034 | Action: Fire   | Paddle_X: 101, Ball: (131, 115) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 34,
+      "obs": "Step 035 | Action: No-Op  | Paddle_X: 101, Ball: (135, 119) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 35,
+      "obs": "Step 036 | Action: Right  | Paddle_X: 113, Ball: (139, 123) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 36,
+      "obs": "Step 037 | Action: Left   | Paddle_X: 111, Ball: (143, 127) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 37,
+      "obs": "Step 038 | Action: Left   | Paddle_X: 088, Ball: (147, 131) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 38,
+      "obs": "Step 039 | Action: Left   | Paddle_X: 066, Ball: (151, 135) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 39,
+      "obs": "Step 040 | Action: Left   | Paddle_X: 055, Ball: (155, 139) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 40,
+      "obs": "Step 041 | Action: Left   | Paddle_X: 055, Ball: (159, 143) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 41,
+      "obs": "Step 042 | Action: Left   | Paddle_X: 055, Ball: (163, 147) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 42,
+      "obs": "Step 043 | Action: Right  | Paddle_X: 064, Ball: (167, 151) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 43,
+      "obs": "Step 044 | Action: Left   | Paddle_X: 072, Ball: (171, 155) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 44,
+      "obs": "Step 045 | Action: Left   | Paddle_X: 055, Ball: (175, 159) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 45,
+      "obs": "Step 046 | Action: No-Op  | Paddle_X: 055, Ball: (179, 163) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 46,
+      "obs": "Step 047 | Action: No-Op  | Paddle_X: 055, Ball: (183, 167) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 47,
+      "obs": "Step 048 | Action: Right  | Paddle_X: 064, Ball: (187, 171) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 48,
+      "obs": "Step 049 | Action: Fire   | Paddle_X: 074, Ball: (191, 175) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 49,
+      "obs": "Step 050 | Action: Right  | Paddle_X: 086, Ball: (195, 179) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 50,
+      "obs": "Step 051 | Action: Left   | Paddle_X: 084, Ball: (199, 183) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 51,
+      "obs": "Step 052 | Action: Left   | Paddle_X: 062, Ball: (197, 187) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 52,
+      "obs": "Step 053 | Action: Right  | Paddle_X: 064, Ball: (193, 191) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 53,
+      "obs": "Step 054 | Action: Left   | Paddle_X: 072, Ball: (189, 195) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 54,
+      "obs": "Step 055 | Action: Left   | Paddle_X: 055, Ball: (185, 199) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 55,
+      "obs": "Step 056 | Action: Fire   | Paddle_X: 055, Ball: (181, 203) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 56,
+      "obs": "Step 057 | Action: No-Op  | Paddle_X: 055, Ball: (177, 207) | Reward: 0.0 | Lives: 4"
+    },
+    {
+      "step": 57,
+      "obs": "Step 058 | Action: Right  | Paddle_X: 059, Ball: (176, 000) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 58,
+      "obs": "Step 059 | Action: Fire   | Paddle_X: 068, Ball: (124, 116) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 59,
+      "obs": "Step 060 | Action: Left   | Paddle_X: 056, Ball: (120, 120) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 60,
+      "obs": "Step 061 | Action: Left   | Paddle_X: 055, Ball: (116, 124) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 61,
+      "obs": "Step 062 | Action: Fire   | Paddle_X: 055, Ball: (112, 128) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 62,
+      "obs": "Step 063 | Action: Fire   | Paddle_X: 055, Ball: (108, 132) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 63,
+      "obs": "Step 064 | Action: Fire   | Paddle_X: 055, Ball: (104, 136) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 64,
+      "obs": "Step 065 | Action: Fire   | Paddle_X: 055, Ball: (100, 140) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 65,
+      "obs": "Step 066 | Action: Left   | Paddle_X: 055, Ball: (096, 144) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 66,
+      "obs": "Step 067 | Action: Right  | Paddle_X: 064, Ball: (092, 148) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 67,
+      "obs": "Step 068 | Action: No-Op  | Paddle_X: 074, Ball: (088, 152) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 68,
+      "obs": "Step 069 | Action: No-Op  | Paddle_X: 074, Ball: (084, 156) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 69,
+      "obs": "Step 070 | Action: Left   | Paddle_X: 062, Ball: (080, 160) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 70,
+      "obs": "Step 071 | Action: Left   | Paddle_X: 055, Ball: (076, 164) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 71,
+      "obs": "Step 072 | Action: Fire   | Paddle_X: 055, Ball: (072, 168) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 72,
+      "obs": "Step 073 | Action: Left   | Paddle_X: 055, Ball: (068, 172) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 73,
+      "obs": "Step 074 | Action: Left   | Paddle_X: 055, Ball: (064, 176) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 74,
+      "obs": "Step 075 | Action: No-Op  | Paddle_X: 055, Ball: (064, 172) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 75,
+      "obs": "Step 076 | Action: No-Op  | Paddle_X: 055, Ball: (060, 166) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 76,
+      "obs": "Step 077 | Action: No-Op  | Paddle_X: 055, Ball: (056, 160) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 77,
+      "obs": "Step 078 | Action: Left   | Paddle_X: 055, Ball: (060, 154) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 78,
+      "obs": "Step 079 | Action: No-Op  | Paddle_X: 055, Ball: (064, 148) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 79,
+      "obs": "Step 080 | Action: No-Op  | Paddle_X: 055, Ball: (068, 142) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 80,
+      "obs": "Step 081 | Action: Fire   | Paddle_X: 055, Ball: (072, 136) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 81,
+      "obs": "Step 082 | Action: No-Op  | Paddle_X: 055, Ball: (076, 130) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 82,
+      "obs": "Step 083 | Action: No-Op  | Paddle_X: 055, Ball: (080, 124) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 83,
+      "obs": "Step 084 | Action: Fire   | Paddle_X: 055, Ball: (084, 118) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 84,
+      "obs": "Step 085 | Action: Left   | Paddle_X: 055, Ball: (088, 112) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 85,
+      "obs": "Step 086 | Action: Right  | Paddle_X: 064, Ball: (092, 106) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 86,
+      "obs": "Step 087 | Action: Right  | Paddle_X: 085, Ball: (096, 100) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 87,
+      "obs": "Step 088 | Action: Right  | Paddle_X: 109, Ball: (100, 094) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 88,
+      "obs": "Step 089 | Action: Left   | Paddle_X: 118, Ball: (104, 088) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 89,
+      "obs": "Step 090 | Action: Fire   | Paddle_X: 109, Ball: (108, 085) | Reward: 1.0 | Lives: 3"
+    },
+    {
+      "step": 90,
+      "obs": "Step 091 | Action: Right  | Paddle_X: 121, Ball: (112, 091) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 91,
+      "obs": "Step 092 | Action: No-Op  | Paddle_X: 130, Ball: (116, 097) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 92,
+      "obs": "Step 093 | Action: Left   | Paddle_X: 124, Ball: (120, 103) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 93,
+      "obs": "Step 094 | Action: Fire   | Paddle_X: 115, Ball: (124, 109) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 94,
+      "obs": "Step 095 | Action: Fire   | Paddle_X: 115, Ball: (128, 115) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 95,
+      "obs": "Step 096 | Action: No-Op  | Paddle_X: 115, Ball: (132, 121) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 96,
+      "obs": "Step 097 | Action: No-Op  | Paddle_X: 115, Ball: (136, 127) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 97,
+      "obs": "Step 098 | Action: Right  | Paddle_X: 122, Ball: (140, 133) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 98,
+      "obs": "Step 099 | Action: Fire   | Paddle_X: 130, Ball: (144, 139) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 99,
+      "obs": "Step 100 | Action: Right  | Paddle_X: 138, Ball: (148, 145) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 100,
+      "obs": "Step 101 | Action: Left   | Paddle_X: 135, Ball: (152, 151) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 101,
+      "obs": "Step 102 | Action: Fire   | Paddle_X: 127, Ball: (156, 157) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 102,
+      "obs": "Step 103 | Action: No-Op  | Paddle_X: 127, Ball: (160, 163) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 103,
+      "obs": "Step 104 | Action: Fire   | Paddle_X: 127, Ball: (164, 169) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 104,
+      "obs": "Step 105 | Action: No-Op  | Paddle_X: 127, Ball: (168, 175) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 105,
+      "obs": "Step 106 | Action: No-Op  | Paddle_X: 127, Ball: (172, 181) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 106,
+      "obs": "Step 107 | Action: Right  | Paddle_X: 138, Ball: (176, 187) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 107,
+      "obs": "Step 108 | Action: Right  | Paddle_X: 161, Ball: (180, 193) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 108,
+      "obs": "Step 109 | Action: Fire   | Paddle_X: 170, Ball: (184, 199) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 109,
+      "obs": "Step 110 | Action: Fire   | Paddle_X: 170, Ball: (188, 205) | Reward: 0.0 | Lives: 3"
+    },
+    {
+      "step": 110,
+      "obs": "Step 111 | Action: Fire   | Paddle_X: 170, Ball: (065, 113) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 111,
+      "obs": "Step 112 | Action: Left   | Paddle_X: 159, Ball: (069, 117) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 112,
+      "obs": "Step 113 | Action: Fire   | Paddle_X: 144, Ball: (073, 121) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 113,
+      "obs": "Step 114 | Action: Right  | Paddle_X: 155, Ball: (077, 125) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 114,
+      "obs": "Step 115 | Action: Fire   | Paddle_X: 166, Ball: (081, 129) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 115,
+      "obs": "Step 116 | Action: Fire   | Paddle_X: 166, Ball: (085, 133) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 116,
+      "obs": "Step 117 | Action: Fire   | Paddle_X: 166, Ball: (089, 137) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 117,
+      "obs": "Step 118 | Action: Left   | Paddle_X: 159, Ball: (093, 141) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 118,
+      "obs": "Step 119 | Action: No-Op  | Paddle_X: 144, Ball: (097, 145) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 119,
+      "obs": "Step 120 | Action: Left   | Paddle_X: 131, Ball: (101, 149) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 120,
+      "obs": "Step 121 | Action: Right  | Paddle_X: 123, Ball: (105, 153) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 121,
+      "obs": "Step 122 | Action: Right  | Paddle_X: 143, Ball: (109, 157) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 122,
+      "obs": "Step 123 | Action: Left   | Paddle_X: 152, Ball: (113, 161) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 123,
+      "obs": "Step 124 | Action: No-Op  | Paddle_X: 143, Ball: (117, 165) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 124,
+      "obs": "Step 125 | Action: No-Op  | Paddle_X: 143, Ball: (121, 169) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 125,
+      "obs": "Step 126 | Action: Left   | Paddle_X: 131, Ball: (125, 173) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 126,
+      "obs": "Step 127 | Action: Fire   | Paddle_X: 121, Ball: (129, 177) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 127,
+      "obs": "Step 128 | Action: No-Op  | Paddle_X: 121, Ball: (121, 171) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 128,
+      "obs": "Step 129 | Action: Left   | Paddle_X: 108, Ball: (117, 165) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 129,
+      "obs": "Step 130 | Action: Left   | Paddle_X: 085, Ball: (113, 159) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 130,
+      "obs": "Step 131 | Action: Right  | Paddle_X: 086, Ball: (109, 153) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 131,
+      "obs": "Step 132 | Action: Fire   | Paddle_X: 096, Ball: (105, 147) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 132,
+      "obs": "Step 133 | Action: Right  | Paddle_X: 109, Ball: (101, 141) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 133,
+      "obs": "Step 134 | Action: No-Op  | Paddle_X: 128, Ball: (097, 135) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 134,
+      "obs": "Step 135 | Action: Fire   | Paddle_X: 130, Ball: (093, 129) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 135,
+      "obs": "Step 136 | Action: No-Op  | Paddle_X: 130, Ball: (089, 123) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 136,
+      "obs": "Step 137 | Action: Left   | Paddle_X: 119, Ball: (085, 117) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 137,
+      "obs": "Step 138 | Action: Left   | Paddle_X: 096, Ball: (081, 111) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 138,
+      "obs": "Step 139 | Action: Fire   | Paddle_X: 085, Ball: (077, 105) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 139,
+      "obs": "Step 140 | Action: Right  | Paddle_X: 092, Ball: (073, 099) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 140,
+      "obs": "Step 141 | Action: Right  | Paddle_X: 115, Ball: (069, 093) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 141,
+      "obs": "Step 142 | Action: Right  | Paddle_X: 137, Ball: (065, 087) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 142,
+      "obs": "Step 143 | Action: Right  | Paddle_X: 161, Ball: (061, 087) | Reward: 1.0 | Lives: 2"
+    },
+    {
+      "step": 143,
+      "obs": "Step 144 | Action: Fire   | Paddle_X: 170, Ball: (057, 093) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 144,
+      "obs": "Step 145 | Action: Fire   | Paddle_X: 170, Ball: (059, 099) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 145,
+      "obs": "Step 146 | Action: Left   | Paddle_X: 159, Ball: (063, 105) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 146,
+      "obs": "Step 147 | Action: Fire   | Paddle_X: 139, Ball: (067, 111) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 147,
+      "obs": "Step 148 | Action: Right  | Paddle_X: 149, Ball: (071, 117) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 148,
+      "obs": "Step 149 | Action: Fire   | Paddle_X: 160, Ball: (075, 123) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 149,
+      "obs": "Step 150 | Action: Right  | Paddle_X: 172, Ball: (079, 129) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 150,
+      "obs": "Step 151 | Action: No-Op  | Paddle_X: 182, Ball: (083, 135) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 151,
+      "obs": "Step 152 | Action: Left   | Paddle_X: 171, Ball: (087, 141) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 152,
+      "obs": "Step 153 | Action: No-Op  | Paddle_X: 161, Ball: (091, 147) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 153,
+      "obs": "Step 154 | Action: Left   | Paddle_X: 148, Ball: (095, 153) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 154,
+      "obs": "Step 155 | Action: Left   | Paddle_X: 126, Ball: (099, 159) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 155,
+      "obs": "Step 156 | Action: No-Op  | Paddle_X: 115, Ball: (103, 165) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 156,
+      "obs": "Step 157 | Action: Fire   | Paddle_X: 115, Ball: (107, 171) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 157,
+      "obs": "Step 158 | Action: Fire   | Paddle_X: 115, Ball: (111, 177) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 158,
+      "obs": "Step 159 | Action: Right  | Paddle_X: 126, Ball: (115, 183) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 159,
+      "obs": "Step 160 | Action: Left   | Paddle_X: 125, Ball: (119, 189) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 160,
+      "obs": "Step 161 | Action: Right  | Paddle_X: 127, Ball: (123, 195) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 161,
+      "obs": "Step 162 | Action: Right  | Paddle_X: 149, Ball: (127, 201) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 162,
+      "obs": "Step 163 | Action: Right  | Paddle_X: 171, Ball: (131, 207) | Reward: 0.0 | Lives: 2"
+    },
+    {
+      "step": 163,
+      "obs": "Step 164 | Action: Fire   | Paddle_X: 182, Ball: (190, 114) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 164,
+      "obs": "Step 165 | Action: Right  | Paddle_X: 182, Ball: (186, 118) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 165,
+      "obs": "Step 166 | Action: Right  | Paddle_X: 191, Ball: (182, 122) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 166,
+      "obs": "Step 167 | Action: Right  | Paddle_X: 191, Ball: (178, 126) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 167,
+      "obs": "Step 168 | Action: No-Op  | Paddle_X: 191, Ball: (174, 130) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 168,
+      "obs": "Step 169 | Action: No-Op  | Paddle_X: 191, Ball: (170, 134) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 169,
+      "obs": "Step 170 | Action: Right  | Paddle_X: 191, Ball: (166, 138) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 170,
+      "obs": "Step 171 | Action: Fire   | Paddle_X: 191, Ball: (162, 142) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 171,
+      "obs": "Step 172 | Action: Right  | Paddle_X: 191, Ball: (158, 146) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 172,
+      "obs": "Step 173 | Action: No-Op  | Paddle_X: 191, Ball: (154, 150) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 173,
+      "obs": "Step 174 | Action: Right  | Paddle_X: 191, Ball: (150, 154) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 174,
+      "obs": "Step 175 | Action: Left   | Paddle_X: 191, Ball: (146, 158) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 175,
+      "obs": "Step 176 | Action: Fire   | Paddle_X: 191, Ball: (142, 162) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 176,
+      "obs": "Step 177 | Action: Fire   | Paddle_X: 191, Ball: (138, 166) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 177,
+      "obs": "Step 178 | Action: Left   | Paddle_X: 191, Ball: (134, 170) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 178,
+      "obs": "Step 179 | Action: Left   | Paddle_X: 183, Ball: (130, 174) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 179,
+      "obs": "Step 180 | Action: Right  | Paddle_X: 185, Ball: (126, 178) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 180,
+      "obs": "Step 181 | Action: Right  | Paddle_X: 191, Ball: (122, 182) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 181,
+      "obs": "Step 182 | Action: No-Op  | Paddle_X: 191, Ball: (118, 186) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 182,
+      "obs": "Step 183 | Action: Right  | Paddle_X: 191, Ball: (114, 190) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 183,
+      "obs": "Step 184 | Action: Left   | Paddle_X: 191, Ball: (110, 194) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 184,
+      "obs": "Step 185 | Action: Fire   | Paddle_X: 191, Ball: (106, 198) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 185,
+      "obs": "Step 186 | Action: Left   | Paddle_X: 187, Ball: (102, 202) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 186,
+      "obs": "Step 187 | Action: Left   | Paddle_X: 166, Ball: (098, 206) | Reward: 0.0 | Lives: 1"
+    },
+    {
+      "step": 187,
+      "obs": "Step 188 | Action: Left   | Paddle_X: 150, Ball: (096, 000) | Reward: 0.0 | Lives: 0"
+    }
+  ]
+}

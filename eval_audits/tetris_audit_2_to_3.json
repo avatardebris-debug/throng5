@@ -1,0 +1,343 @@
+{
+  "session_id": "20260220_005644",
+  "timestamp": "2026-02-20T00:56:53.613892",
+  "summary": {
+    "total_episodes": 15,
+    "discrepancies_found": 0,
+    "total_anomalies": 0,
+    "anomaly_types": {},
+    "mean_reported_lines": 5.4,
+    "mean_verified_lines": 5.4,
+    "mean_reward_gap": 0.0,
+    "suspicious_episodes": []
+  },
+  "episodes": [
+    {
+      "episode_id": 10,
+      "level": 2,
+      "reported_lines": 1,
+      "verified_lines": 1,
+      "reported_reward": -46.379999999999995,
+      "verified_reward": -46.379999999999995,
+      "pieces_placed": 9,
+      "action_distribution": {
+        "(0, 2)": 3,
+        "(0, 0)": 2,
+        "(1, 3)": 1,
+        "(0, 3)": 2,
+        "(0, 1)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:45.109835"
+    },
+    {
+      "episode_id": 20,
+      "level": 2,
+      "reported_lines": 2,
+      "verified_lines": 2,
+      "reported_reward": -49.13,
+      "verified_reward": -49.13,
+      "pieces_placed": 10,
+      "action_distribution": {
+        "(1, 1)": 3,
+        "(1, 2)": 1,
+        "(0, 2)": 2,
+        "(0, 0)": 1,
+        "(1, 0)": 1,
+        "(1, 4)": 2
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:45.609169"
+    },
+    {
+      "episode_id": 30,
+      "level": 2,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -49.12,
+      "verified_reward": -49.12,
+      "pieces_placed": 9,
+      "action_distribution": {
+        "(1, 5)": 1,
+        "(0, 2)": 2,
+        "(1, 1)": 1,
+        "(0, 4)": 1,
+        "(0, 0)": 2,
+        "(1, 2)": 1,
+        "(1, 0)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:46.161397"
+    },
+    {
+      "episode_id": 40,
+      "level": 2,
+      "reported_lines": 40,
+      "verified_lines": 40,
+      "reported_reward": -10.499999999999972,
+      "verified_reward": -10.499999999999972,
+      "pieces_placed": 74,
+      "action_distribution": {
+        "(0, 1)": 4,
+        "(0, 0)": 22,
+        "(0, 2)": 8,
+        "(1, 2)": 5,
+        "(1, 0)": 3,
+        "(1, 4)": 9,
+        "(0, 4)": 7,
+        "(1, 3)": 7,
+        "(1, 5)": 7,
+        "(1, 1)": 2
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:46.684512"
+    },
+    {
+      "episode_id": 50,
+      "level": 2,
+      "reported_lines": 2,
+      "verified_lines": 2,
+      "reported_reward": -43.28,
+      "verified_reward": -43.28,
+      "pieces_placed": 15,
+      "action_distribution": {
+        "(1, 5)": 2,
+        "(1, 4)": 2,
+        "(1, 3)": 1,
+        "(1, 2)": 2,
+        "(0, 0)": 2,
+        "(1, 0)": 5,
+        "(0, 2)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:47.364053"
+    },
+    {
+      "episode_id": 10,
+      "level": 3,
+      "reported_lines": 4,
+      "verified_lines": 4,
+      "reported_reward": -34.79999999999999,
+      "verified_reward": -34.79999999999999,
+      "pieces_placed": 19,
+      "action_distribution": {
+        "(0, 0)": 6,
+        "(2, 2)": 1,
+        "(1, 0)": 1,
+        "(1, 2)": 1,
+        "(0, 1)": 1,
+        "(2, 1)": 1,
+        "(3, 2)": 1,
+        "(1, 4)": 2,
+        "(3, 4)": 1,
+        "(0, 4)": 1,
+        "(2, 0)": 1,
+        "(3, 3)": 1,
+        "(0, 2)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:47.968771"
+    },
+    {
+      "episode_id": 20,
+      "level": 3,
+      "reported_lines": 1,
+      "verified_lines": 1,
+      "reported_reward": -48.51,
+      "verified_reward": -48.51,
+      "pieces_placed": 8,
+      "action_distribution": {
+        "(3, 5)": 1,
+        "(3, 4)": 2,
+        "(3, 3)": 1,
+        "(2, 0)": 2,
+        "(2, 2)": 1,
+        "(3, 1)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:48.516772"
+    },
+    {
+      "episode_id": 30,
+      "level": 3,
+      "reported_lines": 6,
+      "verified_lines": 6,
+      "reported_reward": -39.90999999999999,
+      "verified_reward": -39.90999999999999,
+      "pieces_placed": 21,
+      "action_distribution": {
+        "(1, 0)": 4,
+        "(0, 1)": 7,
+        "(2, 1)": 1,
+        "(1, 3)": 2,
+        "(3, 4)": 1,
+        "(0, 4)": 2,
+        "(1, 4)": 1,
+        "(2, 2)": 1,
+        "(1, 5)": 1,
+        "(0, 0)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:49.104514"
+    },
+    {
+      "episode_id": 40,
+      "level": 3,
+      "reported_lines": 5,
+      "verified_lines": 5,
+      "reported_reward": -28.639999999999986,
+      "verified_reward": -28.639999999999986,
+      "pieces_placed": 21,
+      "action_distribution": {
+        "(1, 0)": 4,
+        "(0, 1)": 3,
+        "(0, 3)": 1,
+        "(1, 1)": 2,
+        "(1, 2)": 1,
+        "(1, 3)": 3,
+        "(2, 0)": 1,
+        "(3, 1)": 1,
+        "(0, 4)": 2,
+        "(1, 4)": 2,
+        "(3, 2)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:49.710626"
+    },
+    {
+      "episode_id": 50,
+      "level": 3,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -48.339999999999996,
+      "verified_reward": -48.339999999999996,
+      "pieces_placed": 8,
+      "action_distribution": {
+        "(3, 3)": 1,
+        "(3, 4)": 2,
+        "(2, 1)": 2,
+        "(3, 0)": 1,
+        "(2, 2)": 1,
+        "(3, 1)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:50.302262"
+    },
+    {
+      "episode_id": 60,
+      "level": 3,
+      "reported_lines": 1,
+      "verified_lines": 1,
+      "reported_reward": -46.82999999999999,
+      "verified_reward": -46.82999999999999,
+      "pieces_placed": 10,
+      "action_distribution": {
+        "(3, 5)": 1,
+        "(1, 0)": 1,
+        "(2, 2)": 1,
+        "(2, 0)": 1,
+        "(1, 3)": 1,
+        "(2, 1)": 1,
+        "(3, 0)": 1,
+        "(2, 3)": 1,
+        "(3, 2)": 1,
+        "(3, 4)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:51.029464"
+    },
+    {
+      "episode_id": 70,
+      "level": 3,
+      "reported_lines": 0,
+      "verified_lines": 0,
+      "reported_reward": -46.66000000000001,
+      "verified_reward": -46.66000000000001,
+      "pieces_placed": 10,
+      "action_distribution": {
+        "(3, 5)": 1,
+        "(3, 4)": 1,
+        "(3, 3)": 1,
+        "(3, 2)": 1,
+        "(3, 1)": 1,
+        "(1, 5)": 1,
+        "(2, 3)": 1,
+        "(3, 0)": 1,
+        "(1, 0)": 2
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:51.614061"
+    },
+    {
+      "episode_id": 80,
+      "level": 3,
+      "reported_lines": 2,
+      "verified_lines": 2,
+      "reported_reward": -37.69999999999999,
+      "verified_reward": -37.69999999999999,
+      "pieces_placed": 16,
+      "action_distribution": {
+        "(1, 0)": 2,
+        "(2, 1)": 2,
+        "(0, 1)": 3,
+        "(0, 0)": 1,
+        "(0, 3)": 1,
+        "(1, 2)": 1,
+        "(1, 1)": 1,
+        "(0, 4)": 3,
+        "(1, 4)": 1,
+        "(3, 4)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:52.292299"
+    },
+    {
+      "episode_id": 90,
+      "level": 3,
+      "reported_lines": 5,
+      "verified_lines": 5,
+      "reported_reward": -46.61000000000001,
+      "verified_reward": -46.61000000000001,
+      "pieces_placed": 15,
+      "action_distribution": {
+        "(3, 4)": 2,
+        "(3, 3)": 1,
+        "(3, 2)": 2,
+        "(2, 0)": 2,
+        "(2, 3)": 1,
+        "(3, 0)": 3,
+        "(2, 1)": 1,
+        "(2, 2)": 2,
+        "(0, 3)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:52.911753"
+    },
+    {
+      "episode_id": 100,
+      "level": 3,
+      "reported_lines": 12,
+      "verified_lines": 12,
+      "reported_reward": -27.12999999999999,
+      "verified_reward": -27.12999999999999,
+      "pieces_placed": 31,
+      "action_distribution": {
+        "(0, 0)": 12,
+        "(1, 0)": 1,
+        "(2, 2)": 1,
+        "(1, 2)": 3,
+        "(0, 4)": 5,
+        "(0, 3)": 2,
+        "(1, 3)": 1,
+        "(3, 2)": 1,
+        "(3, 4)": 1,
+        "(1, 4)": 1,
+        "(0, 1)": 1,
+        "(2, 3)": 1,
+        "(2, 1)": 1
+      },
+      "anomalies": [],
+      "timestamp": "2026-02-20T00:56:53.610270"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+﻿
+≡ƒÄ« Tetris Curriculum Learning Experiment
+======================================================================
+
+  Auditor enabled: checking every 10th episode
+
+  Agent: 18 features ΓåÆ [128] ΓåÆ value
+  Learning rate: 0.005, Gamma: 0.95, Epsilon: 0.2
+
+
+======================================================================
+Level 2: O + I blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I']
+  Episodes: 50, Max pieces: 100
+======================================================================
+
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 4 vs verified 3', 'REWARD_MISMATCH: gap=2.890']
+  Episode  10/50: Lines=2.20┬▒1.78, Reward=-38.99┬▒3.30
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 4 vs verified 5', 'REWARD_MISMATCH: gap=18.320']
+  Episode  20/50: Lines=5.90┬▒4.89, Reward=-37.49┬▒4.64
+    ΓÜá∩╕Å Audit found anomalies: ['REWARD_MISMATCH: gap=7.710']
+  Episode  30/50: Lines=6.00┬▒4.92, Reward=-38.26┬▒3.82
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 6 vs verified 3', 'REWARD_MISMATCH: gap=5.010']
+  Episode  40/50: Lines=3.80┬▒2.99, Reward=-38.49┬▒3.21
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 4 vs verified 2', 'REWARD_MISMATCH: gap=9.200']
+  Episode  50/50: Lines=11.20┬▒7.40, Reward=-34.67┬▒5.68
+
+  Level 2 Summary:
+    Mean lines: 5.82 ┬▒ 5.68
+    Max lines: 24
+    Mean reward: -37.58
+
+  Γ£à Threshold met (5.82 >= 2.00) ΓÇö advancing to level 3
+
+======================================================================
+Level 3: O + I + T blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I', 'T']
+  Episodes: 100, Max pieces: 150
+======================================================================
+
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 1 vs verified 0', 'REWARD_MISMATCH: gap=0.250']
+  Episode  10/100: Lines=1.60┬▒1.56, Reward=-43.80┬▒3.46
+    ΓÜá∩╕Å Audit found anomalies: ['REWARD_MISMATCH: gap=6.140']
+  Episode  20/100: Lines=1.70┬▒1.42, Reward=-40.43┬▒3.60
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 5 vs verified 1', 'REWARD_MISMATCH: gap=3.650']
+  Episode  30/100: Lines=1.30┬▒1.55, Reward=-42.88┬▒2.13
+    ΓÜá∩╕Å Audit found anomalies: ['REWARD_MISMATCH: gap=8.500']
+  Episode  40/100: Lines=1.50┬▒1.75, Reward=-43.34┬▒4.28
+    ΓÜá∩╕Å Audit found anomalies: ['REWARD_MISMATCH: gap=2.000']
+  Episode  50/100: Lines=0.70┬▒1.00, Reward=-45.35┬▒3.09
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 1 vs verified 0', 'REWARD_MISMATCH: gap=6.400']
+  Episode  60/100: Lines=2.10┬▒2.55, Reward=-42.13┬▒4.91
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 6 vs verified 4', 'REWARD_MISMATCH: gap=3.770']
+  Episode  70/100: Lines=1.70┬▒1.73, Reward=-43.75┬▒3.61
+    ΓÜá∩╕Å Audit found anomalies: ['REWARD_MISMATCH: gap=5.520']
+  Episode  80/100: Lines=1.30┬▒1.55, Reward=-42.58┬▒2.76
+    ΓÜá∩╕Å Audit found anomalies: ['LINE_MISMATCH: reported 1 vs verified 0', 'REWARD_MISMATCH: gap=0.480']
+  Episode  90/100: Lines=1.70┬▒1.55, Reward=-44.09┬▒2.66
+    ΓÜá∩╕Å Audit found anomalies: ['REWARD_MISMATCH: gap=3.070']
+  Episode 100/100: Lines=1.40┬▒1.74, Reward=-42.30┬▒3.23
+
+  Level 3 Summary:
+    Mean lines: 1.50 ┬▒ 1.72
+    Max lines: 8
+    Mean reward: -43.07
+
+  Γ¥î Threshold not met (1.50 < 3.00) ΓÇö stopping at level 3
+
+======================================================================
+TETRIS CURRICULUM vs DELLACHERIE COMPARISON
+======================================================================
+
+Level    Curriculum      Dellacherie     Gap       
+-------- --------------- --------------- ----------
+2           5.82 ( 24)     0.00           +5.82
+3           1.50 (  8)     0.00           +1.50
+
+======================================================================
+
+  Results saved to: tetris_curriculum_results.json
+
+  Audit saved to: eval_audits\tetris_audit_2_to_4.json
+
+======================================================================
+≡ƒôï EVAL AUDIT REPORT
+======================================================================
+Session ID: 20260220_011614
+Total episodes audited: 15
+Discrepancies found: 15
+Total anomalies: 24
+
+Anomaly breakdown:
+  - REWARD_MISMATCH: 15
+  - LINE_MISMATCH: 9
+
+Metric verification:
+  Mean reported lines: 2.47
+  Mean verified lines: 1.53
+  Mean reward gap: 5.527
+
+ΓÜá∩╕Å Suspicious episodes: [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]
+   ... and 5 more
+
+ΓÜá∩╕Å Found issues ΓÇö review audit file for details
+======================================================================
+
+
+≡ƒÄ« Training complete!
+

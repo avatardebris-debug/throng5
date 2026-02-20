@@ -1,0 +1,90 @@
+{
+  "timestamp": 1771614808.6685696,
+  "config": {
+    "start_level": 2,
+    "max_level": 2,
+    "auto_advance": true,
+    "tetra_enabled": false
+  },
+  "agent_config": {
+    "n_features": 18,
+    "n_hidden": 128,
+    "learning_rate": 0.005,
+    "gamma": 0.95,
+    "epsilon": 0.2
+  },
+  "level_stats": [
+    {
+      "level": 2,
+      "level_name": "O + I blocks",
+      "episodes": 50,
+      "max_pieces": 100,
+      "mean_lines": 8.04,
+      "std_lines": 7.418786962839681,
+      "max_lines": 25,
+      "mean_reward": -36.32919999999999,
+      "lines_history": [
+        8,
+        25,
+        0,
+        4,
+        10,
+        2,
+        8,
+        11,
+        24,
+        8,
+        0,
+        4,
+        16,
+        12,
+        0,
+        4,
+        2,
+        9,
+        3,
+        5,
+        2,
+        13,
+        1,
+        18,
+        13,
+        20,
+        0,
+        19,
+        2,
+        0,
+        10,
+        0,
+        2,
+        18,
+        18,
+        0,
+        0,
+        2,
+        18,
+        14,
+        0,
+        16,
+        4,
+        6,
+        4,
+        5,
+        4,
+        14,
+        23,
+        1
+      ]
+    }
+  ],
+  "comparison": [
+    {
+      "level": 2,
+      "curriculum": 8.04,
+      "dellacherie": 0.0,
+      "gap": 8.04,
+      "max": 25
+    }
+  ],
+  "baseline": {}
+}

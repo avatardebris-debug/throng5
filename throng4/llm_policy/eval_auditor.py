@@ -110,9 +110,9 @@ class EvalAuditor:
             _, reward, done, info = env_adapter.step(action)
             verified_reward += reward
             pieces_placed += 1
+            verified_lines = info.get('lines_cleared', 0)
             
             if done:
-                verified_lines = info.get('lines_cleared', 0)
                 break
         
         # Detect anomalies

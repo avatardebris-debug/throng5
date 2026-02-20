@@ -1,159 +1,176 @@
 """
-Atari Adapter for Meta-Learning Validation.
+Atari Adapter — Bridges Gymnasium ALE environments to PortableNNAgent.
 
-Uses RAM state (128 bytes) for fast iteration and concept transfer testing.
+Provides:
+- Wrapping for gym's ALE (Arcade Learning Environment)
+- Raw RAM state extraction for fast NN training
+- Action space mapping
 """
+
 import numpy as np
 import gymnasium as gym
-from typing import Dict, Any, List, Tuple, Optional
+from typing import List, Tuple, Dict, Any, Optional
+from throng4.environments.adapter import EnvironmentAdapter
+import ale_py
 
+# Register ALE environments
+gym.register_envs(ale_py)
 
-class AtariAdapter:
+class AtariAdapter(EnvironmentAdapter):
     """
-    Adapter for Atari games using RAM state.
+    Adapter for Atari environments from Gymnasium.
     
-    Compatible with PortableNNAgent for concept transfer experiments.
+    Default behavior uses obs_type="ram" which returns a 128-byte array.
+    This is highly optimized for fast NN training while still being rich
+    enough to establish baseline performance.
     """
     
-    def __init__(self, game_name: str, max_steps: int = 10000):
+    def __init__(self, game_id: str = "ALE/Breakout-v5", 
+                 render_mode: Optional[str] = None,
+                 seed: Optional[int] = None):
         """
-        Initialize Atari environment.
+        Initialize Atari adapter.
         
         Args:
-            game_name: Atari game name (e.g., 'Breakout', 'Pong', 'SpaceInvaders')
-            max_steps: Maximum steps per episode
+            game_id: Gymnasium environment ID (e.g. ALE/Breakout-v5, ALE/Pong-v5)
+            render_mode: Either None or "human"
+            seed: Random seed
         """
-        self.game_name = game_name
-        self.max_steps = max_steps
+        super().__init__()
+        self.game_id = game_id
         
-        # Register ALE environments
-        import ale_py
-        import gymnasium
-        gymnasium.register_envs(ale_py)
+        # We use RAM observation type to get a 1D vector of 128 floats directly
+        self.env = gym.make(self.game_id, obs_type="ram", render_mode=render_mode)
         
-        # Create environment with RAM observation
-        env_id = f'ALE/{game_name}-v5'
-        self.env = gymnasium.make(env_id, obs_type='ram')
-        
-        # State tracking
-        self.episode_steps = 0
-        self.episode_reward = 0.0
-        self.total_episodes = 0
-        self.done = False
-        
-        # RAM state is 128 bytes
+        # RAM state is always 128 bytes
         self.n_features = 128
         
-    def reset(self) -> np.ndarray:
-        """Reset environment and return initial state."""
-        obs, info = self.env.reset()
-        self.episode_steps = 0
-        self.episode_reward = 0.0
+        # Extract discrete action space
+        self.num_actions = self.env.action_space.n
+        self.valid_actions = list(range(self.num_actions))
+        
+        # Current state
+        self._current_obs = None
         self.done = False
         
-        # RAM state is already a feature vector (128 bytes)
-        return obs.astype(np.float32) / 255.0  # Normalize to [0, 1]
+        if seed is not None:
+            self._initial_seed = seed
+    
+    def reset(self, seed: Optional[int] = None) -> np.ndarray:
+        """
+        Reset environment.
+        """
+        obs, info = self.env.reset(seed=seed)
+        self._raw_ram = obs
+        self._current_obs = self.preprocess_obs(obs)
+        self.done = False
+        
+        self.episode_steps = 0
+        self.episode_reward = 0.0
+        
+        return self._current_obs
     
     def step(self, action: int) -> Tuple[np.ndarray, float, bool, Dict]:
         """
         Take a step in the environment.
         
         Args:
-            action: Integer action (0 to n_actions-1)
+            action: Integer action index
             
         Returns:
             (state, reward, done, info)
         """
         obs, reward, terminated, truncated, info = self.env.step(action)
-        done = terminated or truncated or (self.episode_steps >= self.max_steps)
+        self._raw_ram = obs
+        
+        # Combine terminated and truncated into a single 'done'
+        self.done = terminated or truncated
+        self._current_obs = self.preprocess_obs(obs)
         
         self.episode_steps += 1
         self.episode_reward += reward
-        self.done = done
         
-        if done:
+        if self.done:
             self.total_episodes += 1
-        
-        # Normalize RAM state
-        state = obs.astype(np.float32) / 255.0
-        
-        # Add episode info
-        info['episode_steps'] = self.episode_steps
-        info['episode_reward'] = self.episode_reward
-        
-        return state, reward, done, info
+            
+        return self._current_obs, float(reward), self.done, info
+    
+    def preprocess_obs(self, obs: Any) -> np.ndarray:
+        """
+        Preprocess RAM observation (0-255) to normalized features (0.0-1.0).
+        """
+        # Gymnasium RAM obs is a uint8 array of length 128
+        normalized = np.array(obs, dtype=np.float32) / 255.0
+        return normalized
     
     def get_valid_actions(self) -> List[int]:
-        """Get list of valid actions."""
-        return list(range(self.env.action_space.n))
+        """Get list of valid action indices."""
+        return self.valid_actions if not self.done else []
     
+    def make_features(self, action: int) -> np.ndarray:
+        """
+        Create feature vector.
+        
+        Unlike Tetris where 'make_features' parameterizes the board state
+        by action (Q(s,a) natively), in standard MDPs like Atari, the feature 
+        is simply the current state. The NN handles action selection via 
+        multiple outputs or we concatenate the action to the state.
+        
+        However, PortableNNAgent is a single-output value network V(phi(s,a)).
+        To make it compatible with Atari without changing its architecture,
+        we concatenate the normalized state and a one-hot action vector.
+        """
+        if self._current_obs is None:
+            return np.zeros(self.n_features + self.num_actions, dtype=np.float32)
+            
+        state_features = self._current_obs
+        
+        # One-hot encode the action
+        action_hot = np.zeros(self.num_actions, dtype=np.float32)
+        if 0 <= action < self.num_actions:
+            action_hot[action] = 1.0
+            
+        # phi(s, a) = [state, one_hot_action]
+        return np.concatenate([state_features, action_hot])
+
+    def get_semantic_obs(self, action: int, reward: float) -> str:
+        """
+        Extract a human/LLM-readable representation of the RAM state and action.
+        Currently optimized for Breakout to allow LLM diagnosis.
+        """
+        if not hasattr(self, '_raw_ram') or self._raw_ram is None:
+            return "State: Unknown"
+            
+        action_names = ["No-Op", "Fire", "Right", "Left"]
+        act_str = action_names[action] if 0 <= action < len(action_names) else f"Action_{action}"
+        
+        # Extracted Breakout Semantics
+        if "Breakout" in self.game_id:
+            paddle_x = self._raw_ram[72]
+            ball_x = self._raw_ram[99]
+            ball_y = self._raw_ram[101]
+            lives = self._raw_ram[57]
+            blocks = self._raw_ram[14] # Sometimes score/blocks
+            
+            return (f"Step {self.episode_steps:03d} | Action: {act_str: <6} | "
+                    f"Paddle_X: {paddle_x:03d}, Ball: ({ball_x:03d}, {ball_y:03d}) | "
+                    f"Reward: {reward} | Lives: {lives}")
+                    
+        # Fallback for other games: chunk of changing RAM or just numbers
+        # Typically we'd mapping per-game, for now just basic output
+        return f"Step {self.episode_steps} | Action: {act_str} | Reward: {reward} | RAM Hex: {self._raw_ram[:10].hex()}"
+
+    def get_lookahead_actions(self, action: int) -> List[int]:
+        """
+        Atari is not a perfect information board game, and we can't trivially 
+        simulate RAM state branches without an emulator reset/save-state hook.
+        So we disable lookahead.
+        """
+        return []
+
     def get_info(self) -> Dict[str, Any]:
-        """Get current environment info."""
+        """Get episode summary info."""
         return {
-            'game': self.game_name,
-            'n_actions': self.env.action_space.n,
-            'n_features': self.n_features,
-            'episode_steps': self.episode_steps,
             'episode_reward': self.episode_reward,
-            'total_episodes': self.total_episodes
+            'episode_steps': self.episode_steps
         }
-    
-    def close(self):
-        """Close the environment."""
-        self.env.close()
-
-
-def extract_features_for_concept(state: np.ndarray, game_name: str) -> Dict[str, float]:
-    """
-    Extract high-level features from RAM state for concept matching.
-    
-    This is a simple heuristic extractor. In practice, concepts would
-    guide which features to extract.
-    
-    Args:
-        state: RAM state (128 bytes, normalized)
-        game_name: Name of the game
-        
-    Returns:
-        Dictionary of named features
-    """
-    # Generic features that might apply across games
-    features = {
-        'state_mean': float(np.mean(state)),
-        'state_std': float(np.std(state)),
-        'state_max': float(np.max(state)),
-        'state_min': float(np.min(state)),
-        'nonzero_ratio': float(np.count_nonzero(state) / len(state))
-    }
-    
-    # Game-specific feature extraction could be added here
-    # based on concept suggestions from Tetra
-    
-    return features
-
-
-if __name__ == "__main__":
-    # Test the adapter
-    print("Testing AtariAdapter with Breakout...")
-    
-    adapter = AtariAdapter('Breakout')
-    print(f"Game: {adapter.game_name}")
-    print(f"Features: {adapter.n_features}")
-    print(f"Actions: {len(adapter.get_valid_actions())}")
-    
-    # Run a few random steps
-    state = adapter.reset()
-    print(f"\nInitial state shape: {state.shape}")
-    print(f"State range: [{state.min():.3f}, {state.max():.3f}]")
-    
-    for i in range(10):
-        action = np.random.choice(adapter.get_valid_actions())
-        state, reward, done, info = adapter.step(action)
-        print(f"Step {i+1}: action={action}, reward={reward:.1f}, done={done}")
-        
-        if done:
-            print("Episode ended early")
-            break
-    
-    adapter.close()
-    print("\n✅ AtariAdapter test complete!")

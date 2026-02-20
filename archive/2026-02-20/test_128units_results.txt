@@ -1,0 +1,97 @@
+﻿======================================================================
+PHASE F6: Testing 128 Hidden Units
+======================================================================
+
+[FRESH] Training each level from scratch...
+
+  Level 1:
+    Reached 1.5 at episode 20
+
+  Level 2:
+    Reached 1.5 at episode 20
+
+  Level 3:
+    Reached 1.5 at episode 20
+
+  Level 4:
+    Ep 50: mean_50=0.00 lines
+    Reached 1.5 at episode 98
+
+  Level 5:
+    Ep 50: mean_50=0.62 lines
+    Ep 100: mean_50=0.34 lines
+    Reached 1.5 at episode 106
+
+  Level 6:
+    Ep 50: mean_50=0.00 lines
+    Ep 100: mean_50=0.00 lines
+    Ep 150: mean_50=0.32 lines
+    Finished 150 episodes, final=0.00 lines
+
+  Level 7:
+    Ep 50: mean_50=0.00 lines
+    Ep 100: mean_50=0.40 lines
+    Reached 1.5 at episode 112
+
+
+[PROGRESSIVE] Training with weight transfer...
+
+  Level 1:
+    Ep 50: mean_50=0.28 lines
+    Ep 100: mean_50=0.00 lines
+    Ep 150: mean_50=0.00 lines
+    Finished 150 episodes, final=0.00 lines
+
+  Level 2:
+    Transferred weights from level 1
+    Reached 1.5 at episode 20
+
+  Level 3:
+    Transferred weights from level 2
+    Reached 1.5 at episode 20
+
+  Level 4:
+    Transferred weights from level 3
+    Ep 50: mean_50=0.26 lines
+    Reached 1.5 at episode 72
+
+  Level 5:
+    Transferred weights from level 4
+    Ep 50: mean_50=0.66 lines
+    Reached 1.5 at episode 57
+
+  Level 6:
+    Transferred weights from level 5
+    Ep 50: mean_50=0.22 lines
+    Reached 1.5 at episode 99
+
+  Level 7:
+    Transferred weights from level 6
+    Ep 50: mean_50=0.20 lines
+    Ep 100: mean_50=0.24 lines
+    Ep 150: mean_50=0.50 lines
+    Finished 150 episodes, final=0.25 lines
+
+
+======================================================================
+RESULTS: 128 Hidden Units
+======================================================================
+
+Level    Fresh Ep     Prog Ep      Gap        Fresh Mean   Prog Mean   
+----------------------------------------------------------------------
+  1      20           150          -130       90.90        0.00        
+  2      20           20           0          65.40        3.80        
+  3      20           20           0          2.10         2.35        
+  4      98           72           26         1.60         1.60        
+  5      106          57           49         1.85         1.60        
+  6      150          99           51         0.00         1.80        
+  7      112          150          -38        2.00         0.25        
+
+Gap trend:
+  Early levels (L1-L3): -43.3 episodes
+  Later levels (L5-L7): +20.7 episodes
+  Widening: +64.0 episodes
+
+[PASS] COMPOUND LEARNING DETECTED with 128 hidden units!
+
+Total runtime: 2.3 minutes

@@ -1,0 +1,89 @@
+﻿
+≡ƒÄ« Tetris Curriculum Learning Experiment
+======================================================================
+
+  Auditor enabled: checking every 10th episode
+
+  Agent: 18 features ΓåÆ [128] ΓåÆ value
+  Learning rate: 0.005, Gamma: 0.95, Epsilon: 0.2
+
+
+======================================================================
+Level 2: O + I blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I']
+  Episodes: 50, Max pieces: 100
+======================================================================
+
+  Episode  10/50: Lines=2.50┬▒3.01, Reward=-38.02┬▒4.67
+  Episode  20/50: Lines=5.90┬▒2.91, Reward=-38.67┬▒2.56
+  Episode  30/50: Lines=9.70┬▒8.73, Reward=-35.22┬▒5.41
+  Episode  40/50: Lines=7.30┬▒5.42, Reward=-35.65┬▒4.34
+  Episode  50/50: Lines=17.70┬▒13.91, Reward=-28.17┬▒9.77
+
+  Level 2 Summary:
+    Mean lines: 8.62 ┬▒ 9.45
+    Max lines: 45
+    Mean reward: -35.15
+
+  Γ£à Threshold met (8.62 >= 2.00) ΓÇö advancing to level 3
+
+======================================================================
+Level 3: O + I + T blocks
+  Board: 6├ù12
+  Pieces: ['O', 'I', 'T']
+  Episodes: 100, Max pieces: 150
+======================================================================
+
+  Episode  10/100: Lines=0.60┬▒0.80, Reward=-44.53┬▒3.63
+  Episode  20/100: Lines=1.70┬▒2.05, Reward=-44.03┬▒3.60
+  Episode  30/100: Lines=0.90┬▒1.04, Reward=-45.06┬▒2.88
+  Episode  40/100: Lines=0.80┬▒0.98, Reward=-44.09┬▒3.11
+  Episode  50/100: Lines=0.10┬▒0.30, Reward=-46.96┬▒2.03
+  Episode  60/100: Lines=0.90┬▒0.83, Reward=-45.61┬▒2.90
+  Episode  70/100: Lines=0.60┬▒0.80, Reward=-44.79┬▒3.43
+  Episode  80/100: Lines=1.20┬▒1.33, Reward=-43.35┬▒2.22
+  Episode  90/100: Lines=2.10┬▒2.30, Reward=-42.08┬▒2.63
+  Episode 100/100: Lines=1.70┬▒1.90, Reward=-43.94┬▒3.10
+
+  Level 3 Summary:
+    Mean lines: 1.06 ┬▒ 1.50
+    Max lines: 7
+    Mean reward: -44.45
+
+  Γ¥î Threshold not met (1.06 < 3.00) ΓÇö stopping at level 3
+
+======================================================================
+TETRIS CURRICULUM vs DELLACHERIE COMPARISON
+======================================================================
+
+Level    Curriculum      Dellacherie     Gap       
+-------- --------------- --------------- ----------
+2           8.62 ( 45)     0.00           +8.62
+3           1.06 (  7)     0.00           +1.06
+
+======================================================================
+
+  Results saved to: tetris_curriculum_results.json
+
+  Audit saved to: eval_audits\tetris_audit_2_to_4.json
+
+======================================================================
+≡ƒôï EVAL AUDIT REPORT
+======================================================================
+Session ID: 20260220_011955
+Total episodes audited: 15
+Discrepancies found: 0
+Total anomalies: 0
+
+Metric verification:
+  Mean reported lines: 2.53
+  Mean verified lines: 2.53
+  Mean reward gap: 0.000
+
+Γ£à No discrepancies or anomalies detected!
+======================================================================
+
+
+≡ƒÄ« Training complete!
+
