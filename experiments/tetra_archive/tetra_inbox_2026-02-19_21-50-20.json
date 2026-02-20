@@ -1,0 +1,30 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_early_survival_gate",
+    "description": "At level 7, switch to a survival-first placement policy for the first 12 pieces: avoid creating holes and avoid exposing deep wells before any line-clear setup.",
+    "llm_score": 0.81,
+    "llm_priority": "test",
+    "llm_notes": "Level 7 has the weakest stability (avg_height=19.56, avg_holes=59.94), and failure episodes end after avg_pieces=1.0 with avg_holes=90.64. A strict early-game gate targets the immediate-collapse regime before scoring policy can matter.",
+    "game": "tetris"
+  },
+  {
+    "op": "MUTATE",
+    "parent": "tetra_survive_tall_boards",
+    "name": "tetra_survive_tall_boards_hole_cap",
+    "description": "When height > 75%, keep conservative mode but add a hard hole cap: reject placements that increase hole count unless they clear lines immediately.",
+    "llm_score": 0.77,
+    "llm_priority": "test",
+    "llm_notes": "Parent already focuses on tall-board survival. Adding explicit hole-growth control is justified by the failure/success gap (avg_holes 90.64 vs 76.94, delta 13.7) while both operate near terminal height (~19), so hole trajectory is a stronger discriminator than height alone.",
+    "game": "tetris"
+  },
+  {
+    "op": "ADD",
+    "name": "outlier_entry_pattern_replay",
+    "description": "Learn and replay opening-to-midgame board patterns from high-surprise outlier episodes to increase the probability of entering the long-survival mode.",
+    "llm_score": 0.72,
+    "llm_priority": "explore",
+    "llm_notes": "Novelty events at level 7 include 243, 206, and 164 lines (surprise up to 5.75), and top 1% outliers average 183.2 lines vs baseline 2.87. This suggests rare but valid trajectories exist; explicitly modeling their entry conditions should improve consistency.",
+    "game": "tetris"
+  }
+]

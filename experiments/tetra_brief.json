@@ -1,71 +1,71 @@
 {
   "brief_type": "tetra_hypothesis_brief",
-  "generated_at": "2026-02-19 21:13:22",
+  "generated_at": "2026-02-19 21:50:48",
   "game_context": {
     "game": "tetris",
     "levels_trained": [
       {
         "level": 2,
-        "n": 2944,
-        "avg": 34.8984375,
+        "n": 3444,
+        "avg": 36.16144018583043,
         "best": 307,
         "worst": 0,
-        "avg_bump": 1.634850543478261,
-        "avg_holes": 8.567934782608695,
-        "avg_height": 11.511548913043478
+        "avg_bump": 1.7749709639953541,
+        "avg_holes": 9.916085946573752,
+        "avg_height": 11.491289198606271
       },
       {
         "level": 3,
-        "n": 3030,
-        "avg": 58.814851485148516,
-        "best": 395,
+        "n": 3530,
+        "avg": 62.673371104815864,
+        "best": 413,
         "worst": 1,
-        "avg_bump": 2.42013201320132,
-        "avg_holes": 14.703630363036304,
-        "avg_height": 11.476237623762376
+        "avg_bump": 2.384985835694051,
+        "avg_holes": 15.444192634560906,
+        "avg_height": 11.48583569405099
       },
       {
         "level": 4,
-        "n": 2214,
-        "avg": 15.37082204155375,
+        "n": 2714,
+        "avg": 14.987840825350037,
         "best": 129,
         "worst": 1,
-        "avg_bump": 1.2601626016260163,
-        "avg_holes": 28.05103884372177,
-        "avg_height": 13.631436314363144
+        "avg_bump": 1.394620486366986,
+        "avg_holes": 30.47826086956522,
+        "avg_height": 13.60280029476787
       },
       {
         "level": 5,
-        "n": 2301,
-        "avg": 29.222077357670578,
-        "best": 266,
+        "n": 2801,
+        "avg": 30.165655123170296,
+        "best": 364,
         "worst": 1,
-        "avg_bump": 1.193394176445024,
-        "avg_holes": 33.79574098218166,
-        "avg_height": 15.61625380269448
+        "avg_bump": 1.2645483755801499,
+        "avg_holes": 36.37022491967154,
+        "avg_height": 15.61835058907533
       },
       {
         "level": 6,
-        "n": 3710,
-        "avg": 19.0722371967655,
+        "n": 4210,
+        "avg": 18.97790973871734,
         "best": 240,
         "worst": 0,
-        "avg_bump": 1.6964959568733153,
-        "avg_holes": 61.533153638814014,
-        "avg_height": 17.57708894878706
+        "avg_bump": 1.775059382422803,
+        "avg_holes": 63.246555819477436,
+        "avg_height": 17.574821852731592
       },
       {
         "level": 7,
-        "n": 19010,
-        "avg": 16.40410310362967,
+        "n": 21010,
+        "avg": 16.93174678724417,
         "best": 356,
         "worst": 0,
-        "avg_bump": 1.4868490268279853,
-        "avg_holes": 57.424513413992635,
-        "avg_height": 19.580589163598106
+        "avg_bump": 1.526796763445978,
+        "avg_holes": 59.93531651594479,
+        "avg_height": 19.564635887672537
       }
     ],
-    "total_episodes": 33209,
+    "total_episodes": 37709,
     "training_span_days": 367.1
   },
   "hypothesis_ledger": {
@@ -502,26 +502,6 @@
         "updated_at": 1771470445.5717735,
         "bayesian_score": 0.1429,
         "prior_weight": 0.286
-      },
-      {
-        "name": "auto_top_fill",
-        "status": "retired",
-        "win_rate": 0.0,
-        "evidence_count": 501,
-        "confidence": 0.70455,
-        "description": "Auto-discovered: moderately positively correlated with outcome (r=+0.409) \u2014 density of filled cells in the top half of the board. Requires validation.",
-        "metadata": {
-          "source": "auto_metric",
-          "correlation": 0.4091,
-          "mean_val": 0.67,
-          "std_val": 0.093,
-          "discovered_at": "2026-02-19 19:55",
-          "positive_signal": true
-        },
-        "created_at": 1771475991.749805,
-        "updated_at": 1771553018.7839253,
-        "bayesian_score": 0.0398,
-        "prior_weight": 0.056
       }
     ],
     "untested_candidates": [
@@ -638,13 +618,13 @@
         "win_rate": 0.0,
         "evidence_count": 0,
         "confidence": 0.4,
-        "description": "Reduce holes: failure cluster had 89.9 vs success 69.2 avg holes",
+        "description": "Reduce holes: failure cluster had 80.0 vs success 43.4 avg holes (delta=36.6)",
         "metadata": {
           "generated_by": "slow_loop",
-          "hole_delta": 20.700000000000003
+          "hole_delta": 36.6
         },
         "created_at": 1771551978.0401523,
-        "updated_at": 1771551978.0401523,
+        "updated_at": 1771557987.0913293,
         "bayesian_score": 0.4,
         "prior_weight": 1.0
       },
@@ -670,13 +650,13 @@
         "win_rate": 0.0,
         "evidence_count": 0,
         "confidence": 0.4,
-        "description": "Control height: failure cluster had 17.8 vs success 13.8 avg max height",
+        "description": "Control height: failure cluster had 16.3 vs success 12.7 avg max height (delta=3.6)",
         "metadata": {
           "generated_by": "slow_loop",
-          "height_delta": 4.0
+          "height_delta": 3.6
         },
         "created_at": 1771552601.8078332,
-        "updated_at": 1771552601.8078332,
+        "updated_at": 1771557803.3396804,
         "bayesian_score": 0.4,
         "prior_weight": 1.0
       },
@@ -821,9 +801,64 @@
         "updated_at": 1771553463.1599874,
         "bayesian_score": 0.7,
         "prior_weight": 1.0
+      },
+      {
+        "name": "l7_early_survival_gate",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.81,
+        "description": "At level 7, switch to a survival-first placement policy for the first 12 pieces: avoid creating holes and avoid exposing deep wells before any line-clear setup.",
+        "metadata": {
+          "llm_score": 0.81,
+          "llm_priority": "test",
+          "llm_notes": "Level 7 has the weakest stability (avg_height=19.56, avg_holes=59.94), and failure episodes end after avg_pieces=1.0 with avg_holes=90.64. A strict early-game gate targets the immediate-collapse regime before scoring policy can matter.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771559420.114244,
+        "updated_at": 1771559420.111345,
+        "bayesian_score": 0.81,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "tetra_survive_tall_boards_hole_cap",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.77,
+        "description": "When height > 75%, keep conservative mode but add a hard hole cap: reject placements that increase hole count unless they clear lines immediately.",
+        "metadata": {
+          "llm_score": 0.77,
+          "llm_priority": "test",
+          "llm_notes": "Parent already focuses on tall-board survival. Adding explicit hole-growth control is justified by the failure/success gap (avg_holes 90.64 vs 76.94, delta 13.7) while both operate near terminal height (~19), so hole trajectory is a stronger discriminator than height alone.",
+          "source": "tetra_mutation",
+          "parent_name": "tetra_survive_tall_boards"
+        },
+        "created_at": 1771559420.123965,
+        "updated_at": 1771559420.111345,
+        "bayesian_score": 0.77,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "outlier_entry_pattern_replay",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.72,
+        "description": "Learn and replay opening-to-midgame board patterns from high-surprise outlier episodes to increase the probability of entering the long-survival mode.",
+        "metadata": {
+          "llm_score": 0.72,
+          "llm_priority": "explore",
+          "llm_notes": "Novelty events at level 7 include 243, 206, and 164 lines (surprise up to 5.75), and top 1% outliers average 183.2 lines vs baseline 2.87. This suggests rare but valid trajectories exist; explicitly modeling their entry conditions should improve consistency.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771559420.1273513,
+        "updated_at": 1771559420.111345,
+        "bayesian_score": 0.72,
+        "prior_weight": 1.0
       }
     ],
-    "total": 116,
+    "total": 119,
     "key_insight": "Top hypothesis 'maximize_lines' wins 89% of the time after 50 evaluations."
   },
   "failure_patterns": {
@@ -831,7 +866,7 @@
     "avg_lines": 1.0,
     "avg_pieces": 1.0,
     "avg_max_height": 19.0,
-    "avg_holes": 90.76,
+    "avg_holes": 90.64,
     "avg_bumpiness": 3.09,
     "common_fail_modes": {
       "unknown": 100
@@ -839,125 +874,125 @@
     "active_hypotheses_at_failure": {
       "unknown": 100
     },
-    "interpretation": "Failures have avg height=19.0, holes=90.8, bumpiness=3.1. Games end after only 1 pieces."
+    "interpretation": "Failures have avg height=19.0, holes=90.6, bumpiness=3.1. Games end after only 1 pieces."
   },
   "success_patterns": {
     "sample_size": 100,
-    "avg_lines": 64.99,
-    "avg_pieces": 27.35,
-    "avg_max_height": 19.56,
-    "avg_holes": 76.44,
-    "avg_bumpiness": 1.51,
+    "avg_lines": 75.38,
+    "avg_pieces": 31.91,
+    "avg_max_height": 19.63,
+    "avg_holes": 76.94,
+    "avg_bumpiness": 1.38,
     "common_hypotheses": {
       "unknown": 100
     },
-    "interpretation": "Successes have avg height=19.6, holes=76.4, 65 lines avg.",
+    "interpretation": "Successes have avg height=19.6, holes=76.9, 75 lines avg.",
     "delta_vs_failure": {
-      "height_delta": -0.56,
-      "holes_delta": 14.32,
-      "bumpiness_delta": 1.58
+      "height_delta": -0.63,
+      "holes_delta": 13.7,
+      "bumpiness_delta": 1.71
     }
   },
   "success_dissection": {
     "outlier_count": 5,
-    "outlier_threshold_lines": 115,
-    "outlier_avg_lines": 161.4,
-    "baseline_avg_lines": 2.64,
-    "outlier_early_holes": 74.4,
-    "outlier_mid_holes": 74.4,
-    "outlier_late_holes": 85.67,
+    "outlier_threshold_lines": 150,
+    "outlier_avg_lines": 183.2,
+    "baseline_avg_lines": 2.87,
+    "outlier_early_holes": 74.0,
+    "outlier_mid_holes": 74.0,
+    "outlier_late_holes": 74.0,
     "baseline_early_holes": null,
     "baseline_mid_holes": null,
-    "outlier_early_height": 19.4,
+    "outlier_early_height": 19.8,
     "baseline_early_height": null,
-    "interpretation": "Top 1% episodes (5 games, avg 161 lines).\nIf outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\nIf outlier_mid_holes \u2248 baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
+    "interpretation": "Top 1% episodes (5 games, avg 183 lines).\nIf outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\nIf outlier_mid_holes \u2248 baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
   },
   "novelty_events": [
     {
-      "lines": 104,
-      "surprise": 2.99,
-      "episode": 1491,
+      "lines": 164,
+      "surprise": 3.81,
+      "episode": 1967,
       "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
     },
     {
-      "lines": 115,
-      "surprise": 3.56,
-      "episode": 1483,
+      "lines": 127,
+      "surprise": 2.66,
+      "episode": 1929,
       "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
     },
     {
-      "lines": 97,
-      "surprise": 2.77,
-      "episode": 1415,
-      "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
-    },
-    {
-      "lines": 131,
-      "surprise": 3.97,
-      "episode": 1374,
-      "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
-    },
-    {
-      "lines": 103,
-      "surprise": 3.12,
-      "episode": 1364,
-      "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
-    },
-    {
-      "lines": 88,
-      "surprise": 2.76,
-      "episode": 1355,
-      "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
-    },
-    {
-      "lines": 110,
-      "surprise": 2.51,
-      "episode": 1200,
-      "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
-    },
-    {
-      "lines": 192,
+      "lines": 206,
       "surprise": 4.75,
-      "episode": 1172,
+      "episode": 1907,
       "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
     },
     {
-      "lines": 119,
-      "surprise": 3.02,
-      "episode": 1164,
+      "lines": 123,
+      "surprise": 2.72,
+      "episode": 1869,
       "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
     },
     {
-      "lines": 250,
-      "surprise": 6.73,
-      "episode": 1128,
+      "lines": 243,
+      "surprise": 5.75,
+      "episode": 1809,
       "level": 7,
-      "session": "a45ba2ad",
-      "timestamp_str": "2026-02-19 19:56"
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
+    },
+    {
+      "lines": 108,
+      "surprise": 2.66,
+      "episode": 1798,
+      "level": 7,
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
+    },
+    {
+      "lines": 114,
+      "surprise": 2.93,
+      "episode": 1791,
+      "level": 7,
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
+    },
+    {
+      "lines": 132,
+      "surprise": 3.62,
+      "episode": 1784,
+      "level": 7,
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
+    },
+    {
+      "lines": 95,
+      "surprise": 2.6,
+      "episode": 1783,
+      "level": 7,
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
+    },
+    {
+      "lines": 91,
+      "surprise": 2.55,
+      "episode": 1778,
+      "level": 7,
+      "session": "22fa5b15",
+      "timestamp_str": "2026-02-19 21:24"
     }
   ],
   "open_questions": [
-    "Failures have 14.3 more holes on average \u2014 at what hole count does performance collapse?",
-    "13 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
-    "18 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
+    "Failures have 13.7 more holes on average \u2014 at what hole count does performance collapse?",
+    "12 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
+    "21 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
   ],
   "recommended_focus": [
     "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
@@ -1052,5 +1087,5 @@
     "file_path": "experiments/tetra_inbox.json",
     "format": "JSON array (even for a single op)"
   },
-  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 33209 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and open questions above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test using ADD ops, (3) recommend which candidates should be RETIRE'd, (4) optionally MUTATE a weak hypothesis into a stronger variant. Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. See inbox_schema for the exact format."
+  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 37709 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and open questions above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test using ADD ops, (3) recommend which candidates should be RETIRE'd, (4) optionally MUTATE a weak hypothesis into a stronger variant. Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. See inbox_schema for the exact format."
 }

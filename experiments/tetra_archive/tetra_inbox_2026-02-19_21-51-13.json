@@ -1,0 +1,30 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_opening_hole_cap_12",
+    "description": "At level 7, enforce a strict opening policy for the first 12 pieces that rejects placements increasing holes unless they immediately clear a line.",
+    "llm_score": 0.83,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes collapse almost immediately (avg_pieces=1.0) with very high holes (avg_holes=90.64), while successful episodes sustain play with lower holes (76.94). A first-12-piece hole cap targets the early-collapse regime before score optimization matters.",
+    "game": "tetris"
+  },
+  {
+    "op": "ADD",
+    "name": "l7_bumpiness_guardrail",
+    "description": "On level 7, prioritize placements that keep local surface transitions smooth; avoid moves that sharply increase bumpiness unless they clear lines.",
+    "llm_score": 0.76,
+    "llm_priority": "test",
+    "llm_notes": "Bumpiness separates outcomes strongly (failure 3.09 vs success 1.38, delta 1.71). Height is similarly terminal in both groups (~19), so controlling surface volatility is a better discriminator than pure height minimization.",
+    "game": "tetris"
+  },
+  {
+    "op": "MUTATE",
+    "parent": "tetra_survive_tall_boards_hole_cap",
+    "name": "tetra_survive_tall_boards_hole_cap_opening_gate",
+    "description": "Keep the tall-board survival + hole-cap logic, but activate a stricter variant during the opening phase (first 12 pieces) to prevent immediate terminal trajectories.",
+    "llm_score": 0.79,
+    "llm_priority": "test",
+    "llm_notes": "Parent focuses on height>75% states, but current failures die at avg_pieces=1.0, indicating the key decision window is earlier. Novel L7 outliers (164-243 lines, surprise up to 5.75) imply viable trajectories exist if the opening avoids catastrophic early board damage.",
+    "game": "tetris"
+  }
+]
