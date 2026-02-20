@@ -1,6 +1,6 @@
 {
   "brief_type": "tetra_hypothesis_brief",
-  "generated_at": "2026-02-19 20:07:31",
+  "generated_at": "2026-02-19 20:22:50",
   "game_context": {
     "game": "tetris",
     "levels_trained": [
@@ -692,9 +692,58 @@
         },
         "created_at": 1771553048.728848,
         "updated_at": 1771553048.728848
+      },
+      {
+        "name": "your_hypothesis_name_here",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.75,
+        "description": "One or two sentences describing what this hypothesis means strategically.",
+        "metadata": {
+          "llm_score": 0.75,
+          "llm_priority": "explore",
+          "llm_notes": "Why you think this is worth testing \u2014 reference failure clusters, trends, etc.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553463.1613212,
+        "updated_at": 1771553463.1599874
+      },
+      {
+        "name": "second_hypothesis_name",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.65,
+        "description": "Another hypothesis. Put as many of these blocks in the array as you need.",
+        "metadata": {
+          "llm_score": 0.65,
+          "llm_priority": "test",
+          "llm_notes": "Rationale for why this is promising.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553463.16556,
+        "updated_at": 1771553463.1599874
+      },
+      {
+        "name": "new_mutated_hypothesis_name",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.7,
+        "description": "What changed vs the parent hypothesis.",
+        "metadata": {
+          "llm_score": 0.7,
+          "llm_priority": "test",
+          "llm_notes": "Why this mutation is an improvement over the parent.",
+          "source": "tetra_mutation",
+          "parent_name": "name_of_existing_hypothesis_to_mutate_from"
+        },
+        "created_at": 1771553463.1678743,
+        "updated_at": 1771553463.1599874
       }
     ],
-    "total": 113,
+    "total": 116,
     "key_insight": "Top hypothesis 'maximize_lines' wins 89% of the time after 50 evaluations."
   },
   "failure_patterns": {
@@ -814,7 +863,7 @@
   "open_questions": [
     "Failures have 14.3 more holes on average \u2014 at what hole count does performance collapse?",
     "13 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
-    "15 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
+    "18 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
   ],
   "recommended_focus": [
     "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
