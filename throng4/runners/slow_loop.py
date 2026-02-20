@@ -48,6 +48,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(
 
 from throng4.storage.experiment_db import ExperimentDB
 from throng4.storage.policy_pack import PolicyPack, PromotionGates
+try:
+    from throng4.cognition.threat_estimator import ThreatEstimator
+    _THREAT_AVAILABLE = True
+except ImportError:
+    _THREAT_AVAILABLE = False
 
 
 # ── ConsolidationReport ────────────────────────────────────────────────────
@@ -183,6 +188,10 @@ class SlowLoop:
         # Count rejections (all hypotheses - promoted)
         all_hyps = self.db.get_hypotheses(game=self.game or None)
         report.pack_rejected = len(all_hyps) - len(pack.hypotheses)
+
+        # 5b. Auto-retrain ThreatEstimator (nightly/full only)
+        if mode in ('nightly', 'full') and _THREAT_AVAILABLE:
+            self._retrain_threat_estimators(episodes)
 
         report.elapsed_s = time.time() - t_start
 
@@ -393,6 +402,63 @@ class SlowLoop:
                 print(f"  [SlowLoop] LLM callback failed (skipping): {e}")
 
         return candidates
+
+    # ── Step 5b: Auto-retrain ThreatEstimators ────────────────────────────
+
+    def _retrain_threat_estimators(self, episodes: List[Dict],
+                                   min_episodes: int = 500,
+                                   n_train: int = 3000,
+                                   save_dir: str = 'experiments') -> None:
+        """
+        Retrain ThreatEstimator for any level that has >= min_episodes new
+        episodes. Also retrain the universal (all-levels) estimator.
+
+        Skips silently if ThreatEstimator is unavailable or training fails.
+        """
+        # Group by level
+        by_level: Dict[int, int] = defaultdict(int)
+        for ep in episodes:
+            lvl = ep.get('level')
+            if lvl is not None:
+                by_level[int(lvl)] += 1
+
+        retrained = []
+
+        for lvl, count in sorted(by_level.items()):
+            if count < min_episodes:
+                continue
+            path = f'{save_dir}/threat_estimator_L{lvl}.npz'
+            try:
+                te = ThreatEstimator()
+                result = te.train_from_db(
+                    self.db, game=self.game or 'tetris',
+                    n_episodes=n_train, level=lvl, verbose=False,
+                )
+                if 'error' not in result:
+                    te.save(path)
+                    retrained.append(f'L{lvl}(n={count})')
+            except Exception as e:
+                print(f'  [amygdala] L{lvl} retrain failed: {e}')
+
+        # Universal estimator — retrain if any level was retrained
+        if retrained:
+            path = f'{save_dir}/threat_estimator_all.npz'
+            try:
+                te = ThreatEstimator()
+                result = te.train_from_db(
+                    self.db, game=self.game or 'tetris',
+                    n_episodes=n_train, level=None, verbose=False,
+                )
+                if 'error' not in result:
+                    te.save(path)
+                    retrained.append('all')
+            except Exception as e:
+                print(f'  [amygdala] universal retrain failed: {e}')
+
+            print(f'  [amygdala] Retrained estimators: {", ".join(retrained)}')
+        else:
+            print(f'  [amygdala] No estimators retrained '
+                  f'(need >= {min_episodes} new eps per level)')
 
     # ── Step 6: Save report ────────────────────────────────────────────────
 
