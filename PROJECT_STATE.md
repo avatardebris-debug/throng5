@@ -144,7 +144,23 @@ Template entry:
 
 ---
 
-## 8) Current reality check
+## 8) SQLite restart archive (optional but useful)
+
+Created:
+- `state/restart_archive.sqlite`
+- builder: `tools/restart_archive.py`
+
+Use:
+- `python tools/restart_archive.py init`
+- `python tools/restart_archive.py snapshot --summary "<what changed>"`
+
+What it stores:
+- snapshots (`git commit`, branch, timestamp, summary)
+- high-value context files (restart reading order)
+- key decisions/checkpoints
+- quick commands for recovery/debug
+
+## 9) Current reality check
 
 Repo is powerful but noisy (11k+ files + historical copies). The right strategy is:
 - stabilize runtime contracts first (done)
