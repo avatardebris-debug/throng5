@@ -222,9 +222,10 @@ class ExperimentDB:
         now = time.time()
         c = self.conn.cursor()
 
-        # Check if exists by name+game+level
-        c.execute("SELECT id, created_at FROM hypotheses WHERE name = ? AND game = ? AND level = ?",
-                  (name, game, level))
+        # Check if exists by name+game (level is a property of the hypothesis, not its identity key)
+        # Level-scoped hypotheses should use namespaced names: e.g. reduce_holes_L7
+        c.execute("SELECT id, created_at FROM hypotheses WHERE name = ? AND game = ?",
+                  (name, game))
         existing = c.fetchone()
 
         if existing:
