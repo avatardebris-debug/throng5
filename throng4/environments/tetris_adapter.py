@@ -30,18 +30,22 @@ class TetrisAdapter(EnvironmentAdapter):
         [11+W]:  row completeness (avg fill fraction)
     """
     
-    def __init__(self, level: int = 1, max_pieces: int = 500):
+    def __init__(self, level: int = 1, max_pieces: int = 500,
+                 weights=None):
         """
         Initialize Tetris adapter.
-        
+
         Args:
-            level: Curriculum level (1-7)
+            level:      Curriculum level (1-7)
             max_pieces: Max pieces per episode
+            weights:    Optional DellacherieWeights — pass enacted weights here
         """
         super().__init__()
-        self.env = TetrisCurriculumEnv(level=level, max_pieces=max_pieces)
+        self.env = TetrisCurriculumEnv(level=level, max_pieces=max_pieces,
+                                       weights=weights)
         self.level = level
         self.max_pieces = max_pieces
+
         
         # Feature dimensions
         self.board_width = self.env.width

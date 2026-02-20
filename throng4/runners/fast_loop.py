@@ -48,6 +48,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(
 ))))
 
 from throng4.environments.tetris_adapter import TetrisAdapter
+from throng4.environments.tetris_curriculum import DellacherieWeights
 from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 from throng4.storage.experiment_db import ExperimentDB
 from throng4.storage.telemetry_logger import TelemetryLogger
@@ -55,6 +56,11 @@ from throng4.storage.policy_pack import PolicyPack, PromotionGates
 from throng4.storage.auto_metric import AutoMetric
 from throng4.cognition.threat_estimator import ThreatEstimator
 from throng4.cognition.mode_controller import ModeController
+try:
+    from throng4.cognition.enaction_engine import EnactionEngine
+    _ENACTION_AVAILABLE = True
+except ImportError:
+    _ENACTION_AVAILABLE = False
 
 
 # ── Novelty detector ───────────────────────────────────────────────────────
@@ -169,6 +175,14 @@ class FastLoop:
         )
         self._auto_metric_interval = 500
 
+        # EnactionEngine — reads active_enactions.json written by SlowLoop
+        self._enaction: object = None
+        if _ENACTION_AVAILABLE:
+            self._enaction = EnactionEngine()
+            cfg = self._enaction.load()
+            if not cfg.is_identity() and verbose:
+                print(f'  [enaction] Active: {cfg.sources}')
+
 
         # ThreatEstimator + ModeController
         # Try level-specific estimator first, then universal, then None
@@ -201,7 +215,17 @@ class FastLoop:
         """Run one episode. Returns stats dict."""
         self.agent.reset_episode()
         self._mode_ctrl.reset_episode()
-        adapter = TetrisAdapter(level=self.level, max_pieces=self.max_pieces)
+
+        # Build per-episode DellacherieWeights, applying any enacted multipliers
+        weights = DellacherieWeights()
+        if self._enaction is not None:
+            cfg = self._enaction.load()   # cheap: only re-reads if file mtime changed
+            cfg.apply_to_weights(weights)
+        else:
+            cfg = None
+
+        adapter = TetrisAdapter(level=self.level, max_pieces=self.max_pieces,
+                                weights=weights)
         state = adapter.reset()
 
         done           = False
@@ -261,11 +285,22 @@ class FastLoop:
 
             features = feature_fn(action)
             next_state, reward, done, info = adapter.step(action)
+
+            # Apply piece_phase multipliers (e.g. 2x hole penalty for first 12 pieces)
+            # These augment the base reward_weight enactions already baked into weights.
+            if cfg is not None and cfg.piece_phases:
+                pieces_so_far = adapter.env.pieces_placed
+                # Holes increased → negative reward component; scale it up in opening phase
+                holes_mult = cfg.get_phase_multiplier('holes', pieces_so_far)
+                if holes_mult != 1.0 and reward < 0:
+                    reward = reward * holes_mult  # amplify penalty only (don't touch positive)
+
             self.agent.record_step(features, reward)
 
             episode_reward += reward
             steps          += 1
             state           = next_state
+
 
         ep_info = adapter.get_info()
         lines   = ep_info['lines_cleared']
