@@ -169,6 +169,7 @@ class FastLoop:
         )
         self._auto_metric_interval = 500
 
+
         # ThreatEstimator + ModeController
         # Try level-specific estimator first, then universal, then None
         self._threat: Optional[ThreatEstimator] = None
@@ -396,12 +397,14 @@ class FastLoop:
             # Progress print
             if verbose and (ep + 1) % 50 == 0:
                 recent = all_lines[-50:]
-                avg    = sum(recent) / len(recent)
-                best   = max(all_lines)
+                avg        = sum(recent) / len(recent)
+                window_best = max(recent)          # best in this 50-ep window
+                session_best = max(all_lines)      # all-time best this run
                 elapsed = time.time() - t_start
                 eps_per_s = (ep + 1) / elapsed
                 print(f"  Ep {ep+1:>5}/{n_episodes}  "
-                      f"avg={avg:6.1f}  best={best:4d}  "
+                      f"avg={avg:6.1f}  best={window_best:4d}  "
+                      f"(session={session_best})  "
                       f"{eps_per_s:.1f} ep/s")
 
         elapsed = time.time() - t_start

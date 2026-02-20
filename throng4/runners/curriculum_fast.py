@@ -110,13 +110,19 @@ def run_curriculum(
             pack_refresh_interval=200,
         )
 
-        # Transfer weights from previous level if available
+        # Transfer weights from previous level if available.
+        # Note: levels with different board widths have different state sizes,
+        # so weight transfer fails on shape mismatch (e.g. L4 6-wide → L5 8-wide).
+        # This is expected and correct — agent starts fresh at new board width.
         if prev_agent is not None:
             weights_path = f'experiments/weights_L{level - 1}.npz'
             if os.path.exists(weights_path):
                 try:
                     loop.agent.load_weights(weights_path)
                     print(f"  ✓ Loaded weights from L{level - 1}")
+                except ValueError as e:
+                    print(f"  ⚠ L{level-1}→L{level} weight transfer skipped "
+                          f"(board width changed, state size mismatch) — starting fresh")
                 except Exception as e:
                     print(f"  ⚠ Weight load failed: {e} — starting fresh")
 

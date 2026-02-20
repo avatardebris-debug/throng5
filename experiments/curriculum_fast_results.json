@@ -4,82 +4,82 @@
       "level": 2,
       "game": "tetris",
       "episodes": 500,
-      "mean_lines": 7.33,
-      "final_mean_lines": 33.45,
-      "max_lines": 110,
-      "elapsed_s": 11.5,
-      "eps_per_s": 43.3,
-      "pack_version": 6,
-      "session_id": "804cc959"
+      "mean_lines": 43.6,
+      "final_mean_lines": 55.55,
+      "max_lines": 294,
+      "elapsed_s": 20.4,
+      "eps_per_s": 24.5,
+      "pack_version": 20,
+      "session_id": "2c0d1bcc"
     },
     {
       "level": 3,
       "game": "tetris",
       "episodes": 500,
-      "mean_lines": 51.19,
-      "final_mean_lines": 30.65,
-      "max_lines": 291,
-      "elapsed_s": 18.5,
-      "eps_per_s": 27.0,
-      "pack_version": 7,
-      "session_id": "e70a082c"
+      "mean_lines": 86.06,
+      "final_mean_lines": 77.35,
+      "max_lines": 413,
+      "elapsed_s": 32.9,
+      "eps_per_s": 15.2,
+      "pack_version": 21,
+      "session_id": "1875bec6"
     },
     {
       "level": 4,
       "game": "tetris",
       "episodes": 500,
-      "mean_lines": 10.17,
-      "final_mean_lines": 15.8,
-      "max_lines": 119,
-      "elapsed_s": 16.3,
-      "eps_per_s": 30.8,
-      "pack_version": 8,
-      "session_id": "c827afd0"
+      "mean_lines": 13.29,
+      "final_mean_lines": 18.55,
+      "max_lines": 114,
+      "elapsed_s": 18.5,
+      "eps_per_s": 27.1,
+      "pack_version": 22,
+      "session_id": "759d8ed8"
     },
     {
       "level": 5,
       "game": "tetris",
       "episodes": 500,
-      "mean_lines": 29.97,
-      "final_mean_lines": 28.0,
-      "max_lines": 266,
-      "elapsed_s": 17.9,
-      "eps_per_s": 28.0,
-      "pack_version": 9,
-      "session_id": "a6be48f8"
+      "mean_lines": 34.51,
+      "final_mean_lines": 34.0,
+      "max_lines": 364,
+      "elapsed_s": 26.3,
+      "eps_per_s": 19.0,
+      "pack_version": 23,
+      "session_id": "39ff1d00"
     },
     {
       "level": 6,
       "game": "tetris",
       "episodes": 500,
-      "mean_lines": 11.75,
-      "final_mean_lines": 11.1,
-      "max_lines": 115,
-      "elapsed_s": 19.3,
-      "eps_per_s": 25.9,
-      "pack_version": 10,
-      "session_id": "b5eeb4b7"
+      "mean_lines": 18.28,
+      "final_mean_lines": 23.25,
+      "max_lines": 214,
+      "elapsed_s": 24.3,
+      "eps_per_s": 20.5,
+      "pack_version": 24,
+      "session_id": "66841feb"
     },
     {
       "level": 7,
       "game": "tetris",
-      "episodes": 5000,
-      "mean_lines": 11.72,
-      "final_mean_lines": 11.9,
-      "max_lines": 197,
-      "elapsed_s": 109.1,
-      "eps_per_s": 45.8,
-      "pack_version": 11,
-      "session_id": "fdf87acf"
+      "episodes": 2000,
+      "mean_lines": 21.95,
+      "final_mean_lines": 21.3,
+      "max_lines": 279,
+      "elapsed_s": 88.2,
+      "eps_per_s": 22.7,
+      "pack_version": 25,
+      "session_id": "22fa5b15"
     }
   ],
-  "elapsed_s": 193.3,
+  "elapsed_s": 217.6,
   "db_stats": {
-    "total_episodes": 10322,
-    "total_hypotheses": 34,
+    "total_episodes": 37713,
+    "total_hypotheses": 119,
     "total_concepts": 8,
-    "total_events": 406,
-    "total_policy_packs": 12,
+    "total_events": 1666,
+    "total_policy_packs": 26,
     "episodes_by_level": [
       {
         "game": "breakout",
@@ -91,44 +91,44 @@
       {
         "game": "tetris",
         "level": 2,
-        "n": 1444,
-        "avg_lines": 9.84349030470914,
-        "max_lines": 298
+        "n": 3444,
+        "avg_lines": 36.16144018583043,
+        "max_lines": 307
       },
       {
         "game": "tetris",
         "level": 3,
-        "n": 730,
-        "avg_lines": 43.395890410958906,
-        "max_lines": 291
+        "n": 3530,
+        "avg_lines": 62.673371104815864,
+        "max_lines": 413
       },
       {
         "game": "tetris",
         "level": 4,
-        "n": 714,
-        "avg_lines": 12.746498599439775,
+        "n": 2714,
+        "avg_lines": 14.987840825350037,
         "max_lines": 129
       },
       {
         "game": "tetris",
         "level": 5,
-        "n": 710,
-        "avg_lines": 34.153521126760566,
-        "max_lines": 266
+        "n": 2801,
+        "avg_lines": 30.165655123170296,
+        "max_lines": 364
       },
       {
         "game": "tetris",
         "level": 6,
-        "n": 710,
-        "avg_lines": 13.753521126760564,
-        "max_lines": 160
+        "n": 4210,
+        "avg_lines": 18.97790973871734,
+        "max_lines": 240
       },
       {
         "game": "tetris",
         "level": 7,
-        "n": 6010,
-        "avg_lines": 11.765391014975041,
-        "max_lines": 197
+        "n": 21010,
+        "avg_lines": 16.93174678724417,
+        "max_lines": 356
       }
     ],
     "hypotheses": [
@@ -154,6 +154,524 @@
         "evidence_count": 50
       },
       {
+        "name": "auto_agg_height",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6755,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_bot_fill",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.69295,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_bottom_half_mean",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.69295,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_bottom_quarter",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68945,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_bumpiness",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.67725,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_0",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.71305,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7152000000000001,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_3",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.73485,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_4",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.73575,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_6",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6944,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_7",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.71345,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_8",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7586999999999999,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_9",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.718,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_min",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6850499999999999,
+        "evidence_count": 1001
+      },
+      {
+        "name": "auto_col_height_range",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7239,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_height_std",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7219,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_0",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.71665,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.69705,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6862,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_3",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6859500000000001,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_4",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.76355,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_5",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.67565,
+        "evidence_count": 1001
+      },
+      {
+        "name": "auto_col_mean_6",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.67605,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_7",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.683,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_col_mean_9",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.70295,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_entropy",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.74045,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_holes",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6751,
+        "evidence_count": 1001
+      },
+      {
+        "name": "auto_known_bumpiness",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.67725,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_known_holes",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6751,
+        "evidence_count": 1001
+      },
+      {
+        "name": "auto_left_half_mean",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6937,
+        "evidence_count": 1001
+      },
+      {
+        "name": "auto_max_run",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6867,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_mean",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68515,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_n_transitions",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7178,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pct_filled",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68515,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pieces_placed",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.9,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6931,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_10",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.71905,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_13",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.70455,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_14",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.70165,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_15",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7041,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_16",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7102999999999999,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_17",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.73205,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_18",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7737,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_19",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6859,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_20",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.73175,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_21",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.67555,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_22",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68725,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_23",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7686999999999999,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_24",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68545,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_25",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7144,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_26",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.70375,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_27",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7021999999999999,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_28",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.69985,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_29",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6781,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_30",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.72095,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_31",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.72765,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_6",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6793,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_7",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6882,
+        "evidence_count": 1001
+      },
+      {
+        "name": "auto_pos_8",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7973,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_pos_9",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.8019000000000001,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_right_half_mean",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6964,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_row_density_1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.81985,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_row_density_3",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7153,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_row_density_5",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6796,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_row_density_6",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6916,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_row_density_7",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.69415,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_std",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.73985,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_sum",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68515,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_top_fill",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.71455,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_top_half_mean",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.71455,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_top_heaviness",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.8107,
+        "evidence_count": 501
+      },
+      {
+        "name": "auto_top_quarter",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.6962,
+        "evidence_count": 501
+      },
+      {
+        "name": "control_height_v48",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
+        "name": "control_height_v601",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
         "name": "maximize_gain",
         "status": "retired",
         "win_rate": 0.0,
@@ -165,7 +683,7 @@
         "status": "candidate",
         "win_rate": 0.0,
         "confidence": 0.0,
-        "evidence_count": 1800
+        "evidence_count": 1100
       },
       {
         "name": "minimize_cost",
@@ -186,7 +704,7 @@
         "status": "candidate",
         "win_rate": 1.0,
         "confidence": 1.0,
-        "evidence_count": 1788
+        "evidence_count": 1100
       },
       {
         "name": "minimize_v1",
@@ -200,7 +718,7 @@
         "status": "candidate",
         "win_rate": 0.0,
         "confidence": 0.0,
-        "evidence_count": 1046
+        "evidence_count": 346
       },
       {
         "name": "minimize_v3",
@@ -222,6 +740,83 @@
         "win_rate": 0.0364963503649635,
         "confidence": 0.0364963503649635,
         "evidence_count": 137
+      },
+      {
+        "name": "new_mutated_hypothesis_name",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.7,
+        "evidence_count": 0
+      },
+      {
+        "name": "reduce_holes_v48",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
+        "name": "reduce_holes_v535",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
+        "name": "reduce_holes_v58",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
+        "name": "reduce_holes_v601",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
+        "name": "reduce_holes_v978",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.4,
+        "evidence_count": 0
+      },
+      {
+        "name": "second_hypothesis_name",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.65,
+        "evidence_count": 0
+      },
+      {
+        "name": "tetra_holes_early_game",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.72,
+        "evidence_count": 0
+      },
+      {
+        "name": "tetra_reduce_holes_height_gated",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.68,
+        "evidence_count": 0
+      },
+      {
+        "name": "tetra_survive_tall_boards",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.8,
+        "evidence_count": 0
+      },
+      {
+        "name": "your_hypothesis_name_here",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "confidence": 0.75,
+        "evidence_count": 0
       },
       {
         "name": "build_flat",
@@ -372,5 +967,5 @@
       }
     ]
   },
-  "pack_version": 12
+  "pack_version": 26
 }
