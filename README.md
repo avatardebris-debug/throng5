@@ -1,225 +1,145 @@
-# Throng3 — Current State & Resume Guide
+# Throng3 / Throng4 — Resume Guide
 
-> Quick restart pointer: read `PROJECT_STATE.md` first for the current source-of-truth paths/workflow.
+> **Start here after any context reset.** Full state is in `PROJECT_STATE.md`.
 
-## 🎯 Where We Are
-
-**Project**: AI agent learning via curriculum + meta-learning with Tetra integration
-
-**Latest Work** (2026-02-15):
-1. ✅ Built `OpenClawBridge` — real-time communication with Tetra via CLI subprocess
-2. ✅ Live FrozenLake discovery loop — full pipeline test (profiling → attribution → micro-test → Tetra)
-3. ✅ Built `EvalAuditor` — independent reward hacking detection (replays episodes, verifies ground truth)
-4. 🚧 Tetris curriculum training L2-7 (crashed on L4 due to dimension mismatch)
+**Last updated**: 2026-02-20 | **Repo**: `C:\Users\avata\aicompete\throng3`
 
 ---
 
-## 📋 Key Components
+## What This Project Is
 
-### Core Infrastructure
-| Component | Path | Purpose |
-|-----------|------|---------|
-| OpenClaw Bridge | `throng4/llm_policy/openclaw_bridge.py` | Real-time Tetra communication |
-| Eval Auditor | `throng4/llm_policy/eval_auditor.py` | Independent verification (anti-reward-hacking) |
-| Environment Analyzer | `throng4/llm_policy/env_analyzer.py` | Automated env profiling |
-| Attribution Diagnoser | `throng4/llm_policy/attribution.py` | Stochasticity detection |
-| MicroTester | `throng4/llm_policy/micro_tester.py` | Within-episode action probing |
-| Rule Archive | `throng4/llm_policy/rule_archive.py` | SQLite rule storage |
-
-### Training Scripts
-| Script | Purpose |
-|--------|---------|
-| `train_tetris_curriculum.py` | Curriculum learning L1-7 with Tetra + auditor |
-| `live_frozenlake_tetra.py` | FrozenLake discovery loop demo |
-| `test_openclaw_bridge.py` | Bridge integration tests (5 tests, all pass) |
+AI agent that learns across multiple games using:
+- **PortableNNAgent** — value-based DQN with abstract portable features
+- **Abstract feature layer** — fixed 84-dim vector any game maps into (`[core | ext*mask | mask]`)
+- **Tetra** — LLM collaborator generating hypotheses from blind gameplay logs
+- **Blind hypothesis protocol** — Tetra never sees game names; reasons from abstract features only
 
 ---
 
-## 🚀 Quick Resume
+## Right Now: Build Human Play Logger
 
-### 1. Start OpenClaw Gateway (Manual)
-```powershell
-# In a separate terminal:
-openclaw gateway start
+The next thing to implement is the **human play + prioritized replay system**.
+All schemas are already designed and committed:
 
-# Verify:
-openclaw gateway health
-```
+| Schema file | What it defines |
+|-------------|----------------|
+| [`experiments/HUMAN_PLAY_SCHEMA.md`](experiments/HUMAN_PLAY_SCHEMA.md) | JSONL per-timestep format |
+| [`experiments/REPLAY_DB_SCHEMA.sql`](experiments/REPLAY_DB_SCHEMA.sql) | SQLite tables + indexes + views |
 
-**Note**: Gateway does NOT auto-start on boot. Must run manually before using bridge.
+**What to build (in order):**
+1. `throng4/storage/human_play_logger.py` — JSONL writer + SQLite indexer
+2. `throng4/learning/prioritized_replay.py` — replaces uniform ReplayBuffer
+3. Imitation head stub in `PortableNNAgent` (`use_imitation_head` flag)
 
-### 2. Resume Tetris Training
+See **Section 5** of `PROJECT_STATE.md` for full spec.
 
-**What Happened**: Training crashed on Level 4 (feature dimension mismatch: 20 vs 18)
-- L2: 8.50 lines/episode ✅
-- L3: 14.60 lines/episode ✅  
-- L4: Crashed early (board size changed, features changed)
+---
 
-**To Resume**:
-```powershell
-cd c:\Users\avata\aicompete\throng3
-
-# Fix: Train each level separately to avoid dimension issues
-python train_tetris_curriculum.py --tetra --start-level 4 --max-level 4 --output tetris_L4.json
-
-# Then continue:
-python train_tetris_curriculum.py --tetra --start-level 5 --max-level 7 --output tetris_L5_7.json
-```
-
-### 3. Check Previous Results
+## Quick Restart Commands
 
 ```powershell
-# L2-3 successful run:
-cat tetris_levels_2_3.json
+cd C:\Users\avata\aicompete\throng3
 
-# Dellacherie baseline:
-cat dellacherie_results.txt
-
-# Tetra's observations:
-cat C:\Users\avata\.openclaw\workspace\memory\2026-02-15.md
-
-# Audit reports:
-ls eval_audits/
+python -m throng4.config                    # verify paths
+python test_blind_protocol.py               # 11/11 should pass
+git log --oneline -6                        # recent commits
 ```
 
 ---
 
-## ⚠️ Known Issues
+## Key Components
 
-### 1. Feature Dimension Mismatch
-**Problem**: Different Tetris levels have different board sizes → different feature vectors
-- L1-3: 6-wide board = 18 features (6 col heights + 12 Dellacherie)
-- L4+: 8-wide board = 20 features (8 col heights + 12 Dellacherie)
+### Abstract Features (NEW — 2026-02-20)
+| File | Purpose |
+|------|---------|
+| `throng4/learning/abstract_features.py` | 84-dim portable vector, `assert_mask_binary()` |
+| `throng4/environments/adapter.py` | Base adapter + abstract feature protocol |
+| `throng4/environments/tetris_adapter.py` | Tetris → abstract features |
+| `throng4/environments/atari_adapter.py` | Atari/Breakout → abstract features |
 
-**Solution**: Either:
-- Train each level separately with new agent
-- Implement feature padding/projection layer
-- Use fixed-size features independent of board width
+### Blind Hypothesis Pipeline (NEW — 2026-02-20)
+| File | Purpose |
+|------|---------|
+| `throng4/config.py` | All constants: `REQUIRED_HYPOTHESIS_KEYS`, `VALID_GENERALITY_VALUES`, `VALID_DIRECTION_VALUES`, `BLIND_GAME_STRINGS`, `LABEL_REGISTRY_PATH` |
+| `throng4/llm_policy/offline_generator.py` | Blind prompt builder, registry persistence, leak check |
+| `experiments/TETRA_PROMPT.md` | Tetra's full prompt contract (Blind Generalization Mode section) |
+| `generate_blind_logs.py` | Run envs → blind trajectory JSON |
+| `validate_blind_hypotheses.py` | **One-command gate**: validate + ingest + SQLite snapshot |
+| `test_blind_protocol.py` | 11 unit tests — run after any changes to config or generator |
 
-### 2. Audit Anomalies Detected
-The eval auditor found real issues:
-- `LINE_MISMATCH`: Reported lines ≠ verified lines
-- `REWARD_MISMATCH`: Reported reward ≠ actual reward  
-- `SINGLE_ACTION_EXPLOIT`: Agent used only one action
+### Core Learning
+| File | Purpose |
+|------|---------|
+| `throng4/learning/portable_agent.py` | PortableNNAgent: off-policy DQN + ext_noise during training |
+| `throng4/runners/fast_loop.py` | High-speed episode runner (no per-step logging) |
+| `train_tetris_curriculum.py` | Curriculum L1-7 training script |
 
-**This validates the auditor is working!** Means there's either:
-- Bug in reward computation
-- Non-deterministic environment behavior
-- Agent exploiting reward function
-
-### 3. Gateway Requires Manual Start
-**Not a bug, by design**: OpenClaw gateway is a separate service.
-
-**Auto-start (optional)**:
-1. Create `start_gateway.ps1`:
-   ```powershell
-   openclaw gateway start
-   Start-Sleep 3
-   openclaw gateway health
-   ```
-2. Add to Windows startup or create a taskbar shortcut
+### OpenClaw / Tetra Integration
+| File | Purpose |
+|------|---------|
+| `throng4/llm_policy/openclaw_bridge.py` | Real-time Tetra communication |
+| `throng4/llm_policy/eval_auditor.py` | Independent reward hacking detection |
 
 ---
 
-## 📊 Current Metrics
+## Blind Label Registry
 
-### Tetris Performance (L2-3)
-- **L2** (O+I blocks): 8.50 lines/ep (max 50)
-- **L3** (O+I+T blocks): 14.60 lines/ep (max 58)
-- **Dellacherie L7**: 100.94 lines/ep (baseline)
+Tetra-facing anonymization: `tetris` → `Environment-B`, `ALE/Breakout-v5` → `Environment-A`
 
-Gap: 6.8× lower than Dellacherie (expected — we're learning from scratch with fewer episodes)
+Persisted at: `~/.openclaw/workspace/blind_label_registry.json`
 
-### Audit Findings (L2-4 partial)
-- Episodes checked: ~15 (every 10th)
-- Anomalies found: Multiple LINE_MISMATCH and REWARD_MISMATCH
-- Suspicious patterns: Single-action exploits detected
+**Do not delete** — needed for longitudinal cross-session analysis.
 
 ---
 
-## 🔄 Next Conversation Checklist
+## SQLite Databases
 
-When you return:
+| DB path | Contains |
+|---------|----------|
+| `experiments/experiments.db` | Episode logs + `blind_hypothesis_log` table |
+| `experiments/replay_db.sqlite` | **NOT YET CREATED** — human play replay DB (next session) |
 
-1. **Start Gateway**:
-   ```powershell
-   openclaw gateway start
-   openclaw gateway health  # Should see "healthy"
-   ```
-
-2. **Tell me where you want to continue**:
-   - Fix dimension issue and resume Tetris L4-7?
-   - Investigate audit anomalies (reward hacking)?
-   - Move to policy composition (Phase 5)?
-   - Try different game (GridWorld, MountainCar)?
-
-3. **Reference these files**:
-   - This file: `README.md`
-   - Task tracker: `.gemini/antigravity/brain/<conversation-id>/task.md`
-   - Walkthrough: `.gemini/antigravity/brain/<conversation-id>/walkthrough.md`
+Query blind hypothesis log:
+```sql
+SELECT ts, blind_label, total, valid_count, gen_universal, gen_class, gen_instance
+FROM blind_hypothesis_log ORDER BY ts;
+```
 
 ---
 
-## 🗂️ Directory Structure
+## Directory Structure
 
 ```
 throng3/
-├── throng4/
+├── throng4/                          ← active codebase
+│   ├── config.py                     ← ALL path + validation constants
 │   ├── environments/
-│   │   ├── tetris_adapter.py       # Tetris env wrapper
-│   │   ├── tetris_curriculum.py    # Levels 1-7
-│   │   └── gym_envs.py             # FrozenLake, etc.
+│   │   ├── adapter.py                ← base adapter + abstract feature protocol
+│   │   ├── tetris_adapter.py
+│   │   └── atari_adapter.py
 │   ├── learning/
-│   │   └── portable_agent.py       # NN agent
-│   └── llm_policy/
-│       ├── openclaw_bridge.py      # Tetra communication ✨
-│       ├── eval_auditor.py         # Reward hacking detector ✨
-│       ├── env_analyzer.py         # Environment profiling
-│       ├── attribution.py          # Stochasticity diagnosis
-│       ├── micro_tester.py         # Action probing
-│       └── rule_archive.py         # SQLite rule storage
-├── train_tetris_curriculum.py      # Main training script
-├── live_frozenlake_tetra.py        # Demo discovery loop
-├── tetris_levels_2_3.json          # L2-3 results
-├── dellacherie_results.txt         # Baseline
-└── eval_audits/                    # Independent verification logs
+│   │   ├── abstract_features.py      ← 84-dim portable vector
+│   │   └── portable_agent.py         ← DQN agent
+│   ├── llm_policy/
+│   │   ├── offline_generator.py      ← blind hypothesis pipeline
+│   │   ├── openclaw_bridge.py
+│   │   └── eval_auditor.py
+│   ├── runners/
+│   │   └── fast_loop.py
+│   └── storage/
+│       └── [human_play_logger.py]    ← TO BUILD
+├── experiments/
+│   ├── TETRA_PROMPT.md               ← Tetra prompt contract
+│   ├── HUMAN_PLAY_SCHEMA.md          ← JSONL schema (Tetra v1)
+│   └── REPLAY_DB_SCHEMA.sql          ← SQLite DDL
+├── generate_blind_logs.py            ← run envs → blind trajectory JSON
+├── validate_blind_hypotheses.py      ← 4-layer gate + ingest + snapshot
+├── test_blind_protocol.py            ← 11 unit tests
+├── PROJECT_STATE.md                  ← full state (read this for details)
+└── blind_logs/                       ← generated blind trajectory files
+    └── blind_traj_tetris_4ep.json
 ```
 
 ---
 
-## 💾 Tetra's Memory
-
-All discoveries stored at:
-```
-C:\Users\avata\.openclaw\workspace\memory\2026-02-15.md
-```
-
-Tetra has been notified of system reboot. On next conversation, can query:
-```powershell
-openclaw agent --agent main --message "What do you remember about the Tetris curriculum experiment?"
-```
-
----
-
-## 🔧 Quick Fixes Needed
-
-Before next long training run:
-
-1. **Fix dimension issue**:
-   - Option A: Train each level with fresh agent
-   - Option B: Add feature projection layer to handle variable board sizes
-   - Option C: Use board-size-independent features
-
-2. **Investigate audit anomalies**:
-   - Replay failed episodes manually
-   - Check if environment is truly deterministic
-   - Verify reward computation in TetrisAdapter
-
-3. **Optional: Automate gateway**:
-   - Create startup script
-   - Add health check to training script
-
----
-
-**Last Updated**: 2026-02-15 16:28 CST
-**Conversation ID**: 993f7672-2a99-460d-9866-a61ab2026c4a
+**Full detail in**: [`PROJECT_STATE.md`](PROJECT_STATE.md)
