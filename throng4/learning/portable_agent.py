@@ -398,7 +398,9 @@ class PortableNNAgent:
                         target = r - 10.0
                     else:
                         max_q = max(self.forward_target(nx) for nx in next_x_list)
+                        max_q = np.clip(max_q, -500.0, 500.0)   # guard overflow
                         target = r + self.config.gamma * max_q
+                target = np.clip(float(target), -500.0, 500.0)  # final guard
 
                 # Forward pass with optional ext noise
                 x_noisy = self._apply_ext_noise(x)

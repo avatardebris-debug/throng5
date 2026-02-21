@@ -167,6 +167,133 @@ class PrioritizedReplayBuffer:
         )
         self._buffer.append(entry)
 
+    def seed_from_db(
+        self,
+        db_path: str,
+        env_name: str,
+        n_actions: int,
+        max_rows: int = 5000,
+        verbose: bool = True,
+    ) -> int:
+        """
+        Load human play transitions from replay_db.sqlite into the in-memory buffer.
+
+        Feature reconstruction
+        ----------------------
+        The DB stores the raw RAM vector (128 floats) as ``abstract_vec_json``
+        in ``transition_metrics``.  We reconstruct the full agent feature as::
+
+            feat = [ram_vec (128) | one_hot(executed_action, n_actions)]
+
+        For the *next* state we shift by one step: the next row's ``abstract_vec_json``
+        is used, with one feature per possible action (so the agent can score them all).
+        Consecutive transitions within the same episode are matched by step order.
+
+        Parameters
+        ----------
+        db_path   : Path to replay_db.sqlite
+        env_name  : Game ID to filter (e.g. 'ALE/Breakout-v5')
+        n_actions : Action space size — used to build one-hot action encoding
+        max_rows  : Maximum number of transitions to load (newest first)
+        verbose   : Print summary line when done
+
+        Returns
+        -------
+        Number of transitions loaded.
+        """
+        import json as _json
+        import sqlite3 as _sqlite3
+
+        con = _sqlite3.connect(db_path)
+        con.row_factory = _sqlite3.Row
+
+        # Pull: state_vec, next_state_vec (lead by 1 within episode),
+        # executed_action, reward, done, near_death, disagree
+        rows = con.execute("""
+            SELECT
+                t.episode_id,
+                t.step_idx,
+                t.executed_action,
+                t.reward,
+                t.done,
+                t.human_action,
+                t.agent_action,
+                m.near_death_flag,
+                m.human_agent_disagree,
+                m.priority_clipped,
+                m.abstract_vec_json
+            FROM transitions t
+            JOIN transition_metrics m ON m.transition_id = t.id
+            JOIN episodes e ON e.episode_id = t.episode_id
+            JOIN sessions s ON s.session_id = e.session_id
+            WHERE s.env_name = ?
+              AND m.abstract_vec_json IS NOT NULL
+              AND t.executed_action IS NOT NULL
+            ORDER BY t.episode_id, t.step_idx
+        """, (env_name,)).fetchall()
+        con.close()
+
+        if not rows:
+            if verbose:
+                print(f"  [seed_from_db] No rows found for {env_name}")
+            return 0
+
+        # Build per-episode step lookup for next-state matching
+        # key: (episode_id, step_idx) → row
+        lookup: dict = {}
+        for r in rows:
+            lookup[(r["episode_id"], r["step_idx"])] = r
+
+        loaded = 0
+        for r in rows[-max_rows:]:   # newest max_rows
+            try:
+                ram = np.array(_json.loads(r["abstract_vec_json"]),
+                               dtype=np.float32)
+                if len(ram) != 128:
+                    continue
+                # Current feature
+                ah = np.zeros(n_actions, dtype=np.float32)
+                act = int(r["executed_action"])
+                if 0 <= act < n_actions:
+                    ah[act] = 1.0
+                feat = np.concatenate([ram, ah])
+
+                # Next state features (one per possible action for Bellman max)
+                nxt_key = (r["episode_id"], r["step_idx"] + 1)
+                next_feats: List[np.ndarray] = []
+                if nxt_key in lookup and not r["done"]:
+                    nxt_row = lookup[nxt_key]
+                    nxt_vec = nxt_row["abstract_vec_json"]
+                    if nxt_vec:
+                        nxt_ram = np.array(_json.loads(nxt_vec),
+                                           dtype=np.float32)
+                        for a in range(n_actions):
+                            nah = np.zeros(n_actions, dtype=np.float32)
+                            nah[a] = 1.0
+                            nf = np.concatenate([nxt_ram, nah])
+                            if np.isfinite(nf).all():
+                                next_feats.append(nf)
+
+                self.push(
+                    x=feat,
+                    reward=float(r["reward"]),
+                    next_x_list=next_feats,
+                    done=bool(r["done"]),
+                    human_action=r["human_action"],
+                    agent_action=r["agent_action"],
+                    near_death=bool(r["near_death_flag"]),
+                )
+                loaded += 1
+            except Exception:
+                continue
+
+        if verbose:
+            print(f"  [seed_from_db] Loaded {loaded}/{len(rows)} transitions "
+                  f"for {env_name} (buffer size now {len(self._buffer)})")
+        return loaded
+
+
+
     # ------------------------------------------------------------------ #
     # Sample (in-memory path)
     # ------------------------------------------------------------------ #
