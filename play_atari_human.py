@@ -72,32 +72,70 @@ from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 # The dict below maps GAME-ID → { pygame_key_int: action_int }
 # NOOP (action 0) is the fallback for any unmapped key.
 
-def _build_key_map(game_id: str):
-    """Return (keys_to_action dict, action_meanings list)."""
+# ─────────────────────────────────────────────────────────────────────
+# Universal key map — auto-built from ALE action meanings
+# ─────────────────────────────────────────────────────────────────────
+#
+# ALE action names are composed tokens:
+#   Directions : UP  DOWN  LEFT  RIGHT
+#   Diagonal   : UPRIGHT  UPLEFT  DOWNRIGHT  DOWNLEFT
+#   With fire  : FIRE  UPFIRE  RIGHTFIRE ...  UPRIGHTFIRE ...
+#
+# Key layout:
+#   UP → K_UP  |  DOWN → K_DOWN  |  LEFT → K_LEFT
+#   RIGHT → K_RIGHT  |  FIRE → K_SPACE
+#
+# Combos are sorted longest-first so when multiple keys are held,
+# the most specific combo (e.g. UPRIGHTFIRE) wins over subsets.
+
+def _build_key_map_from_meanings(action_meanings: list):
+    """
+    Auto-build {frozenset_of_keys: action_idx} from ALE action name list.
+    """
     import pygame
 
-    if "Breakout" in game_id or "Pong" in game_id or "Tennis" in game_id:
-        return {
-            frozenset([pygame.K_RIGHT]): 2,   # RIGHT
-            frozenset([pygame.K_LEFT]):  3,   # LEFT
-            frozenset([pygame.K_SPACE]): 1,   # FIRE
-        }
-    if "SpaceInvaders" in game_id:
-        return {
-            frozenset([pygame.K_RIGHT, pygame.K_SPACE]): 4,  # RIGHTFIRE
-            frozenset([pygame.K_LEFT,  pygame.K_SPACE]): 5,  # LEFTFIRE
-            frozenset([pygame.K_RIGHT]):                  2,  # RIGHT
-            frozenset([pygame.K_LEFT]):                   3,  # LEFT
-            frozenset([pygame.K_SPACE]):                  1,  # FIRE (stand still)
-        }
-    if "MsPacman" in game_id or "Pacman" in game_id:
-        return {
-            frozenset([pygame.K_UP]):    2,
-            frozenset([pygame.K_DOWN]):  5,
-            frozenset([pygame.K_LEFT]):  3,
-            frozenset([pygame.K_RIGHT]): 4,
-        }
-    # Generic fallback: arrow keys → RIGHT(2) LEFT(3) UP(4) DOWN(5) FIRE=SPACE(1)
+    _TOKEN_KEYS = {
+        "UP":    {pygame.K_UP},
+        "DOWN":  {pygame.K_DOWN},
+        "LEFT":  {pygame.K_LEFT},
+        "RIGHT": {pygame.K_RIGHT},
+        "FIRE":  {pygame.K_SPACE},
+        # Diagonal tokens decompose into two keys
+        "UPRIGHT":   {pygame.K_UP,   pygame.K_RIGHT},
+        "UPLEFT":    {pygame.K_UP,   pygame.K_LEFT},
+        "DOWNRIGHT": {pygame.K_DOWN, pygame.K_RIGHT},
+        "DOWNLEFT":  {pygame.K_DOWN, pygame.K_LEFT},
+    }
+    # Longest tokens first so greedy parse is correct
+    _PARSE_ORDER = sorted(_TOKEN_KEYS, key=len, reverse=True)
+
+    entries: list = []
+    for idx, name in enumerate(action_meanings):
+        if name == "NOOP":
+            continue
+        keys: set = set()
+        rest = name
+        for token in _PARSE_ORDER:
+            if token in rest:
+                keys |= _TOKEN_KEYS[token]
+                rest = rest.replace(token, "", 1)
+        if keys:
+            entries.append((frozenset(keys), idx))
+
+    # Longest combo first — UPRIGHTFIRE wins over UPRIGHT when all keys held
+    entries.sort(key=lambda t: -len(t[0]))
+    return dict(entries)
+
+
+def _build_key_map(game_id: str, env=None):
+    """
+    Build key map for the given game.
+    If env is supplied its action meanings drive the map (always preferred).
+    """
+    if env is not None:
+        return _build_key_map_from_meanings(env.unwrapped.get_action_meanings())
+    # Fallback — only hit if called without env (shouldn't happen in play())
+    import pygame
     return {
         frozenset([pygame.K_RIGHT]): 2,
         frozenset([pygame.K_LEFT]):  3,
@@ -105,6 +143,7 @@ def _build_key_map(game_id: str):
         frozenset([pygame.K_DOWN]):  5,
         frozenset([pygame.K_SPACE]): 1,
     }
+
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -276,7 +315,9 @@ def play(
     font       = pygame.font.SysFont("monospace", 14, bold=True)
     small_font = pygame.font.SysFont("monospace", 12)
 
-    key_map = _build_key_map(game_id)
+    key_map = _build_key_map(game_id, env=env_rgb)
+    # Actions that contain FIRE — these are never throttled (tap actions)
+    fire_actions = {i for i, m in enumerate(action_meanings) if "FIRE" in m}
 
     # ── logger ───────────────────────────────────────────────────────
     logger = HumanPlayLogger()
@@ -358,7 +399,7 @@ def play(
                     raw_action = act
                     break
 
-            if raw_action in (1, 4, 5):   # FIRE, RIGHTFIRE, LEFTFIRE — always immediate
+            if raw_action in fire_actions:   # any FIRE action — always immediate
                 human_action = raw_action
                 _hold_counter = 0
             elif raw_action != 0:        # directional — throttle
