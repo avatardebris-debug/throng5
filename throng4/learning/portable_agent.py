@@ -128,6 +128,8 @@ class PortableNNAgent:
         self._last_x = None
         self._last_h1 = None
         self._last_h2 = None
+        # Training flag — True when inside _train_batch, False otherwise
+        self._training = False
     
     def sync_target_network(self):
         """Synchronize target network with live weights."""
@@ -159,6 +161,24 @@ class PortableNNAgent:
 
         out = self.target_W3 @ h2 + self.target_b3
         return float(out[0])
+
+    def _apply_ext_noise(self, x: np.ndarray) -> np.ndarray:
+        """
+        Apply Gaussian noise to the ext block (indices CORE_SIZE..CORE_SIZE+EXT_MAX)
+        during training so the model does not over-rely on adapter-specific slots.
+        Mask slots are then re-zeroed so the gate stays clean.
+        Only active when self._training is True and ext_noise_std > 0.
+        """
+        if not self._training or self.config.ext_noise_std <= 0.0:
+            return x
+        from throng4.learning.abstract_features import CORE_SIZE, EXT_MAX
+        if len(x) < CORE_SIZE + EXT_MAX * 2:
+            return x  # not an abstract-feature vector — skip
+        x = x.copy()
+        noise = self.rng.randn(EXT_MAX).astype(np.float32) * self.config.ext_noise_std
+        x[CORE_SIZE: CORE_SIZE + EXT_MAX] += noise
+        # Restore mask section (CORE_SIZE+EXT_MAX .. CORE_SIZE+EXT_MAX*2) untouched
+        return x
 
     def forward(self, x: np.ndarray) -> float:
         """
@@ -327,44 +347,45 @@ class PortableNNAgent:
 
         batch = self.replay_buffer.sample(self.config.batch_size)
         total_loss = 0.0
+        self._training = True  # enable ext_noise during this batch
 
-        for x, r, next_x_list, done in batch:
-            # Calculate target via Bellman equation
-            if done:
-                target = r
-            else:
-                if not next_x_list:
-                    target = r - 10.0  # Penalize terminal dead ends
+        try:
+            for x, r, next_x_list, done in batch:
+                # Bellman target (target network — no noise, eval mode)
+                if done:
+                    target = r
                 else:
-                    max_q = max(self.forward_target(nx) for nx in next_x_list)
-                    target = r + self.config.gamma * max_q
+                    if not next_x_list:
+                        target = r - 10.0
+                    else:
+                        max_q = max(self.forward_target(nx) for nx in next_x_list)
+                        target = r + self.config.gamma * max_q
 
-            # Forward pass to cache activations (_last_x, _last_h1, etc)
-            pred = self.forward(x)
+                # Forward pass with optional ext noise
+                x_noisy = self._apply_ext_noise(x)
+                pred = self.forward(x_noisy)
 
-            error = pred - target
-            clipped_error = np.clip(error, -5, 5)
-            total_loss += error ** 2
+                error = pred - target
+                clipped_error = np.clip(error, -5, 5)
+                total_loss += error ** 2
 
-            # Backprop through output layer (W3, b3)
-            self.W3 -= self.config.learning_rate * clipped_error * self._last_h2
-            self.b3 -= self.config.learning_rate * clipped_error
+                # Backprop output layer
+                self.W3 -= self.config.learning_rate * clipped_error * self._last_h2
+                self.b3 -= self.config.learning_rate * clipped_error
 
-            # Gradient into h2 (second hidden layer)
-            dh2 = clipped_error * self.W3[0]  # shape (n_hidden2,)
-            dh2 *= (self._last_h2 > 0)        # ReLU derivative
+                # Backprop second hidden layer
+                dh2 = clipped_error * self.W3[0]
+                dh2 *= (self._last_h2 > 0)
+                self.W2 -= self.config.learning_rate * np.outer(dh2, self._last_h1)
+                self.b2 -= self.config.learning_rate * dh2
 
-            # Backprop second hidden layer (W2, b2)
-            self.W2 -= self.config.learning_rate * np.outer(dh2, self._last_h1)
-            self.b2 -= self.config.learning_rate * dh2
-
-            # Gradient into h1 (first hidden layer)
-            dh1 = self.W2.T @ dh2             # shape (n_hidden,)
-            dh1 *= (self._last_h1 > 0)        # ReLU derivative
-
-            # Backprop first hidden layer (W1, b1)
-            self.W1 -= self.config.learning_rate * np.outer(dh1, self._last_x)
-            self.b1 -= self.config.learning_rate * dh1
+                # Backprop first hidden layer
+                dh1 = self.W2.T @ dh2
+                dh1 *= (self._last_h1 > 0)
+                self.W1 -= self.config.learning_rate * np.outer(dh1, self._last_x)
+                self.b1 -= self.config.learning_rate * dh1
+        finally:
+            self._training = False  # always restore eval mode
 
         self.total_updates += 1
         avg_loss = total_loss / self.config.batch_size

@@ -181,3 +181,37 @@ Step 050 | Action: Right  | Paddle_X: 086, Ball: (195, 179) | Reward: 0.0 | Live
 
 `<-- LIFE LOST` annotations mark the exact step a life was lost.
 
+---
+
+## Blind Generalization Mode
+
+Triggered when the request file header says `# Hypothesis Request — Environment-A` (or B, C, etc.)
+
+The game identity is hidden. You are analyzing abstract gameplay logs only.
+
+### Rules for blind mode
+
+1. **Never guess or name the game.** Reason only from feature names and values in the log.
+2. **Use only abstract vocabulary** in all fields:
+   - `agent` (not paddle, player, ship)
+   - `target` (not ball, enemy, coin)
+   - `resource` (not lives, health, ammo)
+   - `threat_prox` (not ball_y, enemy_distance)
+   - `agent_x`, `agent_y`, `target_x`, `target_y` (ok — these are abstract)
+3. **Tag each hypothesis with `generality`:**
+   - `"universal"` — would be true in any 2D environment with an agent + moving target
+   - `"class"` — true for environments with similar structure (intercept, dodge, stack)
+   - `"instance"` — specific to this particular environment label
+4. **Universal hypotheses are the most valuable.** Push for at least 1–2 per batch.
+
+### Blind log format
+
+```
+Step 050 | act:     2 | agent:(0.54,0.95) target:(0.76,0.70) threat_prox:0.70 reward_prox:0.30 rsrc:0.80 density:0.04 | reward:0.0 | ext_slots:5
+```
+
+Fields: `agent_x/y`, `target_x/y`, `threat_prox`, `reward_prox`, `rsrc`, `density`, `ext_slots`
+
+`<-- RESOURCE LOST` annotations mark exact steps where `rsrc` decreased.
+
+

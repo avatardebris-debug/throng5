@@ -28,11 +28,28 @@ from throng4.llm_policy.openclaw_bridge import OpenClawBridge
 from throng4.llm_policy.hypothesis import DiscoveredRule, RuleLibrary
 
 
+# Stable anonymized labels for blind hypothesis generation
+# Maps real game_id -> Environment-X label so Tetra never sees game names
+_GAME_LABELS: Dict[str, str] = {}
+_LABEL_COUNTER = [0]  # mutable int via list
+
+def _get_blind_label(game_id: str) -> str:
+    """Return a stable anonymous label (Environment-A, -B, ...) for a game_id."""
+    if game_id not in _GAME_LABELS:
+        idx = _LABEL_COUNTER[0]
+        letter = chr(ord('A') + (idx % 26))
+        suffix = '' if idx < 26 else str(idx // 26)
+        _GAME_LABELS[game_id] = f"Environment-{letter}{suffix}"
+        _LABEL_COUNTER[0] += 1
+    return _GAME_LABELS[game_id]
+
+
 class OfflineGenerator:
     """Processes game logs and runs offline hypothesis generation via file handshake."""
 
     def __init__(self, game_id: str, agent_id: str = "main"):
         self.game_id = game_id
+        self.blind_label = _get_blind_label(game_id)  # e.g. "Environment-A"
         self.bridge = OpenClawBridge(game=game_id, agent_id=agent_id)
         self.library = self._load_library()
         ensure_dirs()
@@ -66,46 +83,56 @@ class OfflineGenerator:
         Compress full trajectory to key events:
           - First / last step
           - Steps with reward != 0
-          - Steps where Lives decreases  (<-- LIFE LOST annotated)
+          - Steps where resource count decreases  (<-- RESOURCE LOST annotated)
           - Every 50th step for context
+
+        Prefers `blind_obs` field (abstract format) over `obs` (game-specific)
+        so the compressed log is safe to send to Tetra in blind mode.
         """
         if not trajectory:
             return "Empty trajectory"
 
         key_events = []
-        last_lives: Optional[int] = None
+        last_resource: Optional[float] = None
 
         for i, step_data in enumerate(trajectory):
             step_idx = step_data.get("step", i)
-            obs_str = step_data.get("obs", "")
+            # Prefer blind_obs; fall back to obs for backwards compatibility
+            obs_str = step_data.get("blind_obs") or step_data.get("obs", "")
 
             reward_val = 0.0
-            if "Reward: " in obs_str:
-                try:
-                    reward_val = float(obs_str.split("Reward: ")[1].split("|")[0].strip())
-                except ValueError:
-                    pass
+            for marker in ("reward:", "Reward: "):
+                if marker in obs_str:
+                    try:
+                        reward_val = float(obs_str.split(marker)[1].split("|")[0].strip())
+                        break
+                    except ValueError:
+                        pass
 
-            lives_val = last_lives
-            if "Lives: " in obs_str:
-                try:
-                    lives_val = int(obs_str.split("Lives: ")[1].split("|")[0].strip())
-                except ValueError:
-                    pass
+            # Resource detection: works for both blind_obs (rsrc:) and obs (Lives:)
+            resource_val = last_resource
+            for marker, scale in (("rsrc:", 1.0), ("Lives: ", 0.2)):
+                if marker in obs_str:
+                    try:
+                        resource_val = float(obs_str.split(marker)[1].split()[0].strip())
+                        resource_val *= scale
+                        break
+                    except (ValueError, IndexError):
+                        pass
 
             is_key = (
                 i == 0 or i == len(trajectory) - 1
                 or reward_val != 0.0
                 or step_idx % 50 == 0
             )
-            if last_lives is not None and lives_val != last_lives:
+            if last_resource is not None and resource_val is not None and resource_val < last_resource:
                 is_key = True
-                obs_str += "  <-- LIFE LOST"
+                obs_str += "  <-- RESOURCE LOST"
 
             if is_key:
                 key_events.append(obs_str)
 
-            last_lives = lives_val
+            last_resource = resource_val
 
         return "\n".join(key_events)
 
@@ -113,14 +140,17 @@ class OfflineGenerator:
     # Prompt building
     # ------------------------------------------------------------------
 
-    def _build_prompt(self, game_name: str, log: str, out_path: Path) -> str:
+    def _build_prompt(self, log: str, out_path: Path) -> str:
         """
         Build the full prompt Tetra reads from the request file.
-        Provides absolute output path, atomic-write instruction, and ACK format.
+        Uses blind_label (not game_id) so Tetra never sees the real game name.
+        Includes generality field so hypotheses are tagged for rule-tree placement.
         """
+        label = self.blind_label
         return (
-            f"# Hypothesis Request — {self.game_id}\n\n"
-            f"You are in OFFLINE BATCH MODE. Follow these steps exactly:\n\n"
+            f"# Hypothesis Request — {label}\n\n"
+            f"You are in OFFLINE BATCH MODE. This is a BLIND generalization task.\n"
+            f"You do not know the game name. Reason only from the log data.\n\n"
             f"## Step 1 — Write your response to this EXACT file path:\n"
             f"  {out_path}\n\n"
             f"## Step 2 — Write atomically:\n"
@@ -130,15 +160,20 @@ class OfflineGenerator:
             f"  ACK: WRITTEN {out_path}\n\n"
             f"## Step 4 — JSON schema (top-level key 'hypotheses', list of objects):\n"
             f"  id          (string)  snake_case slug\n"
-            f"  description (string)  one English sentence: what causes what\n"
-            f"  object      (string)  game object: paddle, ball, brick, player\n"
-            f"  feature     (string)  state variable: paddle_x, ball_y, lives\n"
+            f"  description (string)  one English sentence using ABSTRACT terms only\n"
+            f"                        (agent, target, resource, threat — not game names)\n"
+            f"  object      (string)  abstract object: agent, target, threat, resource\n"
+            f"  feature     (string)  abstract state var: agent_x, target_y, rsrc, threat_prox\n"
             f"  direction   (string)  maximize | minimize | increase | decrease | avoid\n"
-            f"  trigger     (string)  what event precedes the reward or life loss\n"
-            f"  confidence  (float)   0.0–1.0\n\n"
-            f"Aim for 3–6 hypotheses. Reference specific step numbers or values.\n\n"
+            f"  trigger     (string)  what event precedes the reward or resource loss\n"
+            f"  confidence  (float)   0.0–1.0\n"
+            f"  generality  (string)  universal | class | instance\n"
+            f"    universal = true for any 2D game with an agent + target\n"
+            f"    class     = true for games with similar structure (e.g. intercept/dodge)\n"
+            f"    instance  = specific to this particular environment\n\n"
+            f"Aim for 3–6 hypotheses. Reference specific step numbers or abstract field values.\n\n"
             f"---\n\n"
-            f"## {game_name} Game Log\n\n"
+            f"## {label} Log\n\n"
             f"{log}\n"
         )
 
@@ -264,13 +299,14 @@ class OfflineGenerator:
         # Where Tetra should write its JSON response (absolute path)
         ts = int(time.time())
         out_path = (MEMORY_DIR / f"hypotheses_{ts}.json").resolve()
-        game_name = self.game_id.split("/")[-1].split("-")[0]
 
-        prompt = self._build_prompt(game_name, compressed, out_path)
+        prompt = self._build_prompt(compressed, out_path)
         req_path = self._write_request_file(prompt)
 
-        print(f"\n📄 Request file : {req_path}")
-        print(f"📥 Output expected: {out_path}")
+        print(f"\n📄 Request file  : {req_path.name}")
+        print(f"📥 Output expected: {out_path.name}")
+        print(f"🔒 Blind label   : {self.blind_label}  (game_id hidden from Tetra)")
+
 
         # Short CLI message — doesn't dump the whole log into chat context
         short_msg = (
