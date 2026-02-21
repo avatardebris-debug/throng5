@@ -229,7 +229,8 @@ def play(
     game_id: str = "ALE/Breakout-v5",
     n_episodes: int = 999,
     fps: int = 30,
-    scale: int = 4,
+    scale_x: int = 5,
+    scale_y: int = 4,
     use_agent: bool = True,
     weights_path: Optional[str] = None,
     near_death_threshold: float = -1.0,
@@ -237,10 +238,12 @@ def play(
     action_hold_frames: int = 4,
 ):
     """
-    action_hold_frames: directional keys (LEFT/RIGHT) only fire every N frames
-    while held.  Frames in between send NOOP so the paddle drifts more slowly.
-    FIRE (SPACE) always fires immediately every frame — it's a tap action.
-    Try --action-hold 2 for faster, 6 for very slow.
+    scale_x / scale_y: independent horizontal and vertical scale factors.
+    Native ALE frame is 160x210 (portrait).  Default 5x / 4y gives 800x840
+    (roughly square), which is more comfortable.
+
+    action_hold_frames: directional keys only fire every N frames while held.
+    FIRE/RIGHTFIRE/LEFTFIRE always fire immediately.
     """
     import pygame
 
@@ -262,11 +265,13 @@ def play(
 
     # ── pygame window ────────────────────────────────────────────────
     pygame.init()
-    HUD_W = 140
-    GFX_W, GFX_H = 160 * scale, 210 * scale
+    HUD_W = 160
+    # Native ALE frame: 160(w) x 210(h)
+    GFX_W = 160 * scale_x
+    GFX_H = 210 * scale_y
     WIN_W = GFX_W + HUD_W
     screen = pygame.display.set_mode((WIN_W, GFX_H))
-    pygame.display.set_caption(f"throng4 human play — {game_id}")
+    pygame.display.set_caption(f"throng4 human play — {game_id}  [{GFX_W}x{GFX_H}]")
     clock = pygame.time.Clock()
     font       = pygame.font.SysFont("monospace", 14, bold=True)
     small_font = pygame.font.SysFont("monospace", 12)
@@ -278,7 +283,8 @@ def play(
     session_id = logger.open_session(
         env_name=game_id,
         source="human_play",
-        config={"fps": fps, "scale": scale, "use_agent": use_agent},
+        config={"fps": fps, "scale_x": scale_x, "scale_y": scale_y,
+                    "use_agent": use_agent},
     )
     print(f"[logger] session_id = {session_id}")
     print(f"[logger] DB → {logger.db_path}")
@@ -333,7 +339,7 @@ def play(
 
             if paused:
                 # Still render but don't step
-                _render(screen, rgb_obs, scale, GFX_W, GFX_H)
+                _render(screen, rgb_obs, scale_x, scale_y, GFX_W, GFX_H)
                 _draw_hud(screen, font, small_font,
                           step_idx, eps_played, total_reward,
                           _lives(ram_obs, game_id),
@@ -397,7 +403,7 @@ def play(
             step_idx += 1
 
             # ── render ────────────────────────────────────────────
-            _render(screen, rgb_obs, scale, GFX_W, GFX_H)
+            _render(screen, rgb_obs, scale_x, scale_y, GFX_W, GFX_H)
             _draw_hud(screen, font, small_font,
                       step_idx, eps_played, total_reward,
                       lives_now,
@@ -435,13 +441,17 @@ def play(
 # Helpers
 # ─────────────────────────────────────────────────────────────────────
 
-def _render(screen, rgb_obs, scale, gfx_w, gfx_h):
-    """Blit scaled RGB observation to the left portion of the window."""
+def _render(screen, rgb_obs, scale_x, scale_y, gfx_w, gfx_h):
+    """
+    Blit the ALE RGB frame to the game area using smoothscale.
+    smoothscale uses bilinear interpolation so small sprites
+    (projectiles, bullets) don't alias to invisible pixels.
+    """
     import pygame
     surf = pygame.surfarray.make_surface(
-        np.transpose(rgb_obs, (1, 0, 2))   # H×W×C → W×H×C
+        np.transpose(rgb_obs, (1, 0, 2))   # H x W x C -> W x H x C
     )
-    surf = pygame.transform.scale(surf, (gfx_w, gfx_h))
+    surf = pygame.transform.smoothscale(surf, (gfx_w, gfx_h))
     screen.blit(surf, (0, 0))
 
 
@@ -471,12 +481,15 @@ def _parse_args():
                    help="Max episodes before auto-quit")
     p.add_argument("--fps",       type=int, default=30,
                    help="Target frame rate")
-    p.add_argument("--scale",     type=int, default=4,
-                   help="Window scale factor (4=640x840, 5=800x1050, 6=960x1260)")
+    p.add_argument("--scale-x",   type=int, default=5, dest="scale_x",
+                   help=("Horizontal scale. Native ALE width=160px. "
+                         "5=800px wide (default)"))
+    p.add_argument("--scale-y",   type=int, default=4, dest="scale_y",
+                   help=("Vertical scale. Native ALE height=210px. "
+                         "4=840px tall (default, ~square with scale-x=5)"))
     p.add_argument("--action-hold", type=int, default=4, dest="action_hold",
-                   help=("Frames a direction key must be held before firing again. "
-                         "Higher = slower/less sensitive paddle. 1=every frame (original), "
-                         "4=default, 8=very slow"))
+                   help=("Directional key repeat delay in frames. "
+                         "1=every frame (touchy), 4=default, 8=very slow"))
     p.add_argument("--seed",      type=int, default=None,
                    help="RNG seed")
     p.add_argument("--weights",   default=None,
@@ -494,7 +507,8 @@ if __name__ == "__main__":
         game_id=args.game,
         n_episodes=args.episodes,
         fps=args.fps,
-        scale=args.scale,
+        scale_x=args.scale_x,
+        scale_y=args.scale_y,
         use_agent=not args.no_agent,
         weights_path=args.weights,
         near_death_threshold=args.near_death_threshold,
