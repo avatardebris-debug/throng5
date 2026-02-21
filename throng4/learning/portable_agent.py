@@ -34,6 +34,12 @@ class AgentConfig:
     lookahead_threshold: int = 30  # Use depth-2 if >30 actions
     target_update_freq: int = 1000 # network sync freq
     train_freq: int = 4            # train every N steps
+    # Abstract feature layer options
+    use_abstract_features: bool = False  # Set True to use 84-dim portable feature space
+    ext_noise_std: float = 0.02          # Gaussian noise on ext block during training
+    #   (prevents over-reliance on any one adapter-specific ext slot)
+    #   Set to 0.0 to disable (e.g. during eval or ablation comparison)
+
 
 class ReplayBuffer:
     """Experience replay buffer for off-policy Q-learning."""

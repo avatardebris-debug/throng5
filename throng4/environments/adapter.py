@@ -1,8 +1,12 @@
 """Base environment adapter for throng3."""
 
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 import numpy as np
+
+from throng4.learning.abstract_features import (
+    AbstractFeature, CORE_SIZE, EXT_MAX, empty_core, make_ext
+)
 
 
 class EnvironmentAdapter(ABC):
@@ -92,3 +96,42 @@ class EnvironmentAdapter(ABC):
             return np.array(obs).flatten()
         else:
             return np.array([obs]).flatten()
+
+    # ------------------------------------------------------------------
+    # Abstract Feature Protocol (two-layer portable representation)
+    # ------------------------------------------------------------------
+
+    def get_core_features(self) -> np.ndarray:
+        """
+        Return the 20-dim universal core vector for the current state.
+        Override in each adapter. Default is all zeros (safe fallback).
+        """
+        return empty_core()
+
+    def get_ext_features(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Return (ext_values, ext_mask) each shape (EXT_MAX,).
+        Override in each adapter to expose game-specific extra features.
+        Default: all zeros / all masked off.
+        """
+        return np.zeros(EXT_MAX, dtype=np.float32), np.zeros(EXT_MAX, dtype=np.float32)
+
+    def get_abstract_features(self, action: int) -> 'AbstractFeature':
+        """
+        Build a full AbstractFeature for the current state + action.
+        Must be called BEFORE step() — same rule as make_features().
+        """
+        core = self.get_core_features()
+        ext, mask = self.get_ext_features()
+        return AbstractFeature(core=core, ext=ext, ext_mask=mask)
+
+    def get_blind_obs_str(self, action: int, reward: float,
+                          action_name: Optional[str] = None) -> str:
+        """
+        Blind semantic log line using abstract field names only.
+        No game-specific names — safe to send to Tetra without revealing game identity.
+        """
+        af = self.get_abstract_features(action)
+        name = action_name or str(action)
+        return af.blind_log_str(action_name=name, reward=reward, step=self.episode_steps)
+

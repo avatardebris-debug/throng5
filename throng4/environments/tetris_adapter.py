@@ -407,3 +407,95 @@ class TetrisAdapter(EnvironmentAdapter):
             'current_piece': self.current_piece,
             'n_valid_actions': len(self.valid_actions)
         }
+
+    # ------------------------------------------------------------------
+    # Abstract Feature Protocol
+    # ------------------------------------------------------------------
+
+    def get_core_features(self) -> np.ndarray:
+        """
+        Map current Tetris board state to the universal 20-dim core vector.
+
+        agent   = current piece position (col normalized, row from drop sim)
+        target  = best column heuristically (centre of least-hole region)
+        threat  = board saturation (max_height / board_height)
+        density = hole density
+        resource = remaining capacity (1 - saturation)
+        """
+        from throng4.learning.abstract_features import (
+            empty_core, IDX_AGENT_X, IDX_AGENT_Y, IDX_TARGET_X, IDX_TARGET_Y,
+            IDX_THREAT_PROX, IDX_REWARD_PROX, IDX_RESOURCE,
+            IDX_DENSITY, IDX_EPISODE_PROG, IDX_CONTEXT_0, IDX_CONTEXT_1, IDX_CONTEXT_2
+        )
+        core = empty_core()
+
+        board = self.env.board
+        H = float(self.env.height)
+        W = float(self.board_width)
+
+        feats = self._compute_board_features(board)
+        max_h    = feats['max_height'] / H
+        holes    = feats['holes'] / max(W * H * 0.5, 1.0)
+        bump     = feats['bumpiness'] / max(H * (W - 1), 1.0)
+        heights  = feats['heights']
+
+        # agent_x = current piece column (midpoint of valid actions if available)
+        if self.valid_actions:
+            cols = [a[1] for a in self.valid_actions]
+            agent_x = (min(cols) + max(cols)) / 2.0 / W
+        else:
+            agent_x = 0.5
+
+        # agent_y = normalised drop row (approx from max_height)
+        agent_y  = max_h
+
+        # target_x = column with lowest height (where pieces should go)
+        if heights:
+            best_col = int(np.argmin(heights))
+            target_x = best_col / W
+            target_y = heights[best_col] / H
+        else:
+            target_x, target_y = 0.5, 0.0
+
+        # threat_prox: how close we are to the danger ceiling (0=safe, 1=full)
+        threat_prox = max_h
+
+        # reward_prox: proximity to clearing a line (avg row completeness)
+        reward_prox = feats['avg_completeness']
+
+        # resource: remaining column capacity (inverse of average fill)
+        avg_fill    = feats['agg_height'] / max(H * W, 1.0)
+        resource    = 1.0 - avg_fill
+
+        core[IDX_AGENT_X]      = agent_x
+        core[IDX_AGENT_Y]      = agent_y
+        core[IDX_TARGET_X]     = target_x
+        core[IDX_TARGET_Y]     = target_y
+        core[IDX_THREAT_PROX]  = np.clip(threat_prox, 0, 1)
+        core[IDX_REWARD_PROX]  = np.clip(reward_prox, 0, 1)
+        core[IDX_RESOURCE]     = np.clip(resource, 0, 1)
+        core[IDX_DENSITY]      = np.clip(holes, 0, 1)
+        core[IDX_EPISODE_PROG] = min(getattr(self.env, 'pieces_placed', 0) / self.max_pieces, 1.0)
+        core[IDX_CONTEXT_0]    = np.clip(bump, 0, 1)      # bumpiness
+        core[IDX_CONTEXT_1]    = feats['avg_completeness'] # row fill fraction
+        core[IDX_CONTEXT_2]    = min(getattr(self.env, 'lines_cleared', 0) / 10.0, 1.0)
+
+        return core
+
+    def get_ext_features(self):
+        """
+        Tetris extension block: per-column heights (normalized).
+
+        For level 2 (4-wide) to level 7 (8-wide) boards this gives 4–8 slots
+        of detailed column structure — the richest game-specific signal.
+        """
+        from throng4.learning.abstract_features import make_ext
+        board  = self.env.board
+        H      = float(self.env.height)
+        feats  = self._compute_board_features(board)
+        heights_norm = [h / H for h in feats['heights']]
+        # Also append agg_height and bumpiness as the last two ext slots
+        agg_norm  = feats['agg_height'] / max(H * self.board_width, 1.0)
+        bump_norm = feats['bumpiness'] / max(H * (self.board_width - 1), 1.0)
+        return make_ext(heights_norm + [agg_norm, bump_norm])
+

@@ -157,8 +157,93 @@ class AtariAdapter(EnvironmentAdapter):
                     f"Reward: {reward} | Lives: {lives}")
                     
         # Fallback for other games: chunk of changing RAM or just numbers
-        # Typically we'd mapping per-game, for now just basic output
         return f"Step {self.episode_steps} | Action: {act_str} | Reward: {reward} | RAM Hex: {self._raw_ram[:10].hex()}"
+
+    # ------------------------------------------------------------------
+    # Abstract Feature Protocol
+    # ------------------------------------------------------------------
+
+    def get_core_features(self) -> np.ndarray:
+        """
+        Map current Atari RAM state to the universal 20-dim core vector.
+        Breakout-specific RAM indices; other games fall back to safe defaults.
+        """
+        from throng4.learning.abstract_features import (
+            empty_core, IDX_AGENT_X, IDX_AGENT_Y, IDX_TARGET_X, IDX_TARGET_Y,
+            IDX_THREAT_X, IDX_THREAT_Y, IDX_THREAT_PROX, IDX_REWARD_PROX,
+            IDX_TARGET_VX, IDX_TARGET_VY, IDX_RESOURCE, IDX_DENSITY, IDX_EPISODE_PROG
+        )
+        core = empty_core()
+
+        if not hasattr(self, '_raw_ram') or self._raw_ram is None:
+            return core
+
+        ram = self._raw_ram
+
+        if "Breakout" in self.game_id:
+            # Screen is ~160x210 pixels; normalize to [0,1]
+            W, H = 160.0, 210.0
+            paddle_x = ram[72] / W
+            ball_x   = ram[99] / W
+            ball_y   = ram[101] / H
+            lives    = ram[57]
+
+            # Velocity approximation: diff from last obs (we store _prev_ram)
+            prev = getattr(self, '_prev_ram', ram)
+            tvx = np.clip((int(ram[99]) - int(prev[99])) / W, -1, 1)
+            tvy = np.clip((int(ram[101]) - int(prev[101])) / H, -1, 1)
+
+            core[IDX_AGENT_X]     = paddle_x
+            core[IDX_AGENT_Y]     = 0.95          # paddle is at bottom
+            core[IDX_TARGET_X]    = ball_x
+            core[IDX_TARGET_Y]    = ball_y
+            core[IDX_THREAT_X]    = ball_x         # ball is also the threat
+            core[IDX_THREAT_Y]    = ball_y
+            # threat_prox: how close ball is to bottom (paddle zone)
+            core[IDX_THREAT_PROX] = ball_y         # 0=top (safe), 1=bottom (danger)
+            core[IDX_REWARD_PROX] = 1.0 - ball_y  # bricks are at top
+            core[IDX_TARGET_VX]   = tvx
+            core[IDX_TARGET_VY]   = tvy
+            core[IDX_RESOURCE]    = min(lives, 5) / 5.0
+            core[IDX_EPISODE_PROG] = min(self.episode_steps / 1000.0, 1.0)
+
+            # Density: use fraction of RAM bytes that changed (crude activity proxy)
+            changed = np.sum(ram != prev) / 128.0
+            core[IDX_DENSITY] = changed
+
+        # Store previous RAM for velocity estimation
+        self._prev_ram = ram.copy()
+        return core
+
+    def get_ext_features(self):
+        """
+        Breakout-specific extension block (up to EXT_MAX slots).
+        Slots: [fine_ball_x, fine_ball_y, fine_paddle_x, brick_activity, ...]
+        """
+        from throng4.learning.abstract_features import make_ext
+        if not hasattr(self, '_raw_ram') or self._raw_ram is None:
+            from throng4.learning.abstract_features import EXT_MAX
+            import numpy as np
+            return np.zeros(EXT_MAX, np.float32), np.zeros(EXT_MAX, np.float32)
+
+        ram = self._raw_ram
+        if "Breakout" in self.game_id:
+            W, H = 160.0, 210.0
+            # Finer (unnormalized) positions that might help edge-case decisions
+            fine_ball_x   = ram[99] / W
+            fine_ball_y   = ram[101] / H
+            fine_paddle_x = ram[72] / W
+            # Paddle-ball horizontal offset (signed), useful alignment signal
+            align_offset  = (fine_ball_x - fine_paddle_x + 1.0) / 2.0
+            # RAM byte 14 loosely correlates with remaining bricks
+            brick_proxy   = ram[14] / 255.0
+
+            return make_ext([fine_ball_x, fine_ball_y, fine_paddle_x,
+                             align_offset, brick_proxy])
+
+        from throng4.learning.abstract_features import EXT_MAX
+        import numpy as np
+        return np.zeros(EXT_MAX, np.float32), np.zeros(EXT_MAX, np.float32)
 
     def get_lookahead_actions(self, action: int) -> List[int]:
         """
@@ -174,3 +259,4 @@ class AtariAdapter(EnvironmentAdapter):
             'episode_reward': self.episode_reward,
             'episode_steps': self.episode_steps
         }
+
