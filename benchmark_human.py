@@ -243,6 +243,14 @@ def benchmark_game(
         replay_buffer_size=50_000,
         batch_size=64,
         train_freq=4,
+        # ── Human data integration ──────────────────────────────────
+        use_prioritized_replay=True,       # stratified sampling (disagree + near-death)
+        use_imitation_head=True,           # cross-entropy head on frozen backbone
+        imitation_n_actions=n_actions,     # exact action space for this game
+        imitation_lr=0.002,
+        imitation_phase_steps=2000,        # ~2k steps pure imitation before RL kicks in
+        imitation_alpha=0.3,               # Phase 2: 30% imitation, 100% RL
+        rl_beta=1.0,
     )
     agent = PortableNNAgent(n_features, config=cfg, seed=seed_base)
 

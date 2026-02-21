@@ -43,6 +43,11 @@ class AgentConfig:
     use_imitation_head: bool = False     # Enable 2-layer adapter on frozen backbone
     imitation_n_actions: int = 10        # Max action space dimension (padded if smaller)
     imitation_lr: float = 0.001          # Separate LR for imitation head updates
+    # Prioritized replay + composite loss schedule
+    use_prioritized_replay: bool = False  # Swap uniform buffer for PrioritizedReplayBuffer
+    imitation_phase_steps: int = 0        # Steps of pure imitation before RL (Phase 1)
+    imitation_alpha: float = 0.5          # Phase 2 weight on imitation loss
+    rl_beta: float = 1.0                  # Phase 2 weight on RL loss
 
 
 class ReplayBuffer:
@@ -118,8 +123,15 @@ class PortableNNAgent:
         self.best_score = 0
         self.recent_scores = []
         
-        # Replay buffer (Q-learning)
-        self.replay_buffer = ReplayBuffer(self.config.replay_buffer_size, self.rng)
+        # Replay buffer — uniform or prioritized depending on config
+        if self.config.use_prioritized_replay:
+            from throng4.learning.prioritized_replay import PrioritizedReplayBuffer
+            self.replay_buffer = PrioritizedReplayBuffer(
+                capacity=self.config.replay_buffer_size,
+                rng=self.rng,
+            )
+        else:
+            self.replay_buffer = ReplayBuffer(self.config.replay_buffer_size, self.rng)
         
         # Metrics
         self.total_updates = 0
@@ -355,13 +367,28 @@ class PortableNNAgent:
             near_death=near_death,
         )
         self.step_counter += 1
-        
-        # Train prioritized + imitation heads periodically
+
+        # ── Composite loss schedule ──────────────────────────────────
+        # Phase 1 (step_counter < imitation_phase_steps):
+        #   Imitation loss ONLY — backbone learns human moves first.
+        #   RL updates are suppressed; human data steers representations.
+        # Phase 2 (step_counter >= imitation_phase_steps  OR  phase_steps==0):
+        #   beta * L_RL  +  alpha * L_imitation  (if use_imitation_head)
+        in_phase1 = (self.config.imitation_phase_steps > 0 and
+                     self.step_counter < self.config.imitation_phase_steps)
+
         if self.step_counter % self.config.train_freq == 0:
-            self._train_batch()
-            if self.config.use_imitation_head and human_action is not None:
-                self._train_imitation_step(features, human_action)
-            
+            if in_phase1:
+                # Phase 1: imitation only, skip RL
+                if human_action is not None:
+                    self._train_imitation_step(features, human_action)
+            else:
+                # Phase 2 (or no schedule): RL batch, then optional imitation
+                self._train_batch(loss_scale=self.config.rl_beta)
+                if self.config.use_imitation_head and human_action is not None:
+                    self._train_imitation_step(features, human_action,
+                                               loss_scale=self.config.imitation_alpha)
+
         # Update target network
         if self.step_counter % self.config.target_update_freq == 0:
             self.sync_target_network()
@@ -379,8 +406,11 @@ class PortableNNAgent:
         # Decay epsilon
         self.epsilon = max(self.config.epsilon_min, self.epsilon * self.config.epsilon_decay)
     
-    def _train_batch(self):
-        """Train 2-layer network on a batch from replay buffer doing Q-learning."""
+    def _train_batch(self, loss_scale: float = 1.0):
+        """
+        Train on one batch from replay buffer (Q-learning / RL loss).
+        loss_scale: beta weighting for Phase 2 composite loss.
+        """
         if len(self.replay_buffer) < self.config.batch_size:
             return
 
@@ -411,20 +441,21 @@ class PortableNNAgent:
                 total_loss += error ** 2
 
                 # Backprop output layer
-                self.W3 -= self.config.learning_rate * clipped_error * self._last_h2
-                self.b3 -= self.config.learning_rate * clipped_error
+                lr = self.config.learning_rate * loss_scale
+                self.W3 -= lr * clipped_error * self._last_h2
+                self.b3 -= lr * clipped_error
 
                 # Backprop second hidden layer
                 dh2 = clipped_error * self.W3[0]
                 dh2 *= (self._last_h2 > 0)
-                self.W2 -= self.config.learning_rate * np.outer(dh2, self._last_h1)
-                self.b2 -= self.config.learning_rate * dh2
+                self.W2 -= lr * np.outer(dh2, self._last_h1)
+                self.b2 -= lr * dh2
 
                 # Backprop first hidden layer
                 dh1 = self.W2.T @ dh2
                 dh1 *= (self._last_h1 > 0)
-                self.W1 -= self.config.learning_rate * np.outer(dh1, self._last_x)
-                self.b1 -= self.config.learning_rate * dh1
+                self.W1 -= lr * np.outer(dh1, self._last_x)
+                self.b1 -= lr * dh1
         finally:
             self._training = False  # always restore eval mode
 
@@ -468,20 +499,13 @@ class PortableNNAgent:
         logits = self.Wi2 @ self._imitation_last_hi1 + self.bi2
         return logits  # shape: (imitation_n_actions,)
 
-    def _train_imitation_step(self, x: np.ndarray, human_action: int) -> None:
+    def _train_imitation_step(self, x: np.ndarray, human_action: int,
+                               loss_scale: float = 1.0) -> None:
         """
         One gradient step on the imitation head (cross-entropy loss).
 
-        Only ``Wi1``, ``bi1``, ``Wi2``, ``bi2`` are updated — the backbone
-        is frozen during imitation training.
-
-        Parameters
-        ----------
-        x : np.ndarray
-            Abstract feature vector for the current state.
-        human_action : int
-            The action the human player took (target class index).
-            Must be < ``imitation_n_actions``.
+        loss_scale: alpha weighting for Phase 2 composite loss.
+        Only Wi1/bi1/Wi2/bi2 are updated — backbone is frozen.
         """
         if not self.config.use_imitation_head or self.Wi1 is None:
             return
@@ -502,7 +526,7 @@ class PortableNNAgent:
         d_logits = probs.copy()
         d_logits[action_idx] -= 1.0                  # cross-entropy gradient
 
-        lr = self.config.imitation_lr
+        lr = self.config.imitation_lr * loss_scale
 
         # Output layer of imitation head
         hi1 = self._imitation_last_hi1
