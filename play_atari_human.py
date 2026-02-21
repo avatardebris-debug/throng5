@@ -84,9 +84,11 @@ def _build_key_map(game_id: str):
         }
     if "SpaceInvaders" in game_id:
         return {
-            frozenset([pygame.K_RIGHT]): 2,
-            frozenset([pygame.K_LEFT]):  3,
-            frozenset([pygame.K_SPACE]): 1,
+            frozenset([pygame.K_RIGHT, pygame.K_SPACE]): 4,  # RIGHTFIRE
+            frozenset([pygame.K_LEFT,  pygame.K_SPACE]): 5,  # LEFTFIRE
+            frozenset([pygame.K_RIGHT]):                  2,  # RIGHT
+            frozenset([pygame.K_LEFT]):                   3,  # LEFT
+            frozenset([pygame.K_SPACE]):                  1,  # FIRE (stand still)
         }
     if "MsPacman" in game_id or "Pacman" in game_id:
         return {
@@ -350,7 +352,7 @@ def play(
                     raw_action = act
                     break
 
-            if raw_action == 1:          # FIRE — always immediate
+            if raw_action in (1, 4, 5):   # FIRE, RIGHTFIRE, LEFTFIRE — always immediate
                 human_action = raw_action
                 _hold_counter = 0
             elif raw_action != 0:        # directional — throttle
@@ -447,6 +449,8 @@ def _lives(ram_obs, game_id: str) -> int:
     """Extract lives from RAM — game-specific."""
     if "Breakout" in game_id:
         return int(ram_obs[57])
+    if "SpaceInvaders" in game_id:
+        return int(ram_obs[73])   # SI stores lives at byte 73
     if "Pong" in game_id:
         return 0   # Pong has no lives concept
     return 0
