@@ -1,0 +1,241 @@
+{
+  "game_id": "tetris",
+  "episodes": 4,
+  "trajectory": [
+    {
+      "step": 0,
+      "blind_obs": "Step 001 | act:(0, 0) | agent:(0.42,0.08) target:(0.67,0.00) threat_prox:0.08 reward_prox:0.67 rsrc:0.94 density:0.00 | reward:-2.22 | ext_slots:8",
+      "obs": "Step 001 | act:(0, 0) | agent:(0.42,0.08) target:(0.67,0.00) threat_prox:0.08 reward_prox:0.67 rsrc:0.94 density:0.00 | reward:-2.22 | ext_slots:8"
+    },
+    {
+      "step": 1,
+      "blind_obs": "Step 002 | act:(1, 3) | agent:(0.42,0.42) target:(0.67,0.00) threat_prox:0.42 reward_prox:0.27 rsrc:0.89 density:0.00 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 002 | act:(1, 3) | agent:(0.42,0.42) target:(0.67,0.00) threat_prox:0.42 reward_prox:0.27 rsrc:0.89 density:0.00 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 2,
+      "blind_obs": "Step 003 | act:(1, 3) | agent:(0.42,0.75) target:(0.67,0.00) threat_prox:0.75 reward_prox:0.22 rsrc:0.83 density:0.00 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 003 | act:(1, 3) | agent:(0.42,0.75) target:(0.67,0.00) threat_prox:0.75 reward_prox:0.22 rsrc:0.83 density:0.00 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 3,
+      "blind_obs": "Step 004 | act:(0, 2) | agent:(0.33,0.83) target:(0.00,0.08) threat_prox:0.83 reward_prox:0.27 rsrc:0.42 density:0.72 | reward:-23.22 | ext_slots:8",
+      "obs": "Step 004 | act:(0, 2) | agent:(0.33,0.83) target:(0.00,0.08) threat_prox:0.83 reward_prox:0.27 rsrc:0.42 density:0.72 | reward:-23.22 | ext_slots:8"
+    },
+    {
+      "step": 4,
+      "blind_obs": "Step 005 | act:(1, 2) | agent:(0.33,1.00) target:(0.00,0.08) threat_prox:1.00 reward_prox:0.28 rsrc:0.36 density:0.72 | reward:-2.76 | ext_slots:8",
+      "obs": "Step 005 | act:(1, 2) | agent:(0.33,1.00) target:(0.00,0.08) threat_prox:1.00 reward_prox:0.28 rsrc:0.36 density:0.72 | reward:-2.76 | ext_slots:8"
+    },
+    {
+      "step": 5,
+      "blind_obs": "Step 006 | act:(1, 4) | agent:(0.08,1.00) target:(0.00,0.08) threat_prox:1.00 reward_prox:0.33 rsrc:0.31 density:0.72 | reward:-1.6800000000000002 | ext_slots:8",
+      "obs": "Step 006 | act:(1, 4) | agent:(0.08,1.00) target:(0.00,0.08) threat_prox:1.00 reward_prox:0.33 rsrc:0.31 density:0.72 | reward:-1.6800000000000002 | ext_slots:8"
+    },
+    {
+      "step": 6,
+      "blind_obs": "Step 007 | act:(1, 1) | agent:(0.00,1.00) target:(0.00,0.08) threat_prox:1.00 reward_prox:0.39 rsrc:0.25 density:0.72 | reward:-2.04 | ext_slots:8",
+      "obs": "Step 007 | act:(1, 1) | agent:(0.00,1.00) target:(0.00,0.08) threat_prox:1.00 reward_prox:0.39 rsrc:0.25 density:0.72 | reward:-2.04 | ext_slots:8"
+    },
+    {
+      "step": 7,
+      "blind_obs": "Step 008 | act:(0, 0) | agent:(0.08,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.44 rsrc:0.14 density:0.83 | reward:-4.4399999999999995 | ext_slots:8",
+      "obs": "Step 008 | act:(0, 0) | agent:(0.08,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.44 rsrc:0.14 density:0.83 | reward:-4.4399999999999995 | ext_slots:8"
+    },
+    {
+      "step": 8,
+      "blind_obs": "Step 009 | act:(1, 0) | agent:(0.08,1.00) target:(0.17,0.58) threat_prox:1.00 reward_prox:0.50 rsrc:0.08 density:0.83 | reward:-3.76 | ext_slots:8",
+      "obs": "Step 009 | act:(1, 0) | agent:(0.08,1.00) target:(0.17,0.58) threat_prox:1.00 reward_prox:0.50 rsrc:0.08 density:0.83 | reward:-3.76 | ext_slots:8"
+    },
+    {
+      "step": 9,
+      "blind_obs": "Step 001 | act:(1, 2) | agent:(0.42,0.33) target:(0.00,0.00) threat_prox:0.33 reward_prox:0.17 rsrc:0.94 density:0.00 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 001 | act:(1, 2) | agent:(0.42,0.33) target:(0.00,0.00) threat_prox:0.33 reward_prox:0.17 rsrc:0.94 density:0.00 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 10,
+      "blind_obs": "Step 002 | act:(1, 2) | agent:(0.42,0.67) target:(0.00,0.00) threat_prox:0.67 reward_prox:0.17 rsrc:0.89 density:0.00 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 002 | act:(1, 2) | agent:(0.42,0.67) target:(0.00,0.00) threat_prox:0.67 reward_prox:0.17 rsrc:0.89 density:0.00 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 11,
+      "blind_obs": "Step 003 | act:(1, 2) | agent:(0.33,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.17 rsrc:0.83 density:0.00 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 003 | act:(1, 2) | agent:(0.33,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.17 rsrc:0.83 density:0.00 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 12,
+      "blind_obs": "Step 004 | act:(1, 4) | agent:(0.42,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.22 rsrc:0.78 density:0.00 | reward:-2.4 | ext_slots:8",
+      "obs": "Step 004 | act:(1, 4) | agent:(0.42,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.22 rsrc:0.78 density:0.00 | reward:-2.4 | ext_slots:8"
+    },
+    {
+      "step": 13,
+      "blind_obs": "Step 005 | act:(1, 3) | agent:(0.42,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.28 rsrc:0.72 density:0.00 | reward:-1.32 | ext_slots:8",
+      "obs": "Step 005 | act:(1, 3) | agent:(0.42,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.28 rsrc:0.72 density:0.00 | reward:-1.32 | ext_slots:8"
+    },
+    {
+      "step": 14,
+      "blind_obs": "Step 006 | act:(1, 3) | agent:(0.33,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.33 rsrc:0.67 density:0.00 | reward:-2.04 | ext_slots:8",
+      "obs": "Step 006 | act:(1, 3) | agent:(0.33,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.33 rsrc:0.67 density:0.00 | reward:-2.04 | ext_slots:8"
+    },
+    {
+      "step": 15,
+      "blind_obs": "Step 007 | act:(0, 4) | agent:(0.42,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.39 rsrc:0.61 density:0.00 | reward:-1.6800000000000002 | ext_slots:8",
+      "obs": "Step 007 | act:(0, 4) | agent:(0.42,1.00) target:(0.00,0.00) threat_prox:1.00 reward_prox:0.39 rsrc:0.61 density:0.00 | reward:-1.6800000000000002 | ext_slots:8"
+    },
+    {
+      "step": 16,
+      "blind_obs": "Step 008 | act:(1, 0) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.44 rsrc:0.56 density:0.00 | reward:-2.76 | ext_slots:8",
+      "obs": "Step 008 | act:(1, 0) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.44 rsrc:0.56 density:0.00 | reward:-2.76 | ext_slots:8"
+    },
+    {
+      "step": 17,
+      "blind_obs": "Step 009 | act:(0, 4) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.50 rsrc:0.50 density:0.00 | reward:-1.6800000000000002 | ext_slots:8",
+      "obs": "Step 009 | act:(0, 4) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.50 rsrc:0.50 density:0.00 | reward:-1.6800000000000002 | ext_slots:8"
+    },
+    {
+      "step": 18,
+      "blind_obs": "Step 010 | act:(0, 4) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.56 rsrc:0.44 density:0.00 | reward:-1.6800000000000002 | ext_slots:8",
+      "obs": "Step 010 | act:(0, 4) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.56 rsrc:0.44 density:0.00 | reward:-1.6800000000000002 | ext_slots:8"
+    },
+    {
+      "step": 19,
+      "blind_obs": "Step 011 | act:(0, 4) | agent:(0.25,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.61 rsrc:0.39 density:0.00 | reward:-2.4 | ext_slots:8",
+      "obs": "Step 011 | act:(0, 4) | agent:(0.25,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.61 rsrc:0.39 density:0.00 | reward:-2.4 | ext_slots:8"
+    },
+    {
+      "step": 20,
+      "blind_obs": "Step 012 | act:(1, 3) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.67 rsrc:0.33 density:0.00 | reward:-1.32 | ext_slots:8",
+      "obs": "Step 012 | act:(1, 3) | agent:(0.33,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.67 rsrc:0.33 density:0.00 | reward:-1.32 | ext_slots:8"
+    },
+    {
+      "step": 21,
+      "blind_obs": "Step 013 | act:(1, 4) | agent:(0.08,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.72 rsrc:0.28 density:0.00 | reward:-1.6800000000000002 | ext_slots:8",
+      "obs": "Step 013 | act:(1, 4) | agent:(0.08,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.72 rsrc:0.28 density:0.00 | reward:-1.6800000000000002 | ext_slots:8"
+    },
+    {
+      "step": 22,
+      "blind_obs": "Step 014 | act:(1, 0) | agent:(0.08,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.78 rsrc:0.22 density:0.00 | reward:-2.76 | ext_slots:8",
+      "obs": "Step 014 | act:(1, 0) | agent:(0.08,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.78 rsrc:0.22 density:0.00 | reward:-2.76 | ext_slots:8"
+    },
+    {
+      "step": 23,
+      "blind_obs": "Step 015 | act:(1, 0) | agent:(0.08,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.83 rsrc:0.17 density:0.00 | reward:-3.76 | ext_slots:8",
+      "obs": "Step 015 | act:(1, 0) | agent:(0.08,1.00) target:(0.17,0.00) threat_prox:1.00 reward_prox:0.83 rsrc:0.17 density:0.00 | reward:-3.76 | ext_slots:8"
+    },
+    {
+      "step": 24,
+      "blind_obs": "Step 001 | act:(0, 4) | agent:(0.42,0.17) target:(0.00,0.00) threat_prox:0.17 reward_prox:0.33 rsrc:0.94 density:0.00 | reward:-2.4 | ext_slots:8",
+      "obs": "Step 001 | act:(0, 4) | agent:(0.42,0.17) target:(0.00,0.00) threat_prox:0.17 reward_prox:0.33 rsrc:0.94 density:0.00 | reward:-2.4 | ext_slots:8"
+    },
+    {
+      "step": 25,
+      "blind_obs": "Step 002 | act:(1, 3) | agent:(0.33,0.33) target:(0.00,0.00) threat_prox:0.33 reward_prox:0.33 rsrc:0.89 density:0.00 | reward:-2.76 | ext_slots:8",
+      "obs": "Step 002 | act:(1, 3) | agent:(0.33,0.33) target:(0.00,0.00) threat_prox:0.33 reward_prox:0.33 rsrc:0.89 density:0.00 | reward:-2.76 | ext_slots:8"
+    },
+    {
+      "step": 26,
+      "blind_obs": "Step 003 | act:(1, 3) | agent:(0.33,0.50) target:(0.00,0.00) threat_prox:0.50 reward_prox:0.33 rsrc:0.81 density:0.06 | reward:-4.5 | ext_slots:8",
+      "obs": "Step 003 | act:(1, 3) | agent:(0.33,0.50) target:(0.00,0.00) threat_prox:0.50 reward_prox:0.33 rsrc:0.81 density:0.06 | reward:-4.5 | ext_slots:8"
+    },
+    {
+      "step": 27,
+      "blind_obs": "Step 004 | act:(1, 0) | agent:(0.42,0.50) target:(0.33,0.00) threat_prox:0.50 reward_prox:0.44 rsrc:0.75 density:0.06 | reward:-2.4 | ext_slots:8",
+      "obs": "Step 004 | act:(1, 0) | agent:(0.42,0.50) target:(0.33,0.00) threat_prox:0.50 reward_prox:0.44 rsrc:0.75 density:0.06 | reward:-2.4 | ext_slots:8"
+    },
+    {
+      "step": 28,
+      "blind_obs": "Step 005 | act:(1, 4) | agent:(0.42,0.83) target:(0.33,0.00) threat_prox:0.83 reward_prox:0.33 rsrc:0.69 density:0.06 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 005 | act:(1, 4) | agent:(0.42,0.83) target:(0.33,0.00) threat_prox:0.83 reward_prox:0.33 rsrc:0.69 density:0.06 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 29,
+      "blind_obs": "Step 006 | act:(0, 0) | agent:(0.42,0.83) target:(0.83,0.17) threat_prox:0.83 reward_prox:0.40 rsrc:0.44 density:0.44 | reward:-12.6 | ext_slots:8",
+      "obs": "Step 006 | act:(0, 0) | agent:(0.42,0.83) target:(0.83,0.17) threat_prox:0.83 reward_prox:0.40 rsrc:0.44 density:0.44 | reward:-12.6 | ext_slots:8"
+    },
+    {
+      "step": 30,
+      "blind_obs": "Step 007 | act:(1, 3) | agent:(0.33,0.92) target:(0.83,0.17) threat_prox:0.92 reward_prox:0.42 rsrc:0.39 density:0.44 | reward:-2.4 | ext_slots:8",
+      "obs": "Step 007 | act:(1, 3) | agent:(0.33,0.92) target:(0.83,0.17) threat_prox:0.92 reward_prox:0.42 rsrc:0.39 density:0.44 | reward:-2.4 | ext_slots:8"
+    },
+    {
+      "step": 31,
+      "blind_obs": "Step 008 | act:(1, 4) | agent:(0.08,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.44 rsrc:0.22 density:0.67 | reward:-7.5600000000000005 | ext_slots:8",
+      "obs": "Step 008 | act:(1, 4) | agent:(0.08,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.44 rsrc:0.22 density:0.67 | reward:-7.5600000000000005 | ext_slots:8"
+    },
+    {
+      "step": 32,
+      "blind_obs": "Step 009 | act:(1, 1) | agent:(0.08,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.50 rsrc:0.17 density:0.67 | reward:-2.04 | ext_slots:8",
+      "obs": "Step 009 | act:(1, 1) | agent:(0.08,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.50 rsrc:0.17 density:0.67 | reward:-2.04 | ext_slots:8"
+    },
+    {
+      "step": 33,
+      "blind_obs": "Step 010 | act:(1, 1) | agent:(0.00,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.56 rsrc:0.11 density:0.67 | reward:-2.04 | ext_slots:8",
+      "obs": "Step 010 | act:(1, 1) | agent:(0.00,1.00) target:(0.00,0.58) threat_prox:1.00 reward_prox:0.56 rsrc:0.11 density:0.67 | reward:-2.04 | ext_slots:8"
+    },
+    {
+      "step": 34,
+      "blind_obs": "Step 011 | act:(1, 0) | agent:(0.17,0.92) target:(0.00,0.83) threat_prox:0.92 reward_prox:0.58 rsrc:0.14 density:0.67 | reward:2.5 | ext_slots:8",
+      "obs": "Step 011 | act:(1, 0) | agent:(0.17,0.92) target:(0.00,0.83) threat_prox:0.92 reward_prox:0.58 rsrc:0.14 density:0.67 | reward:2.5 | ext_slots:8"
+    },
+    {
+      "step": 35,
+      "blind_obs": "Step 012 | act:(1, 2) | agent:(0.17,1.00) target:(0.00,0.83) threat_prox:1.00 reward_prox:0.58 rsrc:0.08 density:0.67 | reward:-3.4 | ext_slots:8",
+      "obs": "Step 012 | act:(1, 2) | agent:(0.17,1.00) target:(0.00,0.83) threat_prox:1.00 reward_prox:0.58 rsrc:0.08 density:0.67 | reward:-3.4 | ext_slots:8"
+    },
+    {
+      "step": 36,
+      "blind_obs": "Step 001 | act:(1, 1) | agent:(0.33,0.33) target:(0.00,0.00) threat_prox:0.33 reward_prox:0.17 rsrc:0.94 density:0.00 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 001 | act:(1, 1) | agent:(0.33,0.33) target:(0.00,0.00) threat_prox:0.33 reward_prox:0.17 rsrc:0.94 density:0.00 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 37,
+      "blind_obs": "Step 002 | act:(1, 0) | agent:(0.33,0.50) target:(0.33,0.00) threat_prox:0.50 reward_prox:0.22 rsrc:0.83 density:0.11 | reward:-5.159999999999999 | ext_slots:8",
+      "obs": "Step 002 | act:(1, 0) | agent:(0.33,0.50) target:(0.33,0.00) threat_prox:0.50 reward_prox:0.22 rsrc:0.83 density:0.11 | reward:-5.159999999999999 | ext_slots:8"
+    },
+    {
+      "step": 38,
+      "blind_obs": "Step 003 | act:(1, 2) | agent:(0.42,0.50) target:(0.67,0.00) threat_prox:0.50 reward_prox:0.33 rsrc:0.78 density:0.11 | reward:-2.04 | ext_slots:8",
+      "obs": "Step 003 | act:(1, 2) | agent:(0.42,0.50) target:(0.67,0.00) threat_prox:0.50 reward_prox:0.33 rsrc:0.78 density:0.11 | reward:-2.04 | ext_slots:8"
+    },
+    {
+      "step": 39,
+      "blind_obs": "Step 004 | act:(1, 5) | agent:(0.42,0.50) target:(0.67,0.00) threat_prox:0.50 reward_prox:0.44 rsrc:0.72 density:0.11 | reward:-2.76 | ext_slots:8",
+      "obs": "Step 004 | act:(1, 5) | agent:(0.42,0.50) target:(0.67,0.00) threat_prox:0.50 reward_prox:0.44 rsrc:0.72 density:0.11 | reward:-2.76 | ext_slots:8"
+    },
+    {
+      "step": 40,
+      "blind_obs": "Step 005 | act:(1, 0) | agent:(0.42,0.83) target:(0.67,0.00) threat_prox:0.83 reward_prox:0.33 rsrc:0.67 density:0.11 | reward:-2.76 | ext_slots:8",
+      "obs": "Step 005 | act:(1, 0) | agent:(0.42,0.83) target:(0.67,0.00) threat_prox:0.83 reward_prox:0.33 rsrc:0.67 density:0.11 | reward:-2.76 | ext_slots:8"
+    },
+    {
+      "step": 41,
+      "blind_obs": "Step 006 | act:(1, 3) | agent:(0.33,0.83) target:(0.67,0.00) threat_prox:0.83 reward_prox:0.40 rsrc:0.61 density:0.11 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 006 | act:(1, 3) | agent:(0.33,0.83) target:(0.67,0.00) threat_prox:0.83 reward_prox:0.40 rsrc:0.61 density:0.11 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 42,
+      "blind_obs": "Step 007 | act:(1, 0) | agent:(0.58,1.00) target:(0.67,0.00) threat_prox:1.00 reward_prox:0.39 rsrc:0.50 density:0.22 | reward:-5.88 | ext_slots:8",
+      "obs": "Step 007 | act:(1, 0) | agent:(0.58,1.00) target:(0.67,0.00) threat_prox:1.00 reward_prox:0.39 rsrc:0.50 density:0.22 | reward:-5.88 | ext_slots:8"
+    },
+    {
+      "step": 43,
+      "blind_obs": "Step 008 | act:(1, 3) | agent:(0.50,1.00) target:(0.67,0.00) threat_prox:1.00 reward_prox:0.44 rsrc:0.44 density:0.22 | reward:-3.48 | ext_slots:8",
+      "obs": "Step 008 | act:(1, 3) | agent:(0.50,1.00) target:(0.67,0.00) threat_prox:1.00 reward_prox:0.44 rsrc:0.44 density:0.22 | reward:-3.48 | ext_slots:8"
+    },
+    {
+      "step": 44,
+      "blind_obs": "Step 009 | act:(1, 4) | agent:(0.58,1.00) target:(0.33,0.17) threat_prox:1.00 reward_prox:0.50 rsrc:0.33 density:0.33 | reward:-3.7199999999999998 | ext_slots:8",
+      "obs": "Step 009 | act:(1, 4) | agent:(0.58,1.00) target:(0.33,0.17) threat_prox:1.00 reward_prox:0.50 rsrc:0.33 density:0.33 | reward:-3.7199999999999998 | ext_slots:8"
+    },
+    {
+      "step": 45,
+      "blind_obs": "Step 010 | act:(1, 4) | agent:(0.50,1.00) target:(0.33,0.17) threat_prox:1.00 reward_prox:0.56 rsrc:0.28 density:0.33 | reward:-2.04 | ext_slots:8",
+      "obs": "Step 010 | act:(1, 4) | agent:(0.50,1.00) target:(0.33,0.17) threat_prox:1.00 reward_prox:0.56 rsrc:0.28 density:0.33 | reward:-2.04 | ext_slots:8"
+    },
+    {
+      "step": 46,
+      "blind_obs": "Step 011 | act:(1, 3) | agent:(0.50,1.00) target:(0.33,0.17) threat_prox:1.00 reward_prox:0.61 rsrc:0.22 density:0.33 | reward:-3.76 | ext_slots:8",
+      "obs": "Step 011 | act:(1, 3) | agent:(0.50,1.00) target:(0.33,0.17) threat_prox:1.00 reward_prox:0.61 rsrc:0.22 density:0.33 | reward:-3.76 | ext_slots:8"
+    }
+  ]
+}
