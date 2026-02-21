@@ -39,6 +39,10 @@ class AgentConfig:
     ext_noise_std: float = 0.02          # Gaussian noise on ext block during training
     #   (prevents over-reliance on any one adapter-specific ext slot)
     #   Set to 0.0 to disable (e.g. during eval or ablation comparison)
+    # Imitation head
+    use_imitation_head: bool = False     # Enable 2-layer adapter on frozen backbone
+    imitation_n_actions: int = 10        # Max action space dimension (padded if smaller)
+    imitation_lr: float = 0.001          # Separate LR for imitation head updates
 
 
 class ReplayBuffer:
@@ -49,7 +53,8 @@ class ReplayBuffer:
         self.buffer = []
         self.pos = 0
 
-    def push(self, x: np.ndarray, reward: float, next_x_list: List[np.ndarray], done: bool):
+    def push(self, x: np.ndarray, reward: float, next_x_list: List[np.ndarray], done: bool,
+             human_action=None, agent_action=None, near_death: bool = False, novelty_score: float = 0.0):
         transition = (x, reward, next_x_list, done)
         if len(self.buffer) < self.capacity:
             self.buffer.append(transition)
@@ -130,6 +135,21 @@ class PortableNNAgent:
         self._last_h2 = None
         # Training flag — True when inside _train_batch, False otherwise
         self._training = False
+
+        # ---- Imitation head (only allocated when use_imitation_head=True) ----
+        # Architecture: h2 (128-dim, frozen backbone) → 64 → imitation_n_actions
+        # The backbone weights (W1/W2/W3) are NOT updated by imitation training.
+        self.Wi1: Optional[np.ndarray] = None
+        self.bi1: Optional[np.ndarray] = None
+        self.Wi2: Optional[np.ndarray] = None
+        self.bi2: Optional[np.ndarray] = None
+        self._imitation_last_hi1: Optional[np.ndarray] = None
+        if self.config.use_imitation_head:
+            n_act = self.config.imitation_n_actions
+            self.Wi1 = self.rng.randn(64, n_hidden2) * np.sqrt(2.0 / n_hidden2)
+            self.bi1 = np.zeros(64)
+            self.Wi2 = self.rng.randn(n_act, 64) * np.sqrt(2.0 / 64)
+            self.bi2 = np.zeros(n_act)
     
     def sync_target_network(self):
         """Synchronize target network with live weights."""
@@ -306,7 +326,16 @@ class PortableNNAgent:
         
         return score + 0.5 * best_next
     
-    def record_step(self, features: np.ndarray, reward: float, next_features_list: List[np.ndarray], done: bool):
+    def record_step(
+        self,
+        features: np.ndarray,
+        reward: float,
+        next_features_list: List[np.ndarray],
+        done: bool,
+        human_action: Optional[int] = None,
+        agent_action: Optional[int] = None,
+        near_death: bool = False,
+    ):
         """
         Record a step in the replay buffer.
         
@@ -315,13 +344,23 @@ class PortableNNAgent:
             reward: Immediate reward received after transition
             next_features_list: List of feature vectors for all available next actions
             done: Whether the episode ended
+            human_action: Human player's chosen action (for imitation + priority)
+            agent_action: Agent's greedy action (for disagreement signal)
+            near_death: Flag a catastrophic transition (boosts priority)
         """
-        self.replay_buffer.push(features.copy(), reward, next_features_list, done)
+        self.replay_buffer.push(
+            features.copy(), reward, next_features_list, done,
+            human_action=human_action,
+            agent_action=agent_action,
+            near_death=near_death,
+        )
         self.step_counter += 1
         
-        # Train periodically
+        # Train prioritized + imitation heads periodically
         if self.step_counter % self.config.train_freq == 0:
             self._train_batch()
+            if self.config.use_imitation_head and human_action is not None:
+                self._train_imitation_step(features, human_action)
             
         # Update target network
         if self.step_counter % self.config.target_update_freq == 0:
@@ -393,6 +432,107 @@ class PortableNNAgent:
         if len(self.recent_loss) > 50:
             self.recent_loss.pop(0)
     
+    # ------------------------------------------------------------------ #
+    # Imitation head methods
+    # ------------------------------------------------------------------ #
+
+    def _forward_imitation(self, x: np.ndarray) -> Optional[np.ndarray]:
+        """
+        Forward pass through the imitation head.
+
+        Uses the **frozen** backbone (W1, W2) to produce h2, then passes
+        through the two-layer imitation adapter (Wi1, Wi2).
+
+        Returns
+        -------
+        np.ndarray of shape (imitation_n_actions,) if head is enabled,
+        else None.
+        """
+        if not self.config.use_imitation_head or self.Wi1 is None:
+            return None
+
+        # Backbone (frozen — no noise, no gradient)
+        if len(x) > self.n_features:
+            x = x[:self.n_features]
+        elif len(x) < self.n_features:
+            x = np.pad(x, (0, self.n_features - len(x)), mode='constant')
+
+        h1 = np.maximum(0, self.W1 @ x + self.b1)
+        h2 = np.maximum(0, self.W2 @ h1 + self.b2)
+
+        # Imitation adapter
+        zi1 = self.Wi1 @ h2 + self.bi1
+        self._imitation_last_hi1 = np.maximum(0, zi1)
+        logits = self.Wi2 @ self._imitation_last_hi1 + self.bi2
+        return logits  # shape: (imitation_n_actions,)
+
+    def _train_imitation_step(self, x: np.ndarray, human_action: int) -> None:
+        """
+        One gradient step on the imitation head (cross-entropy loss).
+
+        Only ``Wi1``, ``bi1``, ``Wi2``, ``bi2`` are updated — the backbone
+        is frozen during imitation training.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Abstract feature vector for the current state.
+        human_action : int
+            The action the human player took (target class index).
+            Must be < ``imitation_n_actions``.
+        """
+        if not self.config.use_imitation_head or self.Wi1 is None:
+            return
+
+        n_act = self.config.imitation_n_actions
+        action_idx = min(human_action, n_act - 1)  # clamp to valid range
+
+        logits = self._forward_imitation(x)          # also caches _imitation_last_hi1
+        if logits is None or self._imitation_last_hi1 is None:
+            return
+
+        # Softmax + cross-entropy
+        shifted = logits - logits.max()              # numerical stability
+        exp_l = np.exp(shifted)
+        probs = exp_l / exp_l.sum()
+
+        # dL/d_logits = probs - one_hot(human_action)
+        d_logits = probs.copy()
+        d_logits[action_idx] -= 1.0                  # cross-entropy gradient
+
+        lr = self.config.imitation_lr
+
+        # Output layer of imitation head
+        hi1 = self._imitation_last_hi1
+        self.Wi2 -= lr * np.outer(d_logits, hi1)
+        self.bi2 -= lr * d_logits
+
+        # Hidden layer of imitation head
+        d_hi1 = self.Wi2.T @ d_logits
+        d_hi1 *= (hi1 > 0)                           # ReLU mask
+        # Need h2 — re-run backbone (cheap, only two layers)
+        if len(x) > self.n_features:
+            x = x[:self.n_features]
+        elif len(x) < self.n_features:
+            x = np.pad(x, (0, self.n_features - len(x)), mode='constant')
+        h1 = np.maximum(0, self.W1 @ x + self.b1)
+        h2 = np.maximum(0, self.W2 @ h1 + self.b2)
+        self.Wi1 -= lr * np.outer(d_hi1, h2)
+        self.bi1 -= lr * d_hi1
+
+    def get_imitation_logits(self, x: np.ndarray) -> Optional[np.ndarray]:
+        """
+        Return imitation head logits for state *x*, or None if head is disabled.
+
+        Convenience wrapper around ``_forward_imitation`` for external callers
+        (e.g. the human play logger, evaluation scripts).
+        """
+        return self._forward_imitation(x)
+
+    # ------------------------------------------------------------------ #
+    # Weight persistence
+    # ------------------------------------------------------------------ #
+
     def save_weights(self, path: str):
         """
         Save agent weights to file.
@@ -400,8 +540,7 @@ class PortableNNAgent:
         Args:
             path: Path to save weights (will add .npz extension)
         """
-        np.savez(
-            path,
+        save_dict: Dict[str, Any] = dict(
             W1=self.W1,
             b1=self.b1,
             W2=self.W2,
@@ -414,9 +553,14 @@ class PortableNNAgent:
                 'n_hidden2': self.config.n_hidden2,
                 'epsilon': self.epsilon,
                 'episode_count': self.episode_count,
-                'best_score': self.best_score
+                'best_score': self.best_score,
+                'use_imitation_head': self.config.use_imitation_head,
+                'imitation_n_actions': self.config.imitation_n_actions,
             }
         )
+        if self.config.use_imitation_head and self.Wi1 is not None:
+            save_dict.update(Wi1=self.Wi1, bi1=self.bi1, Wi2=self.Wi2, bi2=self.bi2)
+        np.savez(path, **save_dict)
     
     def load_weights(self, path: str):
         """
@@ -444,6 +588,13 @@ class PortableNNAgent:
         self.epsilon = config_dict.get('epsilon', self.epsilon)
         self.episode_count = config_dict.get('episode_count', 0)
         self.best_score = config_dict.get('best_score', 0)
+
+        # Restore imitation head weights if present in checkpoint
+        if 'Wi1' in data and self.config.use_imitation_head:
+            self.Wi1 = data['Wi1']
+            self.bi1 = data['bi1']
+            self.Wi2 = data['Wi2']
+            self.bi2 = data['bi2']
     
     def get_stats(self) -> Dict[str, Any]:
         """Get agent statistics."""
