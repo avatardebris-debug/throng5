@@ -169,3 +169,30 @@ def make_ext(values: list, max_size: int = EXT_MAX
 def empty_core() -> np.ndarray:
     """Return a zeroed core vector. Adapters fill slots by index."""
     return np.zeros(CORE_SIZE, dtype=np.float32)
+
+
+def assert_mask_binary(vec: np.ndarray, label: str = "vector") -> None:
+    """
+    Assert that the mask slice of an abstract feature vector is strictly binary.
+
+    In a valid to_vector() output the mask occupies indices
+    [CORE_SIZE + EXT_MAX : CORE_SIZE + EXT_MAX * 2]  →  [52:84].
+    Any value outside {0.0, 1.0} indicates silent drift (e.g. noisy gradient,
+    wrong slice written to, or non-abstract feature accidentally routed here).
+
+    Call this in training or debug mode, e.g.:
+        assert_mask_binary(phi, label="TetrisAdapter step 5")
+
+    Raises:
+        AssertionError with the bad indices and values.
+    """
+    if len(vec) < CORE_SIZE + EXT_MAX * 2:
+        return  # not an abstract-feature vector — skip silently
+    mask_slice = vec[CORE_SIZE + EXT_MAX: CORE_SIZE + EXT_MAX * 2]
+    bad = np.where(~np.isin(mask_slice, [0.0, 1.0]))[0]
+    assert len(bad) == 0, (
+        f"assert_mask_binary FAILED in {label!r}: "
+        f"mask indices {bad.tolist()} have non-binary values "
+        f"{mask_slice[bad].tolist()} (expected only 0.0 or 1.0)"
+    )
+

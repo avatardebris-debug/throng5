@@ -22,6 +22,7 @@ from typing import Dict, Any, List, Optional
 
 from throng4.config import (
     MEMORY_DIR, RULES_DIR, REQUIRED_HYPOTHESIS_KEYS,
+    VALID_GENERALITY_VALUES, BLIND_GAME_STRINGS, LABEL_REGISTRY_PATH,
     rules_path, ensure_dirs
 )
 from throng4.llm_policy.openclaw_bridge import OpenClawBridge
@@ -33,6 +34,36 @@ from throng4.llm_policy.hypothesis import DiscoveredRule, RuleLibrary
 _GAME_LABELS: Dict[str, str] = {}
 _LABEL_COUNTER = [0]  # mutable int via list
 
+
+def _load_label_registry() -> None:
+    """Load persisted label registry from disk into _GAME_LABELS (on import)."""
+    if LABEL_REGISTRY_PATH.exists():
+        try:
+            data = json.loads(LABEL_REGISTRY_PATH.read_text(encoding="utf-8"))
+            _GAME_LABELS.update(data.get("labels", {}))
+            # Restore counter to one past the highest assigned index
+            if _GAME_LABELS:
+                max_letter = max(
+                    ord(v.replace("Environment-", "")[0]) - ord('A')
+                    for v in _GAME_LABELS.values()
+                )
+                _LABEL_COUNTER[0] = max(max_letter + 1, _LABEL_COUNTER[0])
+        except Exception:
+            pass  # Corrupt registry — start fresh
+
+
+def _save_label_registry() -> None:
+    """Persist the current label registry to disk."""
+    try:
+        LABEL_REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        LABEL_REGISTRY_PATH.write_text(
+            json.dumps({"labels": dict(_GAME_LABELS)}, indent=2),
+            encoding="utf-8"
+        )
+    except Exception:
+        pass  # Non-fatal — in-memory registry still works
+
+
 def _get_blind_label(game_id: str) -> str:
     """Return a stable anonymous label (Environment-A, -B, ...) for a game_id."""
     if game_id not in _GAME_LABELS:
@@ -41,7 +72,12 @@ def _get_blind_label(game_id: str) -> str:
         suffix = '' if idx < 26 else str(idx // 26)
         _GAME_LABELS[game_id] = f"Environment-{letter}{suffix}"
         _LABEL_COUNTER[0] += 1
+        _save_label_registry()  # persist immediately on new assignment
     return _GAME_LABELS[game_id]
+
+
+# Load on module import so labels from previous runs are restored
+_load_label_registry()
 
 
 class OfflineGenerator:
@@ -147,6 +183,8 @@ class OfflineGenerator:
         Includes generality field so hypotheses are tagged for rule-tree placement.
         """
         label = self.blind_label
+        # Fail-fast: ensure log payload has no game-identity strings before sending
+        self.check_blindness_leak(log, label=f"log payload for {label}")
         return (
             f"# Hypothesis Request — {label}\n\n"
             f"You are in OFFLINE BATCH MODE. This is a BLIND generalization task.\n"
@@ -177,6 +215,8 @@ class OfflineGenerator:
             f"{log}\n"
         )
 
+
+
     # ------------------------------------------------------------------
     # File handshake + polling
     # ------------------------------------------------------------------
@@ -194,7 +234,38 @@ class OfflineGenerator:
             missing = REQUIRED_HYPOTHESIS_KEYS - set(h.keys())
             if missing:
                 errors.append(f"hypothesis[{i}] missing keys: {missing}")
+                continue  # skip value checks if keys are missing
+            # Validate generality value
+            gen = h.get("generality", "")
+            if gen not in VALID_GENERALITY_VALUES:
+                errors.append(
+                    f"hypothesis[{i}] invalid generality {gen!r}: "
+                    f"must be one of {sorted(VALID_GENERALITY_VALUES)}"
+                )
+            # Validate confidence range
+            try:
+                conf = float(h.get("confidence", -1))
+                if not (0.0 <= conf <= 1.0):
+                    errors.append(f"hypothesis[{i}] confidence {conf} out of range [0,1]")
+            except (TypeError, ValueError):
+                errors.append(f"hypothesis[{i}] confidence is not a float")
         return errors
+
+    @staticmethod
+    def check_blindness_leak(payload: str, label: str = "") -> List[str]:
+        """
+        Scan a prompt or log payload for known game-identity strings.
+        Returns list of leaked strings; empty = clean.
+        Call before any text is sent to Tetra in blind mode.
+        """
+        leaks = [s for s in BLIND_GAME_STRINGS if s in payload]
+        if leaks and label:
+            raise RuntimeError(
+                f"🚨 Blindness leak in {label!r}: found banned strings {leaks}\n"
+                f"Strip game-specific terms before sending to Tetra."
+            )
+        return leaks
+
 
     def _parse_ack_path(self, raw_stdout: str) -> Optional[Path]:
         """Extract confirmed path from 'ACK: WRITTEN <path>' in stdout."""

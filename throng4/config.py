@@ -50,7 +50,28 @@ LOGS_DIR: Path = THRONG_ROOT / "atari_logs"
 AUDITS_DIR: Path = THRONG_ROOT / "eval_audits"
 
 # Required JSON keys Tetra must include for a valid hypothesis response
-REQUIRED_HYPOTHESIS_KEYS = {"id", "description", "object", "feature", "direction", "confidence"}
+REQUIRED_HYPOTHESIS_KEYS = {
+    "id", "description", "object", "feature",
+    "direction", "confidence", "trigger", "generality"
+}
+
+# Allowed values for the generality field
+VALID_GENERALITY_VALUES = {"universal", "class", "instance"}
+
+# Strings that must NOT appear in any blind prompt/log payload
+# (used by blindness leak test to catch accidental game identity exposure)
+BLIND_GAME_STRINGS = {
+    "Breakout", "breakout", "Pong", "pong",
+    "SpaceInvaders", "space_invaders", "Tetris", "tetris",
+    "ALE/", "Freeway", "freeway", "MontezumaRevenge",
+    "Paddle", "paddle", "ball", "Ball", "brick", "Brick",   # Breakout
+    "board", "piece", "Board", "Piece",                     # Tetris
+    "Lives", "lives",                                        # lives counter (game-specific)
+    "score", "Score", "enemy", "Enemy",                     # general game-specific terms
+}
+
+# Persistent label registry — survives process restarts for longitudinal analysis
+LABEL_REGISTRY_PATH: Path = OPENCLAW_ROOT / "workspace" / "blind_label_registry.json"
 
 
 def ensure_dirs():
