@@ -348,6 +348,7 @@ def play(
         near_death   = False
 
         pressed_keys: set[int] = set()
+        just_pressed: set[int] = set()   # keys that fired KEYDOWN THIS frame
         human_action = 0   # NOOP until first keypress
         _hold_counter = 0  # frame counter for action throttle
 
@@ -359,6 +360,7 @@ def play(
 
             # ── event handling ────────────────────────────────────
             reset_ep = False
+            just_pressed.clear()   # reset tap-set each frame
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False; break
@@ -370,6 +372,7 @@ def play(
                     if event.key == pygame.K_r:
                         reset_ep = True; break
                     pressed_keys.add(event.key)
+                    just_pressed.add(event.key)  # mark as tapped this frame
                 if event.type == pygame.KEYUP:
                     pressed_keys.discard(event.key)
 
@@ -389,17 +392,29 @@ def play(
                 pygame.display.flip()
                 continue
 
-            # Resolve human action from held keys, with throttle
-            # FIRE (action 1 / SPACE) is always instant.
-            # Directional actions only fire every action_hold_frames frames.
+            # Resolve human action
+            # FIRE-containing actions: tap-mode — require a fresh KEYDOWN this frame.
+            #   Holding SPACE gives exactly one rotate/fire per press, not per frame.
+            # Directional actions: throttle — fire every action_hold_frames while held.
             raw_action = 0   # NOOP
-            fs = frozenset(pressed_keys)
-            for combo, act in key_map.items():
-                if combo.issubset(fs):
-                    raw_action = act
-                    break
 
-            if raw_action in fire_actions:   # any FIRE action — always immediate
+            # Check fire-containing combos first (require just_pressed)
+            fired_this_frame = False
+            for combo, act in key_map.items():
+                if act in fire_actions:
+                    if combo.issubset(pressed_keys) and combo & just_pressed:
+                        raw_action = act
+                        fired_this_frame = True
+                        break
+
+            # If no fire combo, check directional combos (held + throttle)
+            if not fired_this_frame:
+                for combo, act in key_map.items():
+                    if act not in fire_actions and combo.issubset(pressed_keys):
+                        raw_action = act
+                        break
+
+            if fired_this_frame:
                 human_action = raw_action
                 _hold_counter = 0
             elif raw_action != 0:        # directional — throttle
