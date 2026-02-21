@@ -227,12 +227,19 @@ def play(
     game_id: str = "ALE/Breakout-v5",
     n_episodes: int = 999,
     fps: int = 30,
-    scale: int = 3,
+    scale: int = 4,
     use_agent: bool = True,
     weights_path: Optional[str] = None,
     near_death_threshold: float = -1.0,
     seed: Optional[int] = None,
+    action_hold_frames: int = 4,
 ):
+    """
+    action_hold_frames: directional keys (LEFT/RIGHT) only fire every N frames
+    while held.  Frames in between send NOOP so the paddle drifts more slowly.
+    FIRE (SPACE) always fires immediately every frame — it's a tap action.
+    Try --action-hold 2 for faster, 6 for very slow.
+    """
     import pygame
 
     # ── env setup ────────────────────────────────────────────────────
@@ -293,6 +300,7 @@ def play(
 
         pressed_keys: set[int] = set()
         human_action = 0   # NOOP until first keypress
+        _hold_counter = 0  # frame counter for action throttle
 
         print(f"\n[ep {eps_played}] Starting — press SPACE to fire")
 
@@ -332,13 +340,29 @@ def play(
                 pygame.display.flip()
                 continue
 
-            # Resolve human action from held keys
-            human_action = 0   # default NOOP
+            # Resolve human action from held keys, with throttle
+            # FIRE (action 1 / SPACE) is always instant.
+            # Directional actions only fire every action_hold_frames frames.
+            raw_action = 0   # NOOP
             fs = frozenset(pressed_keys)
             for combo, act in key_map.items():
                 if combo.issubset(fs):
-                    human_action = act
+                    raw_action = act
                     break
+
+            if raw_action == 1:          # FIRE — always immediate
+                human_action = raw_action
+                _hold_counter = 0
+            elif raw_action != 0:        # directional — throttle
+                _hold_counter += 1
+                if _hold_counter >= action_hold_frames:
+                    human_action = raw_action
+                    _hold_counter = 0
+                else:
+                    human_action = 0     # NOOP this frame
+            else:
+                human_action = 0
+                _hold_counter = 0
 
             # Execute human action in both envs (keep them in sync)
             rgb_obs, reward, term, trunc, info = env_rgb.step(human_action)
@@ -433,23 +457,30 @@ def _lives(ram_obs, game_id: str) -> int:
 # ─────────────────────────────────────────────────────────────────────
 
 def _parse_args():
-    p = argparse.ArgumentParser(description="Human play recorder for Atari ALE games")
+    p = argparse.ArgumentParser(
+        description="Human play recorder for Atari ALE games",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     p.add_argument("--game",      default="ALE/Breakout-v5",
-                   help="Gymnasium game ID (default: ALE/Breakout-v5)")
+                   help="Gymnasium game ID")
     p.add_argument("--episodes",  type=int, default=999,
-                   help="Max episodes before auto-quit (default: unlimited)")
+                   help="Max episodes before auto-quit")
     p.add_argument("--fps",       type=int, default=30,
-                   help="Target frame rate (default: 30)")
-    p.add_argument("--scale",     type=int, default=3,
-                   help="Window scale factor (default: 3 → 480×630px)")
+                   help="Target frame rate")
+    p.add_argument("--scale",     type=int, default=4,
+                   help="Window scale factor (4=640x840, 5=800x1050, 6=960x1260)")
+    p.add_argument("--action-hold", type=int, default=4, dest="action_hold",
+                   help=("Frames a direction key must be held before firing again. "
+                         "Higher = slower/less sensitive paddle. 1=every frame (original), "
+                         "4=default, 8=very slow"))
     p.add_argument("--seed",      type=int, default=None,
-                   help="RNG seed (default: random)")
+                   help="RNG seed")
     p.add_argument("--weights",   default=None,
-                   help="Path to agent .npz weights file (optional)")
+                   help="Path to agent .npz weights file")
     p.add_argument("--no-agent",  action="store_true",
                    help="Disable agent voting (no disagreement signal)")
     p.add_argument("--near-death-threshold", type=float, default=-1.0,
-                   help="Reward threshold for near_death_flag (default: -1.0)")
+                   help="Reward threshold for near_death_flag")
     return p.parse_args()
 
 
@@ -464,4 +495,5 @@ if __name__ == "__main__":
         weights_path=args.weights,
         near_death_threshold=args.near_death_threshold,
         seed=args.seed,
+        action_hold_frames=args.action_hold,
     )
