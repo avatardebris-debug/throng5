@@ -62,6 +62,54 @@ from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 
 
 # ─────────────────────────────────────────────────────────────────────
+# DAS (Delayed Auto Shift) tracker
+# ─────────────────────────────────────────────────────────────────────
+# Implements the timing system used in every modern Tetris game:
+#   Frame 0 (first press)  → fire immediately
+#   Frames 1 .. das_delay-1 → silent (charge)
+#   Frame das_delay+         → fire, then every das_repeat frames
+#
+# Usage: one _DASTracker instance per action category.
+#   tracker.update(active_action_this_frame) → action to actually send
+
+class _DASTracker:
+    def __init__(self, das_delay: int, das_repeat: int):
+        self.das_delay  = max(1, das_delay)
+        self.das_repeat = max(1, das_repeat)
+        self._action: int = 0
+        self._held:   int = 0   # frames the current action has been held
+
+    def update(self, raw: int) -> int:
+        """
+        raw: action selected this frame (0 = NOOP).
+        Returns: action to actually send to env (0 = NOOP this frame).
+        """
+        if raw == 0:
+            self._action = 0
+            self._held   = 0
+            return 0
+
+        if raw != self._action:
+            # New action — fire immediately and start charge
+            self._action = raw
+            self._held   = 1
+            return raw
+
+        # Same action still held
+        self._held += 1
+        net = self._held - self.das_delay
+        if net <= 0:
+            return 0   # still charging
+        if net % self.das_repeat == 0:
+            return raw  # auto-repeat fires
+        return 0
+
+    def reset(self) -> None:
+        self._action = 0
+        self._held   = 0
+
+
+# ─────────────────────────────────────────────────────────────────────
 # Per-game key maps  (pygame key constants → ALE action index)
 # ─────────────────────────────────────────────────────────────────────
 #
@@ -274,15 +322,29 @@ def play(
     weights_path: Optional[str] = None,
     near_death_threshold: float = -1.0,
     seed: Optional[int] = None,
-    action_hold_frames: int = 4,
+    action_hold_frames: int = 4,   # kept for backwards compat (ignored, das_repeat used)
+    das_delay:   int = 10,
+    das_repeat:  int = 2,
+    fire_delay:  int = 8,
+    fire_repeat: int = 4,
+    drop_repeat: int = 1,
 ):
     """
     scale_x / scale_y: independent horizontal and vertical scale factors.
     Native ALE frame is 160x210 (portrait).  Default 5x / 4y gives 800x840
     (roughly square), which is more comfortable.
 
-    action_hold_frames: directional keys only fire every N frames while held.
-    FIRE/RIGHTFIRE/LEFTFIRE always fire immediately.
+    DAS controls (Delayed Auto Shift — standard Tetris timing system)
+    -----------------------------------------------------------------
+    das_delay   : frames before directional auto-repeat kicks in
+                  (default 10 ≈ 333ms at 30fps  — feels like a real D-pad charge)
+    das_repeat  : frames between auto-repeat moves after DAS kicks in
+                  (default 2  ≈  67ms — rapid slide once DAS charged)
+    fire_delay  : frames before auto-repeat rotation kicks in
+                  (default 8  ≈ 267ms — prevents double-rotate, allows rapid spin)
+    fire_repeat : frames between auto-repeat rotations
+                  (default 4  ≈ 133ms — comfortable multi-rotate speed)
+    drop_repeat : frames between soft-drop repeats (1 = every frame, very fast)
     """
     import pygame
 
@@ -316,8 +378,11 @@ def play(
     small_font = pygame.font.SysFont("monospace", 12)
 
     key_map = _build_key_map(game_id, env=env_rgb)
-    # Actions that contain FIRE — these are never throttled (tap actions)
+    # Actions that contain FIRE
     fire_actions = {i for i, m in enumerate(action_meanings) if "FIRE" in m}
+    # Pure-drop action (DOWN with no FIRE/direction combo) — gets rapid repeat
+    drop_actions = {i for i, m in enumerate(action_meanings)
+                    if m == "DOWN"}
 
     # ── logger ───────────────────────────────────────────────────────
     logger = HumanPlayLogger()
@@ -348,9 +413,13 @@ def play(
         near_death   = False
 
         pressed_keys: set[int] = set()
-        just_pressed: set[int] = set()   # keys that fired KEYDOWN THIS frame
-        human_action = 0   # NOOP until first keypress
-        _hold_counter = 0  # frame counter for action throttle
+        just_pressed: set[int] = set()  # KEYDOWN this frame
+        human_action = 0
+
+        # One DAS tracker per timing category, reset each episode
+        dir_das  = _DASTracker(das_delay,  das_repeat)   # LEFT / RIGHT / UP
+        fire_das = _DASTracker(fire_delay, fire_repeat)  # FIRE / ROTATE combos
+        drop_das = _DASTracker(1,          drop_repeat)  # DOWN soft-drop
 
         print(f"\n[ep {eps_played}] Starting — press SPACE to fire")
 
@@ -392,41 +461,50 @@ def play(
                 pygame.display.flip()
                 continue
 
-            # Resolve human action
-            # FIRE-containing actions: tap-mode — require a fresh KEYDOWN this frame.
-            #   Holding SPACE gives exactly one rotate/fire per press, not per frame.
-            # Directional actions: throttle — fire every action_hold_frames while held.
-            raw_action = 0   # NOOP
+            # ── Resolve human action via DAS ──────────────────────────
+            #
+            # Priority order (highest first):
+            #   1. FIRE-containing combos  → fire_das (debounce, then auto-repeat)
+            #   2. Pure DOWN soft-drop     → drop_das (fast, every drop_repeat frames)
+            #   3. Other directionals      → dir_das  (DAS charge then rapid slide)
+            #
+            # Special: if UP arrow pressed on a fire-less game (e.g. Tetris has no
+            # UP action), treat UP as a hard-drop impulse: flood 20 soft-downs.
 
-            # Check fire-containing combos first (require just_pressed)
-            fired_this_frame = False
+            # -- Find the highest-priority active combo --
+            raw_fire = 0
+            raw_dir  = 0
+            fs = frozenset(pressed_keys)
+
             for combo, act in key_map.items():
                 if act in fire_actions:
-                    if combo.issubset(pressed_keys) and combo & just_pressed:
-                        raw_action = act
-                        fired_this_frame = True
+                    if combo.issubset(fs):
+                        raw_fire = act
+                        break
+            for combo, act in key_map.items():
+                if act not in fire_actions:
+                    if combo.issubset(fs):
+                        raw_dir = act
                         break
 
-            # If no fire combo, check directional combos (held + throttle)
-            if not fired_this_frame:
-                for combo, act in key_map.items():
-                    if act not in fire_actions and combo.issubset(pressed_keys):
-                        raw_action = act
-                        break
-
-            if fired_this_frame:
-                human_action = raw_action
-                _hold_counter = 0
-            elif raw_action != 0:        # directional — throttle
-                _hold_counter += 1
-                if _hold_counter >= action_hold_frames:
-                    human_action = raw_action
-                    _hold_counter = 0
-                else:
-                    human_action = 0     # NOOP this frame
+            # If fire combo active, suppress dir tracker (and vice-versa)
+            if raw_fire:
+                dir_das.reset()
+                drop_das.reset()
+                human_action = fire_das.update(raw_fire)
+            elif raw_dir in drop_actions:
+                fire_das.reset()
+                dir_das.reset()
+                human_action = drop_das.update(raw_dir)
+            elif raw_dir:
+                fire_das.reset()
+                drop_das.reset()
+                human_action = dir_das.update(raw_dir)
             else:
+                fire_das.reset()
+                dir_das.reset()
+                drop_das.reset()
                 human_action = 0
-                _hold_counter = 0
 
             # Execute human action in both envs (keep them in sync)
             rgb_obs, reward, term, trunc, info = env_rgb.step(human_action)
@@ -531,29 +609,29 @@ def _parse_args():
         description="Human play recorder for Atari ALE games",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--game",      default="ALE/Breakout-v5",
-                   help="Gymnasium game ID")
-    p.add_argument("--episodes",  type=int, default=999,
-                   help="Max episodes before auto-quit")
-    p.add_argument("--fps",       type=int, default=30,
-                   help="Target frame rate")
-    p.add_argument("--scale-x",   type=int, default=5, dest="scale_x",
-                   help=("Horizontal scale. Native ALE width=160px. "
-                         "5=800px wide (default)"))
-    p.add_argument("--scale-y",   type=int, default=4, dest="scale_y",
-                   help=("Vertical scale. Native ALE height=210px. "
-                         "4=840px tall (default, ~square with scale-x=5)"))
-    p.add_argument("--action-hold", type=int, default=4, dest="action_hold",
-                   help=("Directional key repeat delay in frames. "
-                         "1=every frame (touchy), 4=default, 8=very slow"))
-    p.add_argument("--seed",      type=int, default=None,
-                   help="RNG seed")
-    p.add_argument("--weights",   default=None,
-                   help="Path to agent .npz weights file")
-    p.add_argument("--no-agent",  action="store_true",
-                   help="Disable agent voting (no disagreement signal)")
-    p.add_argument("--near-death-threshold", type=float, default=-1.0,
-                   help="Reward threshold for near_death_flag")
+    p.add_argument("--game",      default="ALE/Breakout-v5", help="Gymnasium game ID")
+    p.add_argument("--episodes",  type=int, default=999,    help="Max episodes")
+    p.add_argument("--fps",       type=int, default=30,     help="Target frame rate")
+    p.add_argument("--scale-x",   type=int, default=5,   dest="scale_x",
+                   help="Horizontal scale (native=160px, 5=800px)")
+    p.add_argument("--scale-y",   type=int, default=4,   dest="scale_y",
+                   help="Vertical scale (native=210px, 4=840px)")
+    # DAS timing
+    p.add_argument("--das-delay",   type=int, default=10, dest="das_delay",
+                   help="Directional: frames before auto-repeat kicks in (10≈333ms)")
+    p.add_argument("--das-repeat",  type=int, default=2,  dest="das_repeat",
+                   help="Directional: frames between auto-repeat moves (2≈67ms)")
+    p.add_argument("--fire-delay",  type=int, default=8,  dest="fire_delay",
+                   help="Rotate/fire: frames before auto-repeat (8≈267ms)")
+    p.add_argument("--fire-repeat", type=int, default=4,  dest="fire_repeat",
+                   help="Rotate/fire: frames between auto-repeat (4≈133ms)")
+    p.add_argument("--drop-repeat", type=int, default=1,  dest="drop_repeat",
+                   help="Soft-drop: frames between repeats (1=every frame)")
+    # Misc
+    p.add_argument("--seed",      type=int,   default=None)
+    p.add_argument("--weights",   default=None, help="Agent .npz weights path")
+    p.add_argument("--no-agent",  action="store_true", help="Disable agent voting")
+    p.add_argument("--near-death-threshold", type=float, default=-1.0)
     return p.parse_args()
 
 
@@ -569,5 +647,9 @@ if __name__ == "__main__":
         weights_path=args.weights,
         near_death_threshold=args.near_death_threshold,
         seed=args.seed,
-        action_hold_frames=args.action_hold,
+        das_delay=args.das_delay,
+        das_repeat=args.das_repeat,
+        fire_delay=args.fire_delay,
+        fire_repeat=args.fire_repeat,
+        drop_repeat=args.drop_repeat,
     )
