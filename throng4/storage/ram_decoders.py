@@ -79,26 +79,31 @@ class MontezumaDecoder(BaseDecoder):
     game_id = "ALE/MontezumaRevenge-v5"
     confidence = "mixed"
 
-    # Documented rooms (room_id → description for Tetra context)
+    # Documented rooms (room_id -> description for Tetra context)
+    # Room numbers confirmed: RAM[3]=1 at game start
     ROOM_NAMES = {
-        0: "start_room",
-        1: "first_passage",
-        2: "skull_room",
-        3: "key_room",
-        4: "lower_passage",
-        5: "rope_room",
-        6: "treasure_room",
+        1: "start_room",
+        2: "first_passage",
+        3: "skull_room",
+        4: "key_room",
+        5: "lower_passage",
+        6: "rope_room",
+        7: "treasure_room",
     }
 
     def decode(self, ram: np.ndarray) -> dict[str, Any]:
         ram = np.asarray(ram, dtype=np.uint8)
 
-        player_x   = int(ram[42])          # 0-159
-        player_y   = int(ram[43])          # 0-255 (valid ~8-228)
-        room       = int(ram[3])           # 0-23
-        lives      = int(ram[58])          # 0-5
-        items      = int(ram[66])          # bitmask (estimated)
-        key_bit    = bool(items & 0x01)    # bit 0 = key carried
+        player_x   = int(ram[42])          # 0-159, verified
+        player_y   = int(ram[43])          # 0-255, verified
+        room       = int(ram[3])           # starts at 1, verified
+        lives      = int(ram[58])          # 0-5, verified
+
+        # Key status: RAM[100] starts at 0, may change on pickup.
+        # RAM[66]=0x0F at start (NOT key). RAM[100] and RAM[102] start at 0/255.
+        # Using RAM[100] as key candidate (unverified — needs play calibration)
+        key_raw    = int(ram[100])
+        key_bit    = bool(key_raw > 0)     # confidence: needs calibration
 
         # BCD score decode (estimated addresses)
         score_hi = int(ram[19])
@@ -117,16 +122,16 @@ class MontezumaDecoder(BaseDecoder):
             "room":           room,
             "room_name":      room_name,
             "lives":          lives,
+            "key_raw":        key_raw,
             "key_collected":  key_bit,
-            "items_raw":      items,
             "score":          score,
-            # Normalised 0–1 (for feature engineering)
+            # Normalised 0-1 (for feature engineering)
             "player_x_norm":  round(player_x / 159.0,  4),
             "player_y_norm":  round(player_y / 228.0,  4),
-            "room_norm":      round(room      / 23.0,   4),
+            "room_norm":      round(room      / 24.0,   4),
             "lives_norm":     round(lives     / 5.0,    4),
-            # Derived flags (higher-level — what Tetra can reason about)
-            "in_start_room":  room == 0,
+            # Derived flags (higher-level -- what Tetra can reason about)
+            "in_start_room":  room == 1,
             "has_key":        key_bit,
             "low_lives":      lives <= 1,
             "_decoder":       "MontezumaDecoder",
@@ -135,7 +140,7 @@ class MontezumaDecoder(BaseDecoder):
                 "player_y":  "high",
                 "room":      "high",
                 "lives":     "high",
-                "key":       "estimated",
+                "key":       "needs_calibration",
                 "score":     "estimated",
             },
         }
