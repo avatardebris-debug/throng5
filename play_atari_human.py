@@ -58,6 +58,7 @@ import ale_py
 gym.register_envs(ale_py)
 
 from throng4.storage.human_play_logger import HumanPlayLogger
+from throng4.storage.atari_event import AtariEventLogger
 from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 
 
@@ -217,17 +218,19 @@ class _AgentVoter:
 
     def vote(self, ram_obs: np.ndarray) -> int:
         """Return agent's greedy action for current RAM observation."""
+        q = self.q_values_all(ram_obs)
+        return int(np.argmax(q))
+
+    def q_values_all(self, ram_obs: np.ndarray) -> np.ndarray:
+        """Return Q(s,a) for every action — used by AtariEventLogger."""
         state = (np.array(ram_obs, dtype=np.float32) / 255.0)
-        best_action, best_val = 0, -float("inf")
+        q = np.empty(self.n_actions, dtype=np.float64)
         for a in range(self.n_actions):
             ah = np.zeros(self.n_actions, dtype=np.float32)
             ah[a] = 1.0
             feat = np.concatenate([state, ah])
-            val = self.agent.forward(feat)
-            if val > best_val:
-                best_val = val
-                best_action = a
-        return best_action
+            q[a] = self.agent.forward(feat)
+        return q
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -384,7 +387,7 @@ def play(
     drop_actions = {i for i, m in enumerate(action_meanings)
                     if m == "DOWN"}
 
-    # ── logger ───────────────────────────────────────────────────────
+    # ── loggers ───────────────────────────────────────────────────────
     logger = HumanPlayLogger()
     session_id = logger.open_session(
         env_name=game_id,
@@ -392,8 +395,10 @@ def play(
         config={"fps": fps, "scale_x": scale_x, "scale_y": scale_y,
                     "use_agent": use_agent},
     )
+    event_logger = AtariEventLogger(game_id, action_meanings, session_id)
     print(f"[logger] session_id = {session_id}")
-    print(f"[logger] DB → {logger.db_path}")
+    print(f"[logger] DB  → {logger.db_path}")
+    print(f"[logger] EVT → {event_logger.path}")
 
     eps_played = 0
     running = True
@@ -405,6 +410,7 @@ def play(
         ram_obs, _  = env_ram.reset(seed=ep_seed)
 
         episode_id = logger.open_episode(session_id, eps_played, seed=ep_seed)
+        event_logger.begin_episode(eps_played)
 
         step_idx     = 0
         total_reward = 0.0
@@ -556,6 +562,17 @@ def play(
                 score=float(info.get("score", 0)),
             )
 
+            # ── Canonical event log (for Tetra) ───────────────────
+            q_vals = voter.q_values_all(ram_obs) if voter else None
+            event_logger.log_step(
+                step=step_idx,
+                human_action_idx=human_action,
+                q_values=q_vals,
+                reward=float(reward),
+                done=done,
+                near_death=near_death,
+            )
+
             step_idx += 1
 
             # ── render ────────────────────────────────────────────
@@ -587,10 +604,13 @@ def play(
 
     # ── cleanup ───────────────────────────────────────────────────────
     logger.close()
+    evt_path = event_logger.end_session()
     env_rgb.close()
     env_ram.close()
     pygame.quit()
     print(f"\n[done] {eps_played} episode(s) logged to {logger.db_path}")
+    print(f"[done] events → {evt_path}")
+    print(f"[done] run: python generate_atari_brief.py --print  to update Tetra brief")
 
 
 # ─────────────────────────────────────────────────────────────────────
