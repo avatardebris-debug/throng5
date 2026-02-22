@@ -427,9 +427,23 @@ def play(
         fire_das = _DASTracker(fire_delay, fire_repeat)  # FIRE / ROTATE combos
         drop_das = _DASTracker(1,          drop_repeat)  # DOWN soft-drop
 
-        # Save state slot (F5 = save, F9 = load)
+        # Save state slots: in-memory AND on disk
+        # Disk path: experiments/save_states/<game_slug>/<session_id>_slot<N>.bin
+        _save_states_dir = (_ROOT / "experiments" / "save_states" /
+                            game_id.replace("/", "_").replace("-", "_"))
+        _save_states_dir.mkdir(parents=True, exist_ok=True)
         _saved_state_rgb = None
         _saved_state_ram = None
+        _save_slot = 0   # increments each F5 press so history is kept
+
+        # RAM reward log — records full RAM when reward fires (for byte calibration)
+        _reward_ram_log = (_save_states_dir.parent / "reward_ram_log" /
+                           game_id.replace("/", "_").replace("-", "_"))
+        _reward_ram_log.mkdir(parents=True, exist_ok=True)
+        _reward_ram_fh = open(
+            _reward_ram_log / f"{session_id}_rewards.jsonl", "w", encoding="utf-8"
+        )
+        _prev_ram = None   # RAM from previous step (for before/after diff)
 
         print(f"\n[ep {eps_played}] Starting — press SPACE to fire")
 
@@ -450,22 +464,44 @@ def play(
                         paused = not paused
                     if event.key == pygame.K_r:
                         reset_ep = True; break
-                    # ── Save / Load state ─────────────────────────
+                    # ── Save / Load state (disk-persistent) ────────
                     if event.key == pygame.K_F5:
                         _saved_state_rgb = env_rgb.unwrapped.ale.cloneState()
                         _saved_state_ram = env_ram.unwrapped.ale.cloneState()
-                        print(f"  [F5] State saved  (step {step_idx}  reward {total_reward:.0f})")
+                        # Write to disk so state survives quit
+                        slot_path = _save_states_dir / f"{session_id}_slot{_save_slot:03d}_step{step_idx}.bin"
+                        import pickle
+                        with open(slot_path, 'wb') as sf:
+                            pickle.dump({
+                                'rgb': bytes(_saved_state_rgb),
+                                'ram': bytes(_saved_state_ram),
+                                'step': step_idx,
+                                'reward': total_reward,
+                                'episode': eps_played,
+                            }, sf)
+                        _save_slot += 1
+                        print(f"  [F5] State saved to disk -> {slot_path.name}")
                         continue
                     if event.key == pygame.K_F9:
+                        # Try in-memory first, then disk (most recent slot file)
+                        if _saved_state_rgb is None:
+                            slot_files = sorted(_save_states_dir.glob(f"*_slot*.bin"))
+                            if slot_files:
+                                import pickle
+                                with open(slot_files[-1], 'rb') as sf:
+                                    saved = pickle.load(sf)
+                                _saved_state_rgb = saved['rgb']
+                                _saved_state_ram = saved['ram']
+                                print(f"  [F9] Loaded from disk: {slot_files[-1].name}")
                         if _saved_state_rgb is not None:
                             env_rgb.unwrapped.ale.restoreState(_saved_state_rgb)
                             env_ram.unwrapped.ale.restoreState(_saved_state_ram)
                             rgb_obs = env_rgb.unwrapped.ale.getScreenRGB()
                             ram_obs = np.array(env_ram.unwrapped.ale.getRAM(),
                                                dtype=np.uint8)
-                            print(f"  [F9] State loaded (step {step_idx}  reward {total_reward:.0f})")
+                            print(f"  [F9] State restored (step {step_idx}  reward {total_reward:.0f})")
                         else:
-                            print("  [F9] No state saved yet")
+                            print("  [F9] No save state found (in memory or disk)")
                         continue
                     # ──────────────────────────────────────────────
                     pressed_keys.add(event.key)
@@ -573,6 +609,25 @@ def play(
                 near_death=near_death,
             )
 
+            # ── RAM reward snapshot (key byte calibration) ────────
+            if reward != 0 and _prev_ram is not None:
+                import json as _json
+                snapshot = {
+                    "step": step_idx, "reward": float(reward),
+                    "action": int(human_action),
+                    "ram_before": list(int(x) for x in _prev_ram),
+                    "ram_after":  list(int(x) for x in ram_obs),
+                    "changed_bytes": [
+                        {"idx": i, "before": int(_prev_ram[i]), "after": int(ram_obs[i])}
+                        for i in range(128) if _prev_ram[i] != ram_obs[i]
+                    ],
+                }
+                _reward_ram_fh.write(_json.dumps(snapshot) + "\n")
+                _reward_ram_fh.flush()
+                print(f"  [RAM] reward={reward:+.0f} at step {step_idx}  "
+                      f"{len(snapshot['changed_bytes'])} bytes changed")
+            _prev_ram = ram_obs.copy()
+
             step_idx += 1
 
             # ── render ────────────────────────────────────────────
@@ -602,16 +657,18 @@ def play(
 
         eps_played += 1
 
-    # ── cleanup ───────────────────────────────────────────────────────
+    # -- cleanup -----------------------------------------------------------
     logger.close()
+    _reward_ram_fh.close()
     evt_path = event_logger.end_session()
-    brief_path = update_brief(game_id)          # ← auto-update Tetra brief
+    brief_path = update_brief(game_id)
     env_rgb.close()
     env_ram.close()
     pygame.quit()
     print(f"\n[done] {eps_played} episode(s) logged to {logger.db_path}")
-    print(f"[done] events  → {evt_path}")
-    print(f"[done] brief   → {brief_path}  (updated for Tetra)")
+    print(f"[done] events  -> {evt_path}")
+    print(f"[done] brief   -> {brief_path}  (updated for Tetra)")
+    print(f"[done] RAM log -> {_reward_ram_fh.name}  (reward byte calibration)")
 
 
 # ─────────────────────────────────────────────────────────────────────
