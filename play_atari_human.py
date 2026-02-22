@@ -483,16 +483,21 @@ def play(
                         print(f"  [F5] State saved to disk -> {slot_path.name}")
                         continue
                     if event.key == pygame.K_F9:
-                        # Try in-memory first, then disk (most recent slot file)
+                        # Try in-memory first, then disk (newest slot first)
                         if _saved_state_rgb is None:
-                            slot_files = sorted(_save_states_dir.glob(f"*_slot*.bin"))
-                            if slot_files:
-                                import pickle
-                                with open(slot_files[-1], 'rb') as sf:
-                                    saved = pickle.load(sf)
-                                _saved_state_rgb = saved['rgb']
-                                _saved_state_ram = saved['ram']
-                                print(f"  [F9] Loaded from disk: {slot_files[-1].name}")
+                            import pickle
+                            slot_files = sorted(_save_states_dir.glob("*_slot*.bin"), reverse=True)
+                            for slot_file in slot_files:
+                                try:
+                                    with open(slot_file, 'rb') as sf:
+                                        saved = pickle.load(sf)
+                                    _saved_state_rgb = saved['rgb']
+                                    _saved_state_ram = saved['ram']
+                                    print(f"  [F9] Loaded from disk: {slot_file.name}")
+                                    break
+                                except Exception as e:
+                                    print(f"  [F9] Skipping corrupt file {slot_file.name}: {e}")
+                                    continue
                         if _saved_state_rgb is not None:
                             env_rgb.unwrapped.ale.restoreState(_saved_state_rgb)
                             env_ram.unwrapped.ale.restoreState(_saved_state_ram)
