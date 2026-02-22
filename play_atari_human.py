@@ -322,11 +322,11 @@ def play(
     weights_path: Optional[str] = None,
     near_death_threshold: float = -1.0,
     seed: Optional[int] = None,
-    action_hold_frames: int = 4,   # kept for backwards compat (ignored, das_repeat used)
+    action_hold_frames: int = 4,   # kept for backwards compat
     das_delay:   int = 10,
     das_repeat:  int = 2,
-    fire_delay:  int = 8,
-    fire_repeat: int = 4,
+    fire_delay:  int = 2,   # 2 frames ≈ 67ms — prevents tap double-fire, allows rapid hold
+    fire_repeat: int = 1,   # every frame once charging done — original rapid-fire feel
     drop_repeat: int = 1,
 ):
     """
@@ -643,10 +643,10 @@ def _parse_args():
                    help="Directional: frames before auto-repeat kicks in (10≈333ms)")
     p.add_argument("--das-repeat",  type=int, default=2,  dest="das_repeat",
                    help="Directional: frames between auto-repeat moves (2≈67ms)")
-    p.add_argument("--fire-delay",  type=int, default=8,  dest="fire_delay",
-                   help="Rotate/fire: frames before auto-repeat (8≈267ms)")
-    p.add_argument("--fire-repeat", type=int, default=4,  dest="fire_repeat",
-                   help="Rotate/fire: frames between auto-repeat (4≈133ms)")
+    p.add_argument("--fire-delay",  type=int, default=2,  dest="fire_delay",
+                   help="Rotate/fire: frames before auto-repeat (2≈67ms, default=rapid; Tetris=8)")
+    p.add_argument("--fire-repeat", type=int, default=1,  dest="fire_repeat",
+                   help="Rotate/fire: frames between auto-repeat (1=every frame; Tetris=4)")
     p.add_argument("--drop-repeat", type=int, default=1,  dest="drop_repeat",
                    help="Soft-drop: frames between repeats (1=every frame)")
     # Misc
