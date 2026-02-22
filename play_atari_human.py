@@ -473,8 +473,8 @@ def play(
                         import pickle
                         with open(slot_path, 'wb') as sf:
                             pickle.dump({
-                                'rgb': bytes(_saved_state_rgb),
-                                'ram': bytes(_saved_state_ram),
+                                'rgb': _saved_state_rgb,
+                                'ram': _saved_state_ram,
                                 'step': step_idx,
                                 'reward': total_reward,
                                 'episode': eps_played,

@@ -66,14 +66,16 @@ class MontezumaDecoder(BaseDecoder):
 
     Verified addresses (confidence=high):
         42  player_x       (0-159, pixel column)
-        43  player_y       (0-255, pixel row; valid range ~8-228)
-         3  room           (0-23 room index, 24 rooms in game)
-        58  lives          (0-5, starts at 5)
+        43  player_y       (0-255, pixel row)
+         3  room           (1=start, increments per room)
+        58  lives          (5 to 0)
 
-    Estimated addresses (confidence=estimated — may need calibration):
-        66  items_carried  (bitmask: bit0=key, bit1=torch, bit2=sword)
-        19  score_hi       (BCD high byte)
-        20  score_lo       (BCD low byte)
+    Calibrated from live RAM reward log (reward=+100 at key pickup):
+        56  key_held       (0x00 at start, 0xFF when key is held)
+        65  items_mask     (0 at start, 2 when key held -- bitmask bit1=key)
+
+    Estimated addresses:
+        19  score_hi/lo    (BCD encoded)
     """
 
     game_id = "ALE/MontezumaRevenge-v5"
@@ -99,11 +101,12 @@ class MontezumaDecoder(BaseDecoder):
         room       = int(ram[3])           # starts at 1, verified
         lives      = int(ram[58])          # 0-5, verified
 
-        # Key status: RAM[100] starts at 0, may change on pickup.
-        # RAM[66]=0x0F at start (NOT key). RAM[100] and RAM[102] start at 0/255.
-        # Using RAM[100] as key candidate (unverified — needs play calibration)
-        key_raw    = int(ram[100])
-        key_bit    = bool(key_raw > 0)     # confidence: needs calibration
+        # Key status: calibrated from live RAM reward log
+        # At reward=+100 (key pickup): RAM[56] 0->255, RAM[65] 0->2
+        # RAM[56]=0xFF is classic 6502 flag pattern; RAM[65] bit1 confirms
+        key_raw    = int(ram[56])
+        key_bit    = bool(key_raw == 255)   # 0xFF = key held
+        items_mask = int(ram[65])           # secondary: bit1=key (value 2)
 
         # BCD score decode (estimated addresses)
         score_hi = int(ram[19])
@@ -116,21 +119,19 @@ class MontezumaDecoder(BaseDecoder):
         room_name = self.ROOM_NAMES.get(room, f"room_{room}")
 
         return {
-            # Raw game state
             "player_x":       player_x,
             "player_y":       player_y,
             "room":           room,
             "room_name":      room_name,
             "lives":          lives,
-            "key_raw":        key_raw,
+            "key_held_raw":   key_raw,
             "key_collected":  key_bit,
+            "items_mask":     items_mask,
             "score":          score,
-            # Normalised 0-1 (for feature engineering)
             "player_x_norm":  round(player_x / 159.0,  4),
             "player_y_norm":  round(player_y / 228.0,  4),
             "room_norm":      round(room      / 24.0,   4),
             "lives_norm":     round(lives     / 5.0,    4),
-            # Derived flags (higher-level -- what Tetra can reason about)
             "in_start_room":  room == 1,
             "has_key":        key_bit,
             "low_lives":      lives <= 1,
@@ -140,7 +141,7 @@ class MontezumaDecoder(BaseDecoder):
                 "player_y":  "high",
                 "room":      "high",
                 "lives":     "high",
-                "key":       "needs_calibration",
+                "key":       "calibrated",
                 "score":     "estimated",
             },
         }
