@@ -58,7 +58,7 @@ import ale_py
 gym.register_envs(ale_py)
 
 from throng4.storage.human_play_logger import HumanPlayLogger
-from throng4.storage.atari_event import AtariEventLogger
+from throng4.storage.atari_event import AtariEventLogger, update_brief
 from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 
 
@@ -605,12 +605,13 @@ def play(
     # ── cleanup ───────────────────────────────────────────────────────
     logger.close()
     evt_path = event_logger.end_session()
+    brief_path = update_brief(game_id)          # ← auto-update Tetra brief
     env_rgb.close()
     env_ram.close()
     pygame.quit()
     print(f"\n[done] {eps_played} episode(s) logged to {logger.db_path}")
-    print(f"[done] events → {evt_path}")
-    print(f"[done] run: python generate_atari_brief.py --print  to update Tetra brief")
+    print(f"[done] events  → {evt_path}")
+    print(f"[done] brief   → {brief_path}  (updated for Tetra)")
 
 
 # ─────────────────────────────────────────────────────────────────────

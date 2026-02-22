@@ -263,3 +263,57 @@ def aggregate_all(game_ids: list[str] | None = None) -> list[dict]:
             for p in _EVENTS_DIR.iterdir() if p.is_dir()
         ]
     return [aggregate_game(g) for g in sorted(game_ids)]
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Incremental brief updater — called automatically after each session
+# ─────────────────────────────────────────────────────────────────────
+
+_BRIEF_PATH = Path(__file__).resolve().parents[2] / "experiments" / "atari_brief.json"
+
+
+def update_brief(game_id: str, brief_path: Path = _BRIEF_PATH) -> Path:
+    """
+    Atomically update experiments/atari_brief.json for one game.
+
+    Algorithm
+    ---------
+    1. Re-aggregate all JSONL events for *game_id* (includes the just-closed session).
+    2. Load the existing brief (or start fresh).
+    3. Replace / insert the entry for *game_id*.
+    4. Write to <brief>.tmp then rename — prevents half-written files.
+
+    Returns the brief path.
+    """
+    # Re-aggregate this game from all sessions so far
+    fresh = aggregate_game(game_id)
+
+    # Load existing brief (may not exist yet)
+    brief_path.parent.mkdir(parents=True, exist_ok=True)
+    if brief_path.exists():
+        try:
+            existing: list[dict] = json.loads(brief_path.read_text()).get("games", [])
+        except Exception:
+            existing = []
+    else:
+        existing = []
+
+    # Replace or append
+    updated = [e for e in existing if e.get("game") != game_id]
+    updated.append(fresh)
+    updated.sort(key=lambda e: e.get("game", ""))
+
+    brief = {
+        "schema_version": "atari_v1",
+        "n_games": len(updated),
+        "last_updated": str(Path(__file__).stat().st_mtime),   # cheap timestamp
+        "games": updated,
+    }
+
+    # Atomic write
+    tmp = brief_path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(brief, indent=2))
+    tmp.replace(brief_path)
+
+    return brief_path
+
