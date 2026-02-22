@@ -421,6 +421,10 @@ def play(
         fire_das = _DASTracker(fire_delay, fire_repeat)  # FIRE / ROTATE combos
         drop_das = _DASTracker(1,          drop_repeat)  # DOWN soft-drop
 
+        # Save state slot (F5 = save, F9 = load)
+        _saved_state_rgb = None
+        _saved_state_ram = None
+
         print(f"\n[ep {eps_played}] Starting — press SPACE to fire")
 
         while not episode_done and running:
@@ -440,6 +444,24 @@ def play(
                         paused = not paused
                     if event.key == pygame.K_r:
                         reset_ep = True; break
+                    # ── Save / Load state ─────────────────────────
+                    if event.key == pygame.K_F5:
+                        _saved_state_rgb = env_rgb.unwrapped.ale.getState()
+                        _saved_state_ram = env_ram.unwrapped.ale.getState()
+                        print(f"  [F5] State saved  (step {step_idx}  reward {total_reward:.0f})")
+                        continue
+                    if event.key == pygame.K_F9:
+                        if _saved_state_rgb is not None:
+                            env_rgb.unwrapped.ale.setState(_saved_state_rgb)
+                            env_ram.unwrapped.ale.setState(_saved_state_ram)
+                            rgb_obs = env_rgb.unwrapped.ale.getScreenRGB()
+                            ram_obs = np.array(env_ram.unwrapped.ale.getRAM(),
+                                               dtype=np.uint8)
+                            print(f"  [F9] State loaded (step {step_idx}  reward {total_reward:.0f})")
+                        else:
+                            print("  [F9] No state saved yet")
+                        continue
+                    # ──────────────────────────────────────────────
                     pressed_keys.add(event.key)
                     just_pressed.add(event.key)  # mark as tapped this frame
                 if event.type == pygame.KEYUP:
