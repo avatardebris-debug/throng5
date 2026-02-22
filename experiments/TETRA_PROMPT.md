@@ -136,6 +136,101 @@ Valid conditions: `height > <fraction>`, `holes > <count>`, `pieces < <count>`
 
 ---
 
+## Atari Human-Agent Alignment Analysis (v1)
+
+Triggered when the brief contains `"schema_version": "atari_v1"`.
+
+This mode analyzes how well the agent has internalized human play strategy.
+The agent was trained using human demonstrations; you are measuring alignment gaps.
+
+### Key concepts
+
+**Alignment rate** — P(agent_greedy == human_action). High alignment means the agent
+has learned the human's preferred moves. Low alignment is NOT automatically bad — the
+human may be suboptimal in easy states. Watch WHERE alignment breaks down.
+
+**High-confidence disagreement rate** — P(agent_confident AND agent != human).
+This is the most actionable signal. When the agent is confident (P(top action) >= 0.5)
+but chooses differently from the human, it has learned a WRONG confident habit.
+These are the highest-priority learning gaps.
+
+**Disagree near terminal rate** — P(agent != human | near_death OR episode ending).
+If the agent diverges from the human exactly when survival is at stake, the imitation
+training failed to capture the critical safe-play strategy.
+
+**Mean entropy** — H(P(action)). High entropy means the agent is uncertain.
+- Entropy > 2.0 nats: agent has no strong opinion — needs more training data
+- Entropy < 0.5 nats: agent is highly confident — check if confident actions are RIGHT
+- Entropy 0.5-1.5 nats: healthy — agent has preferences but allows exploration
+
+**Calibration proxy** — P(human agreed | agent was confident). If this is low,
+the agent is confidently wrong. If high, the agent's confidence is trustworthy.
+
+### Decoded game state (Montezuma's Revenge only)
+
+When the brief contains `semantic.json` data, you also receive per-episode:
+- `rooms_visited`: list of room IDs reached (room 0 = start, higher = more progress)
+- `max_room`: furthest room reached (key metric — baseline should be 0)
+- `key_collected_any`: whether the agent ever picked up the key
+- `trajectory_snapshots`: every 50 steps: {player_x, player_y, room, key_collected, top_action, q_entropy}
+
+**Montezuma room progression:**
+- room 0: start room (near-trivial navigation)
+- room 1: first passage (rope + ladder sequence)  
+- room 2: skull room (timing-critical — death here = near-death disagree signal)
+- room 3: key room (KEY OBJECTIVE — any episode reaching here is valuable)
+- room 4+: beyond key (very rare without human seed)
+
+### What to look for
+
+1. **Disagree near skull/room boundary** — agent diverges from human at high-danger
+   transitions. Hypothesis: boost priority of transitions where room changes.
+
+2. **Agent stays in room 0** — max_room == 0 across all episodes. The imitation
+   training didn't transfer room-crossing navigation. Hypothesis: imitation_phase
+   needs longer warm-up, or rope-climbing transitions need priority boost.
+
+3. **Key collected by agent but not in baseline** — direct evidence that human
+   demonstrations transferred a specific sub-goal. NOTE THIS EXPLICITLY.
+
+4. **High entropy in skull room** — agent doesn't know what to do near the skull.
+   Hypothesis: skull-adjacent transitions need 2x priority weight.
+
+5. **High-confidence NOOP** — agent keeps choosing NOOP (do nothing) confidently
+   while human was actively moving. Deadlock pattern — needs exploration_suppress
+   on NOOP action near stationary states.
+
+### How to respond
+
+Same operation format as Tetris mode (ADD/RETIRE/MUTATE), but use Atari enaction types:
+
+```json
+[
+  {
+    "op": "ADD",
+    "name": "skull_room_priority_boost",
+    "description": "Boost replay priority 3x for transitions in the skull room (room 2).",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.82,
+    "llm_priority": "test",
+    "llm_notes": "disagree_near_terminal_rate=0.44 combined with high entropy in room 2 snapshots indicates agent uncertainty exactly when the skull kills. 3x priority should oversample these critical transitions.",
+    "enaction": {"type": "priority_boost", "condition": "near_death", "multiplier": 3.0}
+  },
+  {
+    "op": "ADD",
+    "name": "imitation_phase_extend",
+    "description": "Extend imitation-only phase to 5000 steps for Montezuma.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.75,
+    "llm_priority": "explore",
+    "llm_notes": "alignment_rate=0.225 is very low. The agent has not absorbed human strategy. More imitation-only steps before RL takeover would let backbone representations stabilize.",
+    "enaction": {"type": "imitation_weight", "action": "ALL", "alpha": 1.0}
+  }
+]
+```
+
+---
+
 ## Atari Offline Batch Mode (v2)
 
 Triggered when you see a memory file with header: `# Hypothesis Request — ALE/...`
