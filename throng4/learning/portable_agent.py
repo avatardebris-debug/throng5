@@ -214,7 +214,7 @@ class PortableNNAgent:
 
     def forward(self, x: np.ndarray) -> float:
         """
-        Forward pass: Input → 256 ReLU → 128 ReLU → scalar.
+        Forward pass: Input -> 256 ReLU -> 128 ReLU -> scalar.
 
         Args:
             x: Feature vector (n_features,) or larger
@@ -241,6 +241,35 @@ class PortableNNAgent:
         # Output layer
         out = self.W3 @ self._last_h2 + self.b3
         return float(out[0])
+
+    def forward_batch(self, X: np.ndarray) -> np.ndarray:
+        """
+        Batched forward pass: evaluates N inputs simultaneously using
+        matrix multiplication instead of N separate forward() calls.
+
+        Args:
+            X: (N, n_features) array of feature vectors
+
+        Returns:
+            (N,) array of Q-value predictions
+
+        Use this for action selection (one row per action) to get an
+        ~N-fold speedup over calling forward() N times in a loop.
+        """
+        H1 = np.maximum(0, X @ self.W1.T + self.b1)   # (N, n_hidden)
+        H2 = np.maximum(0, H1 @ self.W2.T + self.b2)  # (N, n_hidden2)
+        Q  = H2 @ self.W3.T + self.b3                  # (N, 1)
+        return Q[:, 0]                                  # (N,)
+
+    def forward_batch_target(self, X: np.ndarray) -> np.ndarray:
+        """
+        Batched forward pass using target network weights.
+        Same interface as forward_batch().
+        """
+        H1 = np.maximum(0, X @ self.target_W1.T + self.target_b1)
+        H2 = np.maximum(0, H1 @ self.target_W2.T + self.target_b2)
+        Q  = H2 @ self.target_W3.T + self.target_b3
+        return Q[:, 0]
     
     def select_action(
         self,
