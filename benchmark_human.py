@@ -319,9 +319,16 @@ def benchmark_game(
         "episodes":       episodes,
     }
     out_path.write_text(json.dumps(summary, indent=2))
-    print(f"\n  Done. mean={summary['mean_reward']:.2f} "
+
+    # Save trained weights for eval_atari_agent.py (Option 1 pipeline)
+    weights_path = RESULTS_DIR / f"human_{slug}_weights.npz"
+    agent.save_weights(str(weights_path))
+    summary["weights_path"] = str(weights_path)
+    print(f"\n  Weights saved -> {weights_path.name}")
+
+    print(f"  Done. mean={summary['mean_reward']:.2f} "
           f"max={summary['max_reward']:.2f}  seeded={n_seeded}  "
-          f"saved → {out_path.name}")
+          f"saved -> {out_path.name}")
     return summary
 
 
