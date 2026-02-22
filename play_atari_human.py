@@ -446,14 +446,14 @@ def play(
                         reset_ep = True; break
                     # ── Save / Load state ─────────────────────────
                     if event.key == pygame.K_F5:
-                        _saved_state_rgb = env_rgb.unwrapped.ale.getState()
-                        _saved_state_ram = env_ram.unwrapped.ale.getState()
+                        _saved_state_rgb = env_rgb.unwrapped.ale.cloneState()
+                        _saved_state_ram = env_ram.unwrapped.ale.cloneState()
                         print(f"  [F5] State saved  (step {step_idx}  reward {total_reward:.0f})")
                         continue
                     if event.key == pygame.K_F9:
                         if _saved_state_rgb is not None:
-                            env_rgb.unwrapped.ale.setState(_saved_state_rgb)
-                            env_ram.unwrapped.ale.setState(_saved_state_ram)
+                            env_rgb.unwrapped.ale.restoreState(_saved_state_rgb)
+                            env_ram.unwrapped.ale.restoreState(_saved_state_ram)
                             rgb_obs = env_rgb.unwrapped.ale.getScreenRGB()
                             ram_obs = np.array(env_ram.unwrapped.ale.getRAM(),
                                                dtype=np.uint8)
