@@ -142,12 +142,12 @@ def _analysis_hints(s: dict, comp: dict | None) -> list[str]:
         elif hu > bl * 1.2:
             delta = (hu - bl) / abs(bl) * 100
             hints.append(
-                f"Human seeding improved reward by +{delta:.0f}% ({bl:.1f} → {hu:.1f}). "
+                f"Human seeding improved reward by +{delta:.0f}% ({bl:.1f} -> {hu:.1f}). "
                 f"Which actions correlate with the reward improvement?"
             )
         elif hu < bl * 0.9:
             hints.append(
-                f"Human seeding HURT performance ({bl:.1f} → {hu:.1f}). "
+                f"Human seeding HURT performance ({bl:.1f} -> {hu:.1f}). "
                 f"Possible negative transfer — human strategy may conflict with RL objective."
             )
 
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(brief, indent=2))
-    print(f"Brief written → {out_path}  ({brief['n_games']} games)")
+    print(f"Brief written -> {out_path}  ({brief['n_games']} games)")
 
     if args.print_brief:
         print(f"\n{'='*70}")
