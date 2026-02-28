@@ -461,39 +461,52 @@ class LoloGAN:
         bad_puzzles: List[np.ndarray],
     ) -> Dict[str, float]:
         """
-        One GAN training step.
+        Balanced GAN training step.
 
-        Args:
-            good_puzzles: (143,9) grids that were appropriately difficult
-            bad_puzzles:  (143,9) grids that were too easy or unsolvable
+        Balance mechanisms:
+          1. Loss-ratio gating: skip D training if D is already too strong
+          2. 2:1 G:D step ratio: G gets twice the updates (harder task)
+          3. Running average tracks balance health
         """
         d_loss = 0.0
         g_loss = 0.0
 
-        # ── Train Discriminator ──
-        # Real (good) puzzles → score toward 1
-        for grid in good_puzzles:
-            score, cache = self.D.forward(grid)
-            d_real_loss = -np.log(score + 1e-10)
-            d_loss += d_real_loss
-            d_grads, _ = self.D.backward(1.0 / (score + 1e-10), cache)
-            self.D.update(d_grads)
+        # ── Check balance: should we train D? ──
+        # If D is much stronger than G (low D-loss, high G-loss), skip D
+        avg_d = float(np.mean(self._d_losses[-20:])) if len(self._d_losses) >= 5 else 999.0
+        avg_g = float(np.mean(self._g_losses[-20:])) if len(self._g_losses) >= 5 else 999.0
+        train_d = (avg_d >= avg_g * 0.5) or len(self._d_losses) < 10  # Always train early
 
-        # Fake (bad) puzzles → score toward 0
-        for grid in bad_puzzles:
-            score, cache = self.D.forward(grid)
-            d_fake_loss = -np.log(1 - score + 1e-10)
-            d_loss += d_fake_loss
-            d_grads, _ = self.D.backward(-1.0 / (1 - score + 1e-10), cache)
-            self.D.update(d_grads)
+        # ── Train Discriminator (if not too strong) ──
+        if train_d:
+            for grid in good_puzzles:
+                score, cache = self.D.forward(grid)
+                d_real_loss = -np.log(score + 1e-10)
+                d_loss += d_real_loss
+                d_grads, _ = self.D.backward(1.0 / (score + 1e-10), cache)
+                self.D.update(d_grads)
 
-        # ── Train Generator ──
-        # Generate puzzles and try to fool discriminator (score → 1)
-        n_gen = max(len(good_puzzles), 2)
+            for grid in bad_puzzles:
+                score, cache = self.D.forward(grid)
+                d_fake_loss = -np.log(1 - score + 1e-10)
+                d_loss += d_fake_loss
+                d_grads, _ = self.D.backward(-1.0 / (1 - score + 1e-10), cache)
+                self.D.update(d_grads)
+        else:
+            # Still compute D loss for tracking, just don't update weights
+            for grid in good_puzzles:
+                score, _ = self.D.forward(grid)
+                d_loss += -np.log(score + 1e-10)
+            for grid in bad_puzzles:
+                score, _ = self.D.forward(grid)
+                d_loss += -np.log(1 - score + 1e-10)
+
+        # ── Train Generator (2:1 ratio — G gets more steps) ──
+        n_gen = max(len(good_puzzles) * 2, 4)  # 2× multiplier
         for _ in range(n_gen):
             z = np.random.randn(self.G.z_dim).astype(np.float32)
             tier_oh = np.zeros(8, np.float32)
-            tier_oh[0] = 1.0  # Default tier 1
+            tier_oh[0] = 1.0
 
             probs, g_cache = self.G.forward(z, tier_oh, temperature=0.8)
             score, d_cache = self.D.forward(probs)
@@ -501,10 +514,7 @@ class LoloGAN:
             gen_loss = -np.log(score + 1e-10)
             g_loss += gen_loss
 
-            # Backprop through D to get gradient w.r.t. generated grid
             _, d_grid_grad = self.D.backward(1.0 / (score + 1e-10), d_cache)
-
-            # Backprop through G
             g_grads = self.G.backward(d_grid_grad, g_cache)
             self.G.update(g_grads)
 
@@ -515,7 +525,8 @@ class LoloGAN:
         self._d_losses.append(d_loss)
         self._g_losses.append(g_loss)
 
-        return {"d_loss": float(d_loss), "g_loss": float(g_loss)}
+        return {"d_loss": float(d_loss), "g_loss": float(g_loss),
+                "d_trained": train_d, "balance": round(avg_d / max(avg_g, 0.01), 2)}
 
     def _pretrain_step(self, target: np.ndarray) -> float:
         """
