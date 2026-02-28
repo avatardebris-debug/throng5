@@ -1,0 +1,55 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_hole_emergency_gate_80",
+    "description": "Enter survival mode as soon as hole count exceeds 80 to prevent collapse trajectories on level-7-like boards.",
+    "llm_score": 0.89,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44) while max height differs by only 0.41 (20.00 vs 19.59), so hole-threshold gating should separate terminal states earlier than height-only control.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "holes > 80",
+        "strategy": "survive"
+      }
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "l7_opening_hole_penalty_0_24_v3",
+    "description": "Apply stronger hole suppression for pieces 0-24 to stabilize the opening-to-midgame transition.",
+    "llm_score": 0.83,
+    "llm_priority": "test",
+    "llm_notes": "Failures end after 23.23 pieces on average with 99.66 holes, and outlier episodes show lower early holes (78.8) than baseline early holes (85.7), indicating the fragile window extends beyond the first 12 pieces.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "piece_phase",
+        "range": [
+          0,
+          24
+        ],
+        "target": "holes",
+        "multiplier": 2.3
+      }
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "l7_surface_volatility_brake",
+    "name": "l7_surface_volatility_brake_height_gate_90",
+    "description": "Keep bumpiness suppression global but intensify survival behavior once stack height exceeds 90% of board capacity.",
+    "llm_score": 0.78,
+    "llm_priority": "explore",
+    "llm_notes": "Bumpiness is the largest separator (7.92 failure vs 1.44 success, delta 6.48), and level 7 average height is already 19.63, so adding a high-height gate tests whether anti-volatility pressure should spike only in terminal-risk states.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "height > 0.90",
+        "strategy": "survive"
+      }
+    }
+  }
+]

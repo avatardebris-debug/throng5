@@ -1,0 +1,60 @@
+[
+  {
+    "op": "ADD",
+    "name": "montezuma_subgoal_shaped_reward",
+    "description": "Inject shaped rewards for 7 RAM-based sub-goals in Montezuma stage 1: ladder_reached (+0.5), ladder_descended (+1.0), platform_run_right (+1.5), rope_zone (+2.5), key_platform (+4.0), key_collected (+10.0), room_advanced (+20.0). Each fires once per episode on first attainment.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.95,
+    "llm_priority": "test",
+    "llm_notes": "disagree_near_terminal_rate=0.74 and game_reward=0.0 across all 10 eval episodes confirms the agent has no gradient signal. All episodes stuck in room 1 (start_room) losing lives from 5 to 0. Sparse +100 key reward unreachable without sub-goal scaffolding. Stage 1 spatial layout anchored to calibrated RAM[42]=player_x, RAM[43]=player_y, RAM[3]=room.",
+    "enaction": {
+      "type": "shaped_reward",
+      "module": "montezuma_subgoals.ShapedRewardEngine",
+      "subgoal_scale": 1.0,
+      "novelty_scale": 0.3,
+      "death_penalty": -5.0
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "montezuma_novelty_count_bonus",
+    "description": "Count-based intrinsic novelty reward: bonus = 0.3 / sqrt(visit_count) for each new (room, x//8, y//8) cell. Decays as cells are revisited. Encourages spatial exploration without losing lives.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.88,
+    "llm_priority": "test",
+    "llm_notes": "eval trajectory snapshots show agent oscillating at x=77-109 y=148-235 (room 1) across ALL 10 episodes with novelty_cells never growing. Count-based bonus creates gradient signal for lateral movement without requiring the sparse +100 key reward. Bin size 8 gives 20x28 cells per room = 560 unique states per room.",
+    "enaction": {
+      "type": "novelty_bonus",
+      "bin_size": 8,
+      "novelty_scale": 0.3
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "montezuma_amygdala_trajectory_switch",
+    "description": "When any episode beats the best-room record, immediately inject all its transitions into the replay buffer at 10x priority and persist the trajectory as the new survivor. Exploits Montezuma determinism: the same action sequence from the same seed reproduces identically.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.92,
+    "llm_priority": "test",
+    "llm_notes": "Montezuma is fully deterministic from a fixed seed. ep3 shows total_steps=410 (died fast) vs ep0-2 at 27000 steps \u2014 the variance is all about dying early, not advancing. Once a trajectory reaches room 2+, replaying those transitions at 10x drowns out the loss-inducing transitions and biases future sampling toward the winning path. This is the Go-Explore insight applied locally.",
+    "enaction": {
+      "type": "trajectory_survivor",
+      "priority_scale": 10.0,
+      "condition": "new_best_room"
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "montezuma_decoder_key_dual_byte",
+    "description": "Fix key_collected decoder: require BOTH RAM[56]==0xFF AND bit1 of RAM[65] set. The single-byte check caused false positives (key_collected=True at step 0) when ALE seeds initialize RAM[56] to non-zero. Confirmed from live RAM log: both bytes change simultaneously at reward=+100.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.99,
+    "llm_priority": "test",
+    "llm_notes": "eval brief shows key_collected=True at step=0 across all 10 episodes and key_held_raw in items_raw=15 at game start. RAM reward log (ses_6589e0c2) confirms: at key pickup, ram_before[56]=0 AND ram_before[65]=0, ram_after[56]=255 AND ram_after[65]=2. Starting items_raw=15 (RAM[65]=15 at init) means the OR-based single check was always triggering. Dual-AND gate fixes this.",
+    "enaction": {
+      "type": "decoder_fix",
+      "decoder": "MontezumaDecoder",
+      "key_check": "RAM[56]==255 AND RAM[65]&0x02"
+    }
+  }
+]

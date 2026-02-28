@@ -1,0 +1,55 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_hole_emergency_gate_88",
+    "description": "Switch to survival strategy when hole count exceeds 88 so wide-board runs stop prioritizing greedy clears in collapse-prone states.",
+    "llm_score": 0.9,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44) while max height differs by only 0.41 (20.00 vs 19.59), so a hole-triggered mode gate should separate terminal trajectories earlier than height-based control.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "holes > 88",
+        "strategy": "survive"
+      }
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "l7_opening_hole_penalty_0_24_v4",
+    "description": "Apply stronger hole suppression through pieces 0-24 to stabilize the fragile opening-to-midgame transition.",
+    "llm_score": 0.84,
+    "llm_priority": "test",
+    "llm_notes": "Failures end after 23.23 pieces on average with 99.66 holes, and outlier openings show lower early holes (78.8) than baseline early holes (85.7), indicating the high-risk window extends beyond the first 12 pieces.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "piece_phase",
+        "range": [
+          0,
+          24
+        ],
+        "target": "holes",
+        "multiplier": 2.4
+      }
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "l7_surface_volatility_brake",
+    "name": "l7_surface_volatility_brake_critical_height_85",
+    "description": "Increase bumpiness penalty only when board height is in the danger band to focus anti-volatility pressure near terminal risk.",
+    "llm_score": 0.79,
+    "llm_priority": "explore",
+    "llm_notes": "Bumpiness separates outcomes strongly (7.92 failure vs 1.44 success, delta 6.48), but height is near terminal in both groups, so gating bumpiness pressure to critical-height states should reduce over-constraint on safer boards.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "height > 0.85",
+        "strategy": "survive"
+      }
+    }
+  }
+]

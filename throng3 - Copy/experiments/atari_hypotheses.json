@@ -1,0 +1,694 @@
+{
+  "active": [
+    {
+      "name": "montezuma_near_death_priority_boost",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Boost replay priority for near_death transitions in Montezuma where disagreement spikes.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 3.0
+      },
+      "llm_score": 0.86,
+      "llm_priority": "test",
+      "llm_notes": "Montezuma shows disagree_near_terminal_rate=0.7436 with mean_entropy=2.3881 and high_conf_disagree_rate=0.3377 over n_steps=267719. Increase sampling of survival-critical transitions to reduce terminal divergence.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771748344.919596,
+      "updated_at": 1771748344.919596
+    },
+    {
+      "name": "montezuma_imitation_phase_extend_7000",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Extend imitation-only phase for Montezuma before RL takeover.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 7000
+      },
+      "llm_score": 0.81,
+      "llm_priority": "test",
+      "llm_notes": "Despite alignment_rate=0.6110, Montezuma remains highly uncertain (mean_entropy=2.3881) and reward_on_disagree (0.5857) exceeds reward_on_agree (0.0520), indicating unstable policy grounding. Extend imitation phase to stabilize action model.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771748344.9196022,
+      "updated_at": 1771748344.9196022
+    },
+    {
+      "name": "frogger_high_conf_disagree_boost",
+      "game": "ALE/Frogger-v5",
+      "status": "active",
+      "description": "Prioritize high-confidence disagreement samples in Frogger to correct confident wrong habits.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "high_conf_disagree",
+        "multiplier": 3.5
+      },
+      "llm_score": 0.84,
+      "llm_priority": "test",
+      "llm_notes": "Frogger has alignment_rate=0.0289 with high_conf_disagree_rate=0.9711 and disagree_near_terminal_rate=1.0 across n_steps=67771. The agent is confidently wrong at death-adjacent states, so oversample high_conf_disagree transitions.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771748344.9196055,
+      "updated_at": 1771748344.9196055
+    },
+    {
+      "name": "breakout_disagree_priority_boost",
+      "game": "ALE/Breakout-v5",
+      "status": "active",
+      "description": "Increase replay weight for disagreement transitions in Breakout to improve imitation alignment.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "disagree",
+        "multiplier": 2.0
+      },
+      "llm_score": 0.72,
+      "llm_priority": "explore",
+      "llm_notes": "Breakout has moderate alignment_rate=0.3691 with high_conf_disagree_rate=0.6309 and disagree_near_terminal_rate=0.5714 over n_steps=12453. A lighter disagreement boost can test whether mismatch reduction improves reward consistency (reward_on_agree=0.0100 vs reward_on_disagree=0.0074).",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771748344.9196074,
+      "updated_at": 1771748344.9196074
+    },
+    {
+      "name": "asterix_high_conf_disagree_boost",
+      "game": "ALE/Asterix-v5",
+      "status": "active",
+      "description": "Boost replay priority for high-confidence disagreements so the agent relearns confident-but-wrong habits from human demonstrations.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "high_conf_disagree",
+        "multiplier": 3.0
+      },
+      "llm_score": 0.88,
+      "llm_priority": "test",
+      "llm_notes": "Asterix shows alignment_rate=0.0292 with high_conf_disagree_rate=0.9708 and disagree_near_terminal_rate=0.8636, so confident disagreement dominates and should be oversampled.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771754482.551773,
+      "updated_at": 1771754482.551773
+    },
+    {
+      "name": "asterix_imitation_phase_extend_8000",
+      "game": "ALE/Asterix-v5",
+      "status": "active",
+      "description": "Extend imitation-only warmup to stabilize policy before RL takeover in a high-entropy, low-alignment regime.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 8000
+      },
+      "llm_score": 0.8,
+      "llm_priority": "explore",
+      "llm_notes": "Mean entropy is 2.0533 (>2.0) while alignment is only 0.0292, indicating the policy remains uncertain and poorly aligned; longer imitation should improve backbone action priors.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771754482.5517795,
+      "updated_at": 1771754482.5517795
+    },
+    {
+      "name": "montezuma_near_death_priority_boost_v2",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Increase near-death replay emphasis to target persistent disagreement in survival-critical moments.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 4.0
+      },
+      "llm_score": 0.79,
+      "llm_priority": "test",
+      "llm_notes": "Montezuma still has disagree_near_terminal_rate=0.7436 and mean_entropy=2.3881 despite existing ops, with eval runs stuck at max_room=1 and total_reward=0.0, so stronger near-death sampling is warranted.",
+      "evidence_count": 0,
+      "source": "atari_mutation",
+      "parent_name": "montezuma_near_death_priority_boost",
+      "created_at": 1771754482.5517843,
+      "updated_at": 1771754482.5517843,
+      "parent_enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 3.0
+      }
+    },
+    {
+      "name": "centipede_near_death_priority_boost",
+      "game": "ALE/Centipede-v5",
+      "status": "active",
+      "description": "Boost replay priority on near-death transitions to correct catastrophic divergence in survival-critical moments.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 4.5
+      },
+      "llm_score": 0.9,
+      "llm_priority": "test",
+      "llm_notes": "Centipede has alignment_rate=0.0003, high_conf_disagree_rate=0.9997, and disagree_near_terminal_rate=1.0 with mean_entropy=2.0995 across 13,863 steps, so survival-critical disagreement should be heavily oversampled.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771787650.752548,
+      "updated_at": 1771787650.752548
+    },
+    {
+      "name": "defender_imitation_phase_extend_10000",
+      "game": "ALE/Defender-v5",
+      "status": "active",
+      "description": "Extend imitation-only warmup to stabilize policy priors before RL takeover in an extreme low-alignment regime.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 10000
+      },
+      "llm_score": 0.82,
+      "llm_priority": "test",
+      "llm_notes": "Defender shows alignment_rate=0.0434 with mean_entropy=2.0306 and high_conf_disagree_rate=0.9566, while reward_on_agree=16.8449 greatly exceeds reward_on_disagree=1.1278, indicating human behavior is valuable but underlearned.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771787650.752555,
+      "updated_at": 1771787650.752555
+    },
+    {
+      "name": "montezuma_imitation_phase_extend_10000",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Increase Montezuma imitation-only warmup further to address persistent high-entropy uncertainty and stagnant eval progression.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 10000
+      },
+      "llm_score": 0.8,
+      "llm_priority": "test",
+      "llm_notes": "Montezuma still has mean_entropy=2.3881 with disagree_near_terminal_rate=0.7436 and eval episodes stuck at max_room=1 with total_reward=0.0, so 7000 imitation steps appear insufficient for stable behavior grounding.",
+      "evidence_count": 0,
+      "source": "atari_mutation",
+      "parent_name": "montezuma_imitation_phase_extend_7000",
+      "created_at": 1771787650.75256,
+      "updated_at": 1771787650.75256,
+      "parent_enaction": {
+        "type": "phase_extend",
+        "phase_steps": 7000
+      }
+    },
+    {
+      "name": "montezuma_subgoal_shaped_reward",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Inject shaped rewards for 7 RAM-based sub-goals in Montezuma stage 1: ladder_reached (+0.5), ladder_descended (+1.0), platform_run_right (+1.5), rope_zone (+2.5), key_platform (+4.0), key_collected (+10.0), room_advanced (+20.0). Each fires once per episode on first attainment.",
+      "enaction": {
+        "type": "shaped_reward",
+        "module": "montezuma_subgoals.ShapedRewardEngine",
+        "subgoal_scale": 1.0,
+        "novelty_scale": 0.3,
+        "death_penalty": -5.0
+      },
+      "llm_score": 0.95,
+      "llm_priority": "test",
+      "llm_notes": "disagree_near_terminal_rate=0.74 and game_reward=0.0 across all 10 eval episodes confirms the agent has no gradient signal. All episodes stuck in room 1 (start_room) losing lives from 5 to 0. Sparse +100 key reward unreachable without sub-goal scaffolding. Stage 1 spatial layout anchored to calibrated RAM[42]=player_x, RAM[43]=player_y, RAM[3]=room.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771788197.4387941,
+      "updated_at": 1771788197.4387941
+    },
+    {
+      "name": "montezuma_novelty_count_bonus",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Count-based intrinsic novelty reward: bonus = 0.3 / sqrt(visit_count) for each new (room, x//8, y//8) cell. Decays as cells are revisited. Encourages spatial exploration without losing lives.",
+      "enaction": {
+        "type": "novelty_bonus",
+        "bin_size": 8,
+        "novelty_scale": 0.3
+      },
+      "llm_score": 0.88,
+      "llm_priority": "test",
+      "llm_notes": "eval trajectory snapshots show agent oscillating at x=77-109 y=148-235 (room 1) across ALL 10 episodes with novelty_cells never growing. Count-based bonus creates gradient signal for lateral movement without requiring the sparse +100 key reward. Bin size 8 gives 20x28 cells per room = 560 unique states per room.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771788197.4388077,
+      "updated_at": 1771788197.4388077
+    },
+    {
+      "name": "montezuma_amygdala_trajectory_switch",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "When any episode beats the best-room record, immediately inject all its transitions into the replay buffer at 10x priority and persist the trajectory as the new survivor. Exploits Montezuma determinism: the same action sequence from the same seed reproduces identically.",
+      "enaction": {
+        "type": "trajectory_survivor",
+        "priority_scale": 10.0,
+        "condition": "new_best_room"
+      },
+      "llm_score": 0.92,
+      "llm_priority": "test",
+      "llm_notes": "Montezuma is fully deterministic from a fixed seed. ep3 shows total_steps=410 (died fast) vs ep0-2 at 27000 steps \u2014 the variance is all about dying early, not advancing. Once a trajectory reaches room 2+, replaying those transitions at 10x drowns out the loss-inducing transitions and biases future sampling toward the winning path. This is the Go-Explore insight applied locally.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771788197.438813,
+      "updated_at": 1771788197.438813
+    },
+    {
+      "name": "montezuma_decoder_key_dual_byte",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Fix key_collected decoder: require BOTH RAM[56]==0xFF AND bit1 of RAM[65] set. The single-byte check caused false positives (key_collected=True at step 0) when ALE seeds initialize RAM[56] to non-zero. Confirmed from live RAM log: both bytes change simultaneously at reward=+100.",
+      "enaction": {
+        "type": "decoder_fix",
+        "decoder": "MontezumaDecoder",
+        "key_check": "RAM[56]==255 AND RAM[65]&0x02"
+      },
+      "llm_score": 0.99,
+      "llm_priority": "test",
+      "llm_notes": "eval brief shows key_collected=True at step=0 across all 10 episodes and key_held_raw in items_raw=15 at game start. RAM reward log (ses_6589e0c2) confirms: at key pickup, ram_before[56]=0 AND ram_before[65]=0, ram_after[56]=255 AND ram_after[65]=2. Starting items_raw=15 (RAM[65]=15 at init) means the OR-based single check was always triggering. Dual-AND gate fixes this.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771788197.4388158,
+      "updated_at": 1771788197.4388158
+    },
+    {
+      "name": "montezuma_frontier_recovery_curriculum",
+      "game": "ALE/MontezumaRevenge-v5",
+      "description": "Montezuma shows collapse to zero recent reward despite long episodes; bias training toward frontier states, recoverable trajectories, and key-door completion micro-goals.",
+      "enaction": {
+        "type": "curriculum_adjust",
+        "dream_interval": 6,
+        "advisory_rate": 0.62,
+        "promote_threshold": 14,
+        "epsilon_decay": 0.998,
+        "gamma": 0.995,
+        "subgoals": [
+          "first_ladder_contact",
+          "first_key_acquired",
+          "door_unlock_sequence",
+          "safe_return_after_key"
+        ]
+      },
+      "llm_score": 0.86,
+      "llm_priority": "explore",
+      "llm_notes": "300 episodes with recent20_mean=0.0 indicates sparse-reward starvation. Increase exploration persistence and shorten dream interval to improve planning frequency.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771814431.2998092,
+      "updated_at": 1771814431.2998092
+    },
+    {
+      "name": "breakout_stability_then_speed",
+      "game": "ALE/Breakout-v5",
+      "description": "Breakout is stochastic+dense with low but nonzero reward; prioritize consistency before high-reward streak chasing.",
+      "enaction": {
+        "type": "parameter_tune",
+        "dream_interval": 12,
+        "advisory_rate": 0.34,
+        "promote_threshold": 22,
+        "epsilon_decay": 0.996,
+        "gamma": 0.985,
+        "focus": "paddle_ball_alignment_and_life_preservation"
+      },
+      "llm_score": 0.68,
+      "llm_priority": "exploit",
+      "llm_notes": "500 episodes, recent20_mean=0.8 and flat trend suggest noisy local policy. Slightly lower advisory use and longer horizon should reduce oscillation.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771814431.3002293,
+      "updated_at": 1771814431.3002293
+    },
+    {
+      "name": "frogger_lane_phase_model",
+      "game": "ALE/Frogger-v5",
+      "description": "Frogger maintains moderate reward but plateaus; introduce lane-phase timing abstractions and selective risk pulses near completion states.",
+      "enaction": {
+        "type": "timing_policy_upgrade",
+        "dream_interval": 8,
+        "advisory_rate": 0.44,
+        "promote_threshold": 18,
+        "epsilon_decay": 0.997,
+        "gamma": 0.99,
+        "timing_mode": "phase_window_crossing"
+      },
+      "llm_score": 0.74,
+      "llm_priority": "explore",
+      "llm_notes": "500 episodes, recent20_mean above global mean but trend still flat. Improve temporal abstraction rather than raw exploration magnitude.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771814431.3004572,
+      "updated_at": 1771814431.3004572
+    },
+    {
+      "name": "cartpole_relearn_foundation",
+      "game": "CartPole-v1",
+      "description": "CartPole performance is far below expected solved regime, indicating value-estimation instability; re-stabilize baseline control objective.",
+      "enaction": {
+        "type": "stability_reset",
+        "dream_interval": 20,
+        "advisory_rate": 0.12,
+        "promote_threshold": 35,
+        "epsilon_decay": 0.999,
+        "gamma": 0.995,
+        "reset_condition": "if_recent20_mean_below_20"
+      },
+      "llm_score": 0.9,
+      "llm_priority": "explore",
+      "llm_notes": "1200 episodes with mean~13 implies core control policy has not consolidated. Treat as diagnostic anchor task and repair before trusting transfer metrics.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771814431.3005822,
+      "updated_at": 1771814431.3005822
+    },
+    {
+      "name": "instrumentation_check_dreamer_reliance_lock",
+      "game": "ALE/MontezumaRevenge-v5",
+      "description": "Cross-game diagnostics show dreamer_reliance fixed at 0.5 in all games; verify whether adaptive advisory calibration is disabled or clipped.",
+      "enaction": {
+        "type": "diagnostic_probe",
+        "checks": [
+          "log_pre_post_calibration_reliance",
+          "verify_meta_adapter_overrides_per_game",
+          "assert_reliance_not_hardclamped"
+        ]
+      },
+      "llm_score": 0.92,
+      "llm_priority": "explore",
+      "llm_notes": "No PRINCIPLE ops emitted: the strongest apparent cross-game pattern is an instrumentation confound (constant reliance=0.5), which can invalidate causal conclusions.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771814431.3022313,
+      "updated_at": 1771814431.3022313
+    },
+    {
+      "name": "montezuma_frontier_recovery_curriculum",
+      "game": "ALE/MontezumaRevenge-v5",
+      "description": "Montezuma shows collapse to zero recent reward despite long episodes; bias training toward frontier states, recoverable trajectories, and key-door completion micro-goals.",
+      "enaction": {
+        "type": "curriculum_adjust",
+        "dream_interval": 6,
+        "advisory_rate": 0.62,
+        "promote_threshold": 14,
+        "epsilon_decay": 0.998,
+        "gamma": 0.995,
+        "subgoals": [
+          "first_ladder_contact",
+          "first_key_acquired",
+          "door_unlock_sequence",
+          "safe_return_after_key"
+        ]
+      },
+      "llm_score": 0.86,
+      "llm_priority": "explore",
+      "llm_notes": "300 episodes with recent20_mean=0.0 indicates sparse-reward starvation. Increase exploration persistence and shorten dream interval to improve planning frequency.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771815071.4670117,
+      "updated_at": 1771815071.4670117
+    },
+    {
+      "name": "breakout_stability_then_speed",
+      "game": "ALE/Breakout-v5",
+      "description": "Breakout is stochastic+dense with low but nonzero reward; prioritize consistency before high-reward streak chasing.",
+      "enaction": {
+        "type": "parameter_tune",
+        "dream_interval": 12,
+        "advisory_rate": 0.34,
+        "promote_threshold": 22,
+        "epsilon_decay": 0.996,
+        "gamma": 0.985,
+        "focus": "paddle_ball_alignment_and_life_preservation"
+      },
+      "llm_score": 0.68,
+      "llm_priority": "exploit",
+      "llm_notes": "500 episodes, recent20_mean=0.8 and flat trend suggest noisy local policy. Slightly lower advisory use and longer horizon should reduce oscillation.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771815071.4672139,
+      "updated_at": 1771815071.4672139
+    },
+    {
+      "name": "frogger_lane_phase_model",
+      "game": "ALE/Frogger-v5",
+      "description": "Frogger maintains moderate reward but plateaus; introduce lane-phase timing abstractions and selective risk pulses near completion states.",
+      "enaction": {
+        "type": "timing_policy_upgrade",
+        "dream_interval": 8,
+        "advisory_rate": 0.44,
+        "promote_threshold": 18,
+        "epsilon_decay": 0.997,
+        "gamma": 0.99,
+        "timing_mode": "phase_window_crossing"
+      },
+      "llm_score": 0.74,
+      "llm_priority": "explore",
+      "llm_notes": "500 episodes, recent20_mean above global mean but trend still flat. Improve temporal abstraction rather than raw exploration magnitude.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771815071.467403,
+      "updated_at": 1771815071.467403
+    },
+    {
+      "name": "cartpole_relearn_foundation",
+      "game": "CartPole-v1",
+      "description": "CartPole performance is far below expected solved regime, indicating value-estimation instability; re-stabilize baseline control objective.",
+      "enaction": {
+        "type": "stability_reset",
+        "dream_interval": 20,
+        "advisory_rate": 0.12,
+        "promote_threshold": 35,
+        "epsilon_decay": 0.999,
+        "gamma": 0.995,
+        "reset_condition": "if_recent20_mean_below_20"
+      },
+      "llm_score": 0.9,
+      "llm_priority": "explore",
+      "llm_notes": "1200 episodes with mean~13 implies core control policy has not consolidated. Treat as diagnostic anchor task and repair before trusting transfer metrics.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771815071.4676213,
+      "updated_at": 1771815071.4676213
+    },
+    {
+      "name": "instrumentation_check_dreamer_reliance_lock",
+      "game": "ALE/MontezumaRevenge-v5",
+      "description": "Cross-game diagnostics show dreamer_reliance fixed at 0.5 in all games; verify whether adaptive advisory calibration is disabled or clipped.",
+      "enaction": {
+        "type": "diagnostic_probe",
+        "checks": [
+          "log_pre_post_calibration_reliance",
+          "verify_meta_adapter_overrides_per_game",
+          "assert_reliance_not_hardclamped"
+        ]
+      },
+      "llm_score": 0.92,
+      "llm_priority": "explore",
+      "llm_notes": "No PRINCIPLE ops emitted: the strongest apparent cross-game pattern is an instrumentation confound (constant reliance=0.5), which can invalidate causal conclusions.",
+      "status": "active",
+      "evidence_count": 0,
+      "source": "crossgame_inbox",
+      "created_at": 1771815071.4677396,
+      "updated_at": 1771815071.4677396
+    },
+    {
+      "name": "montezuma_near_death_priority_boost_v3",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Increase replay priority for Montezuma near-death disagreements to force repeated learning on survival-critical transitions.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 4.0
+      },
+      "llm_score": 0.86,
+      "llm_priority": "test",
+      "llm_notes": "Montezuma disagree_near_terminal_rate is 0.8519 and mean_entropy is 2.4109, indicating persistent uncertainty exactly where deaths happen; stronger oversampling should improve survival alignment.",
+      "evidence_count": 0,
+      "source": "atari_mutation",
+      "parent_name": "montezuma_near_death_priority_boost_v2",
+      "created_at": 1771859452.6638017,
+      "updated_at": 1771859452.6638017,
+      "parent_enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 4.0
+      }
+    },
+    {
+      "name": "montezuma_high_entropy_phase_extend_12000",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Extend Montezuma imitation phase to 12k steps to reduce broad policy uncertainty before RL dominates updates.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 12000
+      },
+      "llm_score": 0.8,
+      "llm_priority": "explore",
+      "llm_notes": "Montezuma mean_entropy=2.4109 is well above the 2.0 uncertainty threshold while alignment_rate is only 0.4094, so a longer imitation warm-up should stabilize human-strategy features.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771859452.6638114,
+      "updated_at": 1771859452.6638114
+    },
+    {
+      "name": "asterix_high_conf_disagree_boost_v2",
+      "game": "ALE/Asterix-v5",
+      "status": "active",
+      "description": "Increase priority for Asterix high-confidence disagreements so confidently wrong habits are corrected faster.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "high_conf_disagree",
+        "multiplier": 3.5
+      },
+      "llm_score": 0.83,
+      "llm_priority": "test",
+      "llm_notes": "Asterix has alignment_rate=0.0292 with high_conf_disagree_rate=0.9708 and disagree_near_terminal_rate=0.8636, a clear confidently-wrong regime requiring targeted replay pressure.",
+      "evidence_count": 0,
+      "source": "atari_mutation",
+      "parent_name": "asterix_high_conf_disagree_boost",
+      "created_at": 1771859452.6638155,
+      "updated_at": 1771859452.6638155,
+      "parent_enaction": {
+        "type": "priority_boost",
+        "condition": "high_conf_disagree",
+        "multiplier": 3.0
+      }
+    },
+    {
+      "name": "centipede_high_conf_disagree_boost_v2",
+      "game": "ALE/Centipede-v5",
+      "status": "active",
+      "description": "Apply aggressive replay boost on Centipede high-confidence disagreements to break entrenched wrong policy loops.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "high_conf_disagree",
+        "multiplier": 4.0
+      },
+      "llm_score": 0.87,
+      "llm_priority": "test",
+      "llm_notes": "Centipede shows alignment_rate=0.0003 and high_conf_disagree_rate=0.9997 with mean_entropy=2.0995, so nearly all confident actions diverge from demonstrations and should be heavily reweighted.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1771859452.6638231,
+      "updated_at": 1771859452.6638231
+    },
+    {
+      "name": "asterix_imitation_phase_extend_12000",
+      "game": "ALE/Asterix-v5",
+      "status": "active",
+      "description": "Extend imitation-only warmup to 12000 steps for Asterix to reduce globally high uncertainty before RL dominates updates.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 12000
+      },
+      "llm_score": 0.8,
+      "llm_priority": "test",
+      "llm_notes": "Asterix has alignment_rate=0.0292, high_conf_disagree_rate=0.9708, and mean_entropy=2.0533, indicating the policy is both uncertain and confidently misaligned. Extending the imitation phase beyond 8000 should improve representation grounding.",
+      "evidence_count": 0,
+      "source": "atari_mutation",
+      "parent_name": "asterix_imitation_phase_extend_8000",
+      "created_at": 1772013727.3127506,
+      "updated_at": 1772013727.3127506,
+      "parent_enaction": {
+        "type": "phase_extend",
+        "phase_steps": 8000
+      }
+    },
+    {
+      "name": "frogger_near_death_priority_boost_v1",
+      "game": "ALE/Frogger-v5",
+      "status": "active",
+      "description": "Boost replay priority for near-death transitions in Frogger so survival-critical human moves are oversampled.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "near_death",
+        "multiplier": 3.0
+      },
+      "llm_score": 0.86,
+      "llm_priority": "test",
+      "llm_notes": "Frogger shows alignment_rate=0.0289 with high_conf_disagree_rate=0.9711 and disagree_near_terminal_rate=1.0, so divergence is worst at survival-critical states. A 3x near_death boost directly targets that gap.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1772013727.3127606,
+      "updated_at": 1772013727.3127606
+    },
+    {
+      "name": "riverraid_noop_imitation_downweight",
+      "game": "ALE/Riverraid-v5",
+      "status": "active",
+      "description": "Reduce imitation pressure on NOOP in Riverraid to avoid overfitting passive human segments when disagreement actions are yielding higher reward.",
+      "enaction": {
+        "type": "imitation_weight",
+        "action": "NOOP",
+        "alpha": 0.7
+      },
+      "llm_score": 0.72,
+      "llm_priority": "explore",
+      "llm_notes": "Riverraid has low alignment_rate=0.0264 and high_conf_disagree_rate=0.9736, but reward_on_disagree=1.3712 exceeds reward_on_agree=0.6696 while NOOP dominates both human and disagreement counts (12245). Downweighting NOOP imitation tests whether agent reward gains are being suppressed by passive imitation.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1772013727.3127646,
+      "updated_at": 1772013727.3127646
+    },
+    {
+      "name": "montezuma_room_boundary_priority_v1",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Boost replay priority at room-boundary transitions in Montezuma to force learning of crossing behaviors out of the start room.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "room_boundary",
+        "multiplier": 3.5
+      },
+      "llm_score": 0.88,
+      "llm_priority": "test",
+      "llm_notes": "Montezuma alignment_rate=0.3924 with mean_entropy=2.434 and disagree_near_terminal_rate=0.8506, while eval episodes remain stuck at max_room=1 with key_collected_any=false. Oversampling boundary transitions targets the no-progression bottleneck directly.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1772037797.038572,
+      "updated_at": 1772037797.038572
+    },
+    {
+      "name": "montezuma_high_entropy_phase_extend_16000",
+      "game": "ALE/MontezumaRevenge-v5",
+      "status": "active",
+      "description": "Extend Montezuma imitation-only warmup to 16k steps to reduce persistent high-entropy action uncertainty before RL updates dominate.",
+      "enaction": {
+        "type": "phase_extend",
+        "phase_steps": 16000
+      },
+      "llm_score": 0.82,
+      "llm_priority": "explore",
+      "llm_notes": "Mean entropy remains very high at 2.434 (>2.0 uncertainty threshold) and latest eval trajectories repeatedly show q_entropy around 2.89 with no room progression beyond room 1. A longer imitation phase tests whether representation grounding is still insufficient at 12k.",
+      "evidence_count": 0,
+      "source": "atari_mutation",
+      "parent_name": "montezuma_high_entropy_phase_extend_12000",
+      "created_at": 1772037797.0385783,
+      "updated_at": 1772037797.0385783,
+      "parent_enaction": {
+        "type": "phase_extend",
+        "phase_steps": 12000
+      }
+    },
+    {
+      "name": "defender_high_conf_disagree_boost_v1",
+      "game": "ALE/Defender-v5",
+      "status": "active",
+      "description": "Aggressively prioritize high-confidence disagreements in Defender to correct confidently wrong habits where human actions are much more rewarding.",
+      "enaction": {
+        "type": "priority_boost",
+        "condition": "high_conf_disagree",
+        "multiplier": 3.5
+      },
+      "llm_score": 0.86,
+      "llm_priority": "test",
+      "llm_notes": "Defender has alignment_rate=0.0434, high_conf_disagree_rate=0.9566, and disagree_near_terminal_rate=1.0; importantly reward_on_agree=16.8449 far exceeds reward_on_disagree=1.1278, indicating human actions are strongly superior and misaligned confident choices should be heavily replayed.",
+      "evidence_count": 0,
+      "source": "atari_inbox",
+      "created_at": 1772037797.0385869,
+      "updated_at": 1772037797.0385869
+    }
+  ],
+  "retired": [],
+  "candidates": []
+}

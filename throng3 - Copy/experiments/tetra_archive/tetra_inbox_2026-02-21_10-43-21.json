@@ -1,0 +1,55 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_hole_collapse_mode_gate_90",
+    "description": "Switch to survival strategy when hole count exceeds 90 so the policy prioritizes stabilization over greedy clears in collapse-prone states.",
+    "llm_score": 0.85,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), while height differs by only 0.41 (20.00 vs 19.59), so a hole-triggered gate should separate collapse trajectories earlier.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "holes > 90",
+        "strategy": "survive"
+      }
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "l7_opening_hole_penalty_0_20",
+    "description": "Apply stronger hole suppression during the first 20 pieces to prevent early-board damage before midgame.",
+    "llm_score": 0.8,
+    "llm_priority": "test",
+    "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and success dissection shows lower outlier early holes (78.8) than baseline early holes (85.7), supporting a longer opening discipline window.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "piece_phase",
+        "range": [
+          0,
+          20
+        ],
+        "target": "holes",
+        "multiplier": 2.2
+      }
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "l7_surface_volatility_brake",
+    "name": "l7_surface_volatility_brake_height_gate_80",
+    "description": "Retain bumpiness control but intensify survival behavior once stack height enters the danger band.",
+    "llm_score": 0.77,
+    "llm_priority": "explore",
+    "llm_notes": "Bumpiness is a major separator (7.92 failure vs 1.44 success, delta 6.48), and level-7 average height is already extreme (19.63), so adding a high-height gate should focus anti-volatility behavior at terminal risk.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "height > 0.80",
+        "strategy": "survive"
+      }
+    }
+  }
+]

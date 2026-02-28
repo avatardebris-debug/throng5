@@ -1,0 +1,59 @@
+[
+  {
+    "op": "MUTATE",
+    "parent": "montezuma_near_death_priority_boost_v2",
+    "name": "montezuma_near_death_priority_boost_v3",
+    "description": "Increase replay priority for Montezuma near-death disagreements to force repeated learning on survival-critical transitions.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.86,
+    "llm_priority": "test",
+    "llm_notes": "Montezuma disagree_near_terminal_rate is 0.8519 and mean_entropy is 2.4109, indicating persistent uncertainty exactly where deaths happen; stronger oversampling should improve survival alignment.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 4.0
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "montezuma_high_entropy_phase_extend_12000",
+    "description": "Extend Montezuma imitation phase to 12k steps to reduce broad policy uncertainty before RL dominates updates.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.8,
+    "llm_priority": "explore",
+    "llm_notes": "Montezuma mean_entropy=2.4109 is well above the 2.0 uncertainty threshold while alignment_rate is only 0.4094, so a longer imitation warm-up should stabilize human-strategy features.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 12000
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "asterix_high_conf_disagree_boost",
+    "name": "asterix_high_conf_disagree_boost_v2",
+    "description": "Increase priority for Asterix high-confidence disagreements so confidently wrong habits are corrected faster.",
+    "game": "ALE/Asterix-v5",
+    "llm_score": 0.83,
+    "llm_priority": "test",
+    "llm_notes": "Asterix has alignment_rate=0.0292 with high_conf_disagree_rate=0.9708 and disagree_near_terminal_rate=0.8636, a clear confidently-wrong regime requiring targeted replay pressure.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.5
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "centipede_high_conf_disagree_boost_v2",
+    "description": "Apply aggressive replay boost on Centipede high-confidence disagreements to break entrenched wrong policy loops.",
+    "game": "ALE/Centipede-v5",
+    "llm_score": 0.87,
+    "llm_priority": "test",
+    "llm_notes": "Centipede shows alignment_rate=0.0003 and high_conf_disagree_rate=0.9997 with mean_entropy=2.0995, so nearly all confident actions diverge from demonstrations and should be heavily reweighted.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 4.0
+    }
+  }
+]

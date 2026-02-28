@@ -1,0 +1,1156 @@
+[
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 47.808380669155184,
+    "steps": 489,
+    "min_steps_per_life": 489,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": true,
+    "epsilon": 0.1497,
+    "novelty_cells": 53,
+    "episode": 0,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -9.845533048472104,
+    "steps": 2658,
+    "min_steps_per_life": 2658,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_platform_reached",
+      "right_ladder_entered",
+      "right_ladder_descended",
+      "lower_floor_reached",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1494006,
+    "novelty_cells": 108,
+    "episode": 1,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -564.7874141895167,
+    "steps": 1869,
+    "min_steps_per_life": 1869,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_lower_ladder_top"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1491017988,
+    "novelty_cells": 113,
+    "episode": 2,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -256.5724909175257,
+    "steps": 1745,
+    "min_steps_per_life": 1745,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "lower_platform_right",
+      "center_ladder_descended",
+      "skull_zone_crossed",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1488035952024,
+    "novelty_cells": 123,
+    "episode": 3,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 116.60177338913114,
+    "steps": 2086,
+    "min_steps_per_life": 2086,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "rope_grabbed",
+      "right_platform_reached",
+      "right_ladder_entered",
+      "lower_floor_reached",
+      "right_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1485059880119952,
+    "novelty_cells": 128,
+    "episode": 4,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 61.856116159537606,
+    "steps": 459,
+    "min_steps_per_life": 459,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1482089760359712,
+    "novelty_cells": 130,
+    "episode": 5,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -164.7293444036688,
+    "steps": 1004,
+    "min_steps_per_life": 1004,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14791255808389925,
+    "novelty_cells": 135,
+    "episode": 6,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -1327.1197314756444,
+    "steps": 2143,
+    "min_steps_per_life": 2143,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14761673296773145,
+    "novelty_cells": 136,
+    "episode": 7,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 128.1731916942816,
+    "steps": 2309,
+    "min_steps_per_life": 2309,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_lower_ladder_top",
+      "center_ladder_descended",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.147321499501796,
+    "novelty_cells": 146,
+    "episode": 8,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 64.38992282878199,
+    "steps": 802,
+    "min_steps_per_life": 802,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1470268565027924,
+    "novelty_cells": 146,
+    "episode": 9,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 6.972836189755098,
+    "steps": 340,
+    "min_steps_per_life": 340,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14673280278978681,
+    "novelty_cells": 146,
+    "episode": 10,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -749.1827056594541,
+    "steps": 2995,
+    "min_steps_per_life": 2995,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_platform_reached",
+      "right_ladder_entered",
+      "right_ladder_descended",
+      "lower_floor_reached",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14643933718420724,
+    "novelty_cells": 148,
+    "episode": 11,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -696.5973411092317,
+    "steps": 1552,
+    "min_steps_per_life": 1552,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "center_ladder_descended",
+      "lower_platform_right",
+      "rope_grabbed",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14614645850983882,
+    "novelty_cells": 149,
+    "episode": 12,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -90.9513349907095,
+    "steps": 2181,
+    "min_steps_per_life": 2181,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "center_ladder_descended",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14585416559281913,
+    "novelty_cells": 149,
+    "episode": 13,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -121.26482211779714,
+    "steps": 1159,
+    "min_steps_per_life": 1159,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1455624572616335,
+    "novelty_cells": 149,
+    "episode": 14,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -110.22423399822216,
+    "steps": 1486,
+    "min_steps_per_life": 1486,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14527133234711023,
+    "novelty_cells": 150,
+    "episode": 15,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 0.7072292400876939,
+    "steps": 433,
+    "min_steps_per_life": 433,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.144980789682416,
+    "novelty_cells": 150,
+    "episode": 16,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -852.4617903659384,
+    "steps": 1436,
+    "min_steps_per_life": 1436,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14469082810305117,
+    "novelty_cells": 150,
+    "episode": 17,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -463.799287841452,
+    "steps": 1697,
+    "min_steps_per_life": 1697,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14440144644684508,
+    "novelty_cells": 150,
+    "episode": 18,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 7.1638449258743755,
+    "steps": 362,
+    "min_steps_per_life": 362,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1441126435539514,
+    "novelty_cells": 150,
+    "episode": 19,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 79.91170377272199,
+    "steps": 532,
+    "min_steps_per_life": 532,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1438244182668435,
+    "novelty_cells": 150,
+    "episode": 20,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 32.92405502131128,
+    "steps": 508,
+    "min_steps_per_life": 508,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14353676943030982,
+    "novelty_cells": 151,
+    "episode": 21,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -799.8442607817136,
+    "steps": 1655,
+    "min_steps_per_life": 1655,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "center_ladder_descended",
+      "lower_platform_right",
+      "rope_grabbed",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1432496958914492,
+    "novelty_cells": 151,
+    "episode": 22,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -372.30455952141045,
+    "steps": 1531,
+    "min_steps_per_life": 1531,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "center_ladder_descended",
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_platform_reached",
+      "lower_floor_reached"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1429631964996663,
+    "novelty_cells": 151,
+    "episode": 23,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 39.78678864275645,
+    "steps": 609,
+    "min_steps_per_life": 609,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "lower_platform_right",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14267727010666698,
+    "novelty_cells": 151,
+    "episode": 24,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -272.91411374875855,
+    "steps": 841,
+    "min_steps_per_life": 841,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14239191556645364,
+    "novelty_cells": 151,
+    "episode": 25,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 63.75036208161393,
+    "steps": 487,
+    "min_steps_per_life": 487,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14210713173532075,
+    "novelty_cells": 151,
+    "episode": 26,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -2081.329496750155,
+    "steps": 3345,
+    "min_steps_per_life": 3345,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1418229174718501,
+    "novelty_cells": 151,
+    "episode": 27,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -1689.0197568369113,
+    "steps": 2562,
+    "min_steps_per_life": 2562,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1415392716369064,
+    "novelty_cells": 151,
+    "episode": 28,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 39.45051530896107,
+    "steps": 755,
+    "min_steps_per_life": 755,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended",
+      "right_lower_ladder_top"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1412561930936326,
+    "novelty_cells": 151,
+    "episode": 29,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 32.627418712668714,
+    "steps": 1222,
+    "min_steps_per_life": 1222,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "center_ladder_descended",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14097368070744534,
+    "novelty_cells": 151,
+    "episode": 30,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -319.3230249335711,
+    "steps": 1338,
+    "min_steps_per_life": 1338,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_platform_reached",
+      "right_ladder_entered",
+      "lower_floor_reached",
+      "right_ladder_descended",
+      "center_ladder_descended",
+      "right_lower_ladder_top"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14069173334603044,
+    "novelty_cells": 151,
+    "episode": 31,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -254.49955050160418,
+    "steps": 856,
+    "min_steps_per_life": 856,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "center_ladder_descended",
+      "lower_platform_right",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.14041034987933837,
+    "novelty_cells": 151,
+    "episode": 32,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -30.724455380069784,
+    "steps": 1303,
+    "min_steps_per_life": 1303,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1401295291795797,
+    "novelty_cells": 151,
+    "episode": 33,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -1207.8111743061224,
+    "steps": 1909,
+    "min_steps_per_life": 1909,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "center_ladder_descended",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13984927012122053,
+    "novelty_cells": 151,
+    "episode": 34,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -194.88320045003078,
+    "steps": 1751,
+    "min_steps_per_life": 1751,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "right_platform_reached",
+      "lower_floor_reached"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1395695715809781,
+    "novelty_cells": 152,
+    "episode": 35,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -26.634422297530296,
+    "steps": 2021,
+    "min_steps_per_life": 2021,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_platform_reached",
+      "right_ladder_entered",
+      "right_ladder_descended",
+      "lower_floor_reached",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13929043243781614,
+    "novelty_cells": 152,
+    "episode": 36,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -276.6163922333017,
+    "steps": 1124,
+    "min_steps_per_life": 1124,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_lower_ladder_top",
+      "center_ladder_descended",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1390118515729405,
+    "novelty_cells": 152,
+    "episode": 37,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -322.39863051622933,
+    "steps": 1409,
+    "min_steps_per_life": 1409,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "center_ladder_descended",
+      "lower_platform_right",
+      "right_lower_ladder_top",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1387338278697946,
+    "novelty_cells": 152,
+    "episode": 38,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 46.39445097366114,
+    "steps": 401,
+    "min_steps_per_life": 401,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "center_ladder_descended",
+      "rope_grabbed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13845636021405502,
+    "novelty_cells": 152,
+    "episode": 39,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 68.08625764984247,
+    "steps": 375,
+    "min_steps_per_life": 375,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1381794474936269,
+    "novelty_cells": 152,
+    "episode": 40,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -88.12824980039872,
+    "steps": 2223,
+    "min_steps_per_life": 2223,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_platform_reached",
+      "right_ladder_entered",
+      "lower_floor_reached",
+      "right_ladder_descended",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13790308859863964,
+    "novelty_cells": 152,
+    "episode": 41,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 52.589825021673754,
+    "steps": 501,
+    "min_steps_per_life": 501,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13762728242144237,
+    "novelty_cells": 152,
+    "episode": 42,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 74.14137929857363,
+    "steps": 655,
+    "min_steps_per_life": 655,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13735202785659947,
+    "novelty_cells": 152,
+    "episode": 43,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 76.2577154663656,
+    "steps": 1292,
+    "min_steps_per_life": 1292,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "right_lower_ladder_top",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13707732380088627,
+    "novelty_cells": 152,
+    "episode": 44,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -223.9112607492317,
+    "steps": 1074,
+    "min_steps_per_life": 1074,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1368031691532845,
+    "novelty_cells": 152,
+    "episode": 45,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 79.47070497494643,
+    "steps": 569,
+    "min_steps_per_life": 569,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "rope_grabbed",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13652956281497794,
+    "novelty_cells": 152,
+    "episode": 46,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -592.2457860210886,
+    "steps": 1253,
+    "min_steps_per_life": 1253,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "lower_platform_right",
+      "center_ladder_descended"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.136256503689348,
+    "novelty_cells": 152,
+    "episode": 47,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": -385.61777925628894,
+    "steps": 1480,
+    "min_steps_per_life": 1480,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "skull_zone_crossed",
+      "rope_grabbed",
+      "right_platform_reached",
+      "lower_floor_reached"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.1359839906819693,
+    "novelty_cells": 153,
+    "episode": 48,
+    "policy": "A"
+  },
+  {
+    "game_reward": 0.0,
+    "shaped_reward": 61.33697637678516,
+    "steps": 1194,
+    "min_steps_per_life": 1194,
+    "max_room": 1,
+    "rooms_visited": [
+      1
+    ],
+    "subgoals_hit": [
+      "lower_platform_right",
+      "center_ladder_descended",
+      "right_lower_ladder_top",
+      "rope_grabbed",
+      "skull_zone_crossed"
+    ],
+    "current_target": "right_lower_ladder_top",
+    "amygdala_switch": false,
+    "epsilon": 0.13571202270060537,
+    "novelty_cells": 153,
+    "episode": 49,
+    "policy": "A"
+  }
+]

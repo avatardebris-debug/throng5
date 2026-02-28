@@ -251,6 +251,7 @@ def _draw_hud(
     paused: bool,
     near_death: bool,
     hud_w: int,
+    coord_xy=None,   # (x, y, stale) — pre-validated, see play() for filtering
 ):
     import pygame
     hud_surf = pygame.Surface((hud_w, screen.get_height()), pygame.SRCALPHA)
@@ -270,7 +271,23 @@ def _draw_hud(
     txt(f"Rew  {total_reward:+.1f}", 8, y); y += dy
     txt(f"Lives {lives}",  8, y,
         (255, 80, 80) if lives <= 1 else (220, 220, 220))
-    y += dy + 6
+    y += dy + 4
+
+    # ── Coordinate HUD (for calibration playthrough) ─────────────────
+    # coord_xy = (x, y, stale) where stale=True during death/transition animation
+    if coord_xy is not None:
+        px, py, stale = coord_xy
+        try:
+            from throng4.basal_ganglia.room_constants import platform_name
+            zone = platform_name(px, py)
+        except Exception:
+            zone = "?"
+        c_coord = (160, 160, 160) if stale else (120, 255, 120)
+        c_zone  = (100, 100, 100) if stale else (100, 220, 180)
+        suffix  = " ~" if stale else ""
+        txt(f"x={px:3d} y={py:3d}{suffix}", 8, y, c_coord, small_font);  y += 16
+        txt(zone[:22],                       8, y, c_zone,  small_font);  y += 18
+    y += 4
 
     # Agent vs human
     am = action_meanings
@@ -369,7 +386,7 @@ def play(
 
     # ── pygame window ────────────────────────────────────────────────
     pygame.init()
-    HUD_W = 160
+    HUD_W = 200   # wider panel to fit coordinate text
     # Native ALE frame: 160(w) x 210(h)
     GFX_W = 160 * scale_x
     GFX_H = 210 * scale_y
@@ -426,6 +443,16 @@ def play(
         dir_das  = _DASTracker(das_delay,  das_repeat)   # LEFT / RIGHT / UP
         fire_das = _DASTracker(fire_delay, fire_repeat)  # FIRE / ROTATE combos
         drop_das = _DASTracker(1,          drop_repeat)  # DOWN soft-drop
+
+        # Stable coordinate tracking — filters death-animation resets & glitches.
+        # ALE bytes 42/43 briefly read 0 or make impossible jumps during:
+        #   - Death animations (reset to 0,0)
+        #   - Room transitions (jump to new room start)
+        #   - First few frames after env.reset()
+        _vx, _vy     = 0, 0        # last validated x, y
+        _stale_count = 0           # frames since we last got a valid reading
+        _STALE_LIMIT = 5           # frames before coord display greys out
+        _JUMP_LIMIT  = 60          # max plausible pixel jump per step
 
         # Save state slots: in-memory AND on disk
         # Disk path: experiments/save_states/<game_slug>/<session_id>_slot<N>.bin
@@ -486,7 +513,7 @@ def play(
                         # Try in-memory first, then disk (newest slot first)
                         if _saved_state_rgb is None:
                             import pickle
-                            slot_files = sorted(_save_states_dir.glob("*_slot*.bin"), reverse=True)
+                            slot_files = sorted(_save_states_dir.glob("*_slot*.bin"), key=lambda p: p.stat().st_mtime, reverse=True)
                             for slot_file in slot_files:
                                 try:
                                     with open(slot_file, 'rb') as sf:
@@ -526,7 +553,8 @@ def play(
                           step_idx, eps_played, total_reward,
                           _lives(ram_obs, game_id),
                           agent_action, human_action, action_meanings,
-                          paused=True, near_death=near_death, hud_w=HUD_W)
+                          paused=True, near_death=near_death, hud_w=HUD_W,
+                          ram_obs=ram_obs)
                 pygame.display.flip()
                 continue
 
@@ -612,6 +640,7 @@ def play(
                 reward=float(reward),
                 done=done,
                 near_death=near_death,
+                ram_obs=ram_obs,
             )
 
             # ── RAM reward snapshot (key byte calibration) ────────
@@ -635,13 +664,24 @@ def play(
 
             step_idx += 1
 
-            # ── render ────────────────────────────────────────────
+            # ── Coordinate validation (filter glitch frames) ─────────
+            _rx, _ry = int(ram_obs[42]), int(ram_obs[43])
+            _jump = abs(_rx - _vx) + abs(_ry - _vy)  # Manhattan distance
+            if _rx > 0 and _ry > 0 and (_vx == 0 or _jump <= _JUMP_LIMIT):
+                _vx, _vy    = _rx, _ry
+                _stale_count = 0
+            else:
+                _stale_count += 1
+            _coord_xy = (_vx, _vy, _stale_count >= _STALE_LIMIT)
+
+            # ── render ────────────────────────────────────────────────
             _render(screen, rgb_obs, scale_x, scale_y, GFX_W, GFX_H)
             _draw_hud(screen, font, small_font,
                       step_idx, eps_played, total_reward,
                       lives_now,
                       agent_action, human_action, action_meanings,
-                      paused=False, near_death=near_death, hud_w=HUD_W)
+                      paused=False, near_death=near_death, hud_w=HUD_W,
+                      coord_xy=_coord_xy)
             pygame.display.flip()
 
             if done:
@@ -699,9 +739,11 @@ def _lives(ram_obs, game_id: str) -> int:
     if "Breakout" in game_id:
         return int(ram_obs[57])
     if "SpaceInvaders" in game_id:
-        return int(ram_obs[73])   # SI stores lives at byte 73
+        return int(ram_obs[73])
     if "Pong" in game_id:
-        return 0   # Pong has no lives concept
+        return 0
+    if "Montezuma" in game_id or "montezuma" in game_id:
+        return int(ram_obs[58])   # RAM[58] = lives in MontezumaRevenge
     return 0
 
 
@@ -719,8 +761,8 @@ def _parse_args():
     p.add_argument("--fps",       type=int, default=30,     help="Target frame rate")
     p.add_argument("--scale-x",   type=int, default=5,   dest="scale_x",
                    help="Horizontal scale (native=160px, 5=800px)")
-    p.add_argument("--scale-y",   type=int, default=4,   dest="scale_y",
-                   help="Vertical scale (native=210px, 4=840px)")
+    p.add_argument("--scale-y",   type=int, default=3,   dest="scale_y",
+                   help="Vertical scale (native=210px, 3=630px, 4=840px)")
     # DAS timing
     p.add_argument("--das-delay",   type=int, default=10, dest="das_delay",
                    help="Directional: frames before auto-repeat kicks in (10≈333ms)")

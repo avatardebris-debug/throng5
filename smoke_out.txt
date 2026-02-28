@@ -1,0 +1,20 @@
+﻿============================================================
+Throng 5 Brain Module Smoke Test ù v5.0.0-alpha
+============================================================
+[PASS] SessionLogger wrote 10 events to smoke_test_20260225_211813_f7017e35-87f.jsonl
+[PASS] Branch tracking: 1 active branch(es) detected
+[PASS] ContextRestorer summary (563 chars)
+[PASS] Divergence detection: 1 point(s) found
+[PASS] MessageBus routing (routine)
+[PASS] Emergency halt working
+[PASS] Resume after halt
+[PASS] BrainRegion.step() works
+[PASS] BrainRegion halted correctly
+[PASS] BrainRegion resumed correctly
+[PASS] BrainRegion messaging works
+
+============================================================
+ALL TESTS PASSED
+Brain module v5.0.0-alpha foundation verified.
+Log file: C:\Users\avata\aicompete\throng5\logs\telemetry\smoke_test_20260225_211813_f7017e35-87f.jsonl
+============================================================

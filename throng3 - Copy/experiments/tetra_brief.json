@@ -1,0 +1,1560 @@
+{
+  "brief_type": "tetra_hypothesis_brief",
+  "generated_at": "2026-02-25 10:42:07",
+  "game_context": {
+    "game": "tetris",
+    "levels_trained": [
+      {
+        "level": 2,
+        "n": 2852,
+        "avg": 43.20652173913044,
+        "best": 307,
+        "worst": 0,
+        "avg_bump": 2.1434081346423564,
+        "avg_holes": 11.974403927068725,
+        "avg_height": 11.46984572230014
+      },
+      {
+        "level": 3,
+        "n": 3109,
+        "avg": 70.65455130266967,
+        "best": 413,
+        "worst": 2,
+        "avg_bump": 2.1846252814409777,
+        "avg_holes": 15.210678674815053,
+        "avg_height": 11.626568028304922
+      },
+      {
+        "level": 4,
+        "n": 1853,
+        "avg": 20.79546681057744,
+        "best": 129,
+        "worst": 1,
+        "avg_bump": 1.2266594711279006,
+        "avg_holes": 30.635725849973017,
+        "avg_height": 13.730706961683756
+      },
+      {
+        "level": 5,
+        "n": 2190,
+        "avg": 37.38493150684931,
+        "best": 364,
+        "worst": 2,
+        "avg_bump": 1.160730593607306,
+        "avg_holes": 34.1716894977169,
+        "avg_height": 15.741095890410959
+      },
+      {
+        "level": 6,
+        "n": 2680,
+        "avg": 28.736194029850747,
+        "best": 240,
+        "worst": 2,
+        "avg_bump": 1.4843283582089553,
+        "avg_holes": 62.507462686567166,
+        "avg_height": 17.665298507462687
+      },
+      {
+        "level": 7,
+        "n": 10537,
+        "avg": 32.40485906804593,
+        "best": 356,
+        "worst": 0,
+        "avg_bump": 1.3552244471861061,
+        "avg_holes": 62.27265825187435,
+        "avg_height": 19.634620859827276
+      }
+    ],
+    "total_episodes": 23221,
+    "training_span_days": 2.0
+  },
+  "hypothesis_ledger": {
+    "active": [
+      {
+        "name": "maximize_lines",
+        "status": "active",
+        "win_rate": 0.89,
+        "evidence_count": 50,
+        "confidence": 0.58,
+        "description": "Maximize line clears per piece placed",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 50
+            },
+            {
+              "ep": 19,
+              "pct": 63
+            },
+            {
+              "ep": 29,
+              "pct": 58
+            },
+            {
+              "ep": 39,
+              "pct": 53
+            },
+            {
+              "ep": 49,
+              "pct": 58
+            }
+          ]
+        },
+        "created_at": 1771383677.0854716,
+        "updated_at": 1771383688.3529403,
+        "bayesian_score": 0.7737,
+        "prior_weight": 0.375
+      },
+      {
+        "name": "maximize_lines",
+        "status": "testing",
+        "win_rate": 0.59,
+        "evidence_count": 20,
+        "confidence": 0.59,
+        "description": "Maximize line clears \u2014 HARMFUL on 8-wide board",
+        "metadata": {
+          "transfer_result": "negative",
+          "mean_lines": 4.9,
+          "decline_pct": -41
+        },
+        "created_at": 1771383677.1015906,
+        "updated_at": 1771383688.368111,
+        "bayesian_score": 0.59,
+        "prior_weight": 0.6
+      },
+      {
+        "name": "maximize_lines",
+        "status": "active",
+        "win_rate": 0.55,
+        "evidence_count": 100,
+        "confidence": 0.55,
+        "description": "Maximize line clears per piece placed",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 55
+            },
+            {
+              "ep": 49,
+              "pct": 44
+            },
+            {
+              "ep": 88,
+              "pct": 57
+            },
+            {
+              "ep": 99,
+              "pct": 55
+            }
+          ],
+          "best_episode": {
+            "ep": 88,
+            "lines": 88
+          }
+        },
+        "created_at": 1771383677.091728,
+        "updated_at": 1771383688.361109,
+        "bayesian_score": 0.55,
+        "prior_weight": 0.231
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.38,
+        "evidence_count": 100,
+        "confidence": 0.38,
+        "description": "Minimize bumpiness, build flat surfaces",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 48
+            },
+            {
+              "ep": 49,
+              "pct": 55
+            },
+            {
+              "ep": 88,
+              "pct": 49
+            },
+            {
+              "ep": 99,
+              "pct": 38
+            }
+          ]
+        },
+        "created_at": 1771383677.0947778,
+        "updated_at": 1771383688.3630245,
+        "bayesian_score": 0.38,
+        "prior_weight": 0.231
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.3,
+        "evidence_count": 20,
+        "confidence": 0.3,
+        "description": "Minimize bumpiness",
+        "metadata": null,
+        "created_at": 1771383677.1043575,
+        "updated_at": 1771383688.370529,
+        "bayesian_score": 0.3,
+        "prior_weight": 0.6
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.12,
+        "evidence_count": 100,
+        "confidence": 0.12,
+        "description": "Keep max column height low to avoid death",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 8
+            },
+            {
+              "ep": 49,
+              "pct": 14
+            },
+            {
+              "ep": 88,
+              "pct": 9
+            },
+            {
+              "ep": 99,
+              "pct": 12
+            }
+          ]
+        },
+        "created_at": 1771383677.0981226,
+        "updated_at": 1771383688.365174,
+        "bayesian_score": 0.12,
+        "prior_weight": 0.231
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.11,
+        "evidence_count": 20,
+        "confidence": 0.11,
+        "description": "Keep max column height low",
+        "metadata": null,
+        "created_at": 1771383677.1071246,
+        "updated_at": 1771383688.374648,
+        "bayesian_score": 0.11,
+        "prior_weight": 0.6
+      },
+      {
+        "name": "build_flat",
+        "status": "testing",
+        "win_rate": 0.06,
+        "evidence_count": 50,
+        "confidence": 0.32,
+        "description": "Minimize bumpiness, build flat surfaces",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 11
+            },
+            {
+              "ep": 19,
+              "pct": 42
+            },
+            {
+              "ep": 29,
+              "pct": 30
+            },
+            {
+              "ep": 39,
+              "pct": 50
+            },
+            {
+              "ep": 49,
+              "pct": 32
+            }
+          ]
+        },
+        "created_at": 1771383677.0877273,
+        "updated_at": 1771383688.356483,
+        "bayesian_score": 0.1575,
+        "prior_weight": 0.375
+      },
+      {
+        "name": "minimize_height",
+        "status": "testing",
+        "win_rate": 0.06,
+        "evidence_count": 50,
+        "confidence": 0.09,
+        "description": "Keep max column height low to avoid death",
+        "metadata": {
+          "evolution": [
+            {
+              "ep": 9,
+              "pct": 9
+            },
+            {
+              "ep": 19,
+              "pct": 17
+            },
+            {
+              "ep": 29,
+              "pct": 8
+            },
+            {
+              "ep": 39,
+              "pct": 9
+            },
+            {
+              "ep": 49,
+              "pct": 9
+            }
+          ]
+        },
+        "created_at": 1771383677.0896487,
+        "updated_at": 1771383688.359017,
+        "bayesian_score": 0.0712,
+        "prior_weight": 0.375
+      }
+    ],
+    "retired": [
+      {
+        "name": "minimize_cost",
+        "status": "retired",
+        "win_rate": 0.5818639798488665,
+        "evidence_count": 397,
+        "confidence": 0.5818639798488665,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_cost_v1"
+        },
+        "created_at": 1771470099.882014,
+        "updated_at": 1771470445.5620801,
+        "bayesian_score": 0.5819,
+        "prior_weight": 0.07
+      },
+      {
+        "name": "minimize_v2",
+        "status": "retired",
+        "win_rate": 0.09965635738831616,
+        "evidence_count": 1164,
+        "confidence": 0.09965635738831616,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v3"
+        },
+        "created_at": 1771393074.376001,
+        "updated_at": 1771393074.376001,
+        "bayesian_score": 0.0997,
+        "prior_weight": 0.025
+      },
+      {
+        "name": "minimize_cost",
+        "status": "retired",
+        "win_rate": 0.09782608695652174,
+        "evidence_count": 184,
+        "confidence": 0.09782608695652174,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_cost_v1"
+        },
+        "created_at": 1771393009.7991378,
+        "updated_at": 1771393009.7991378,
+        "bayesian_score": 0.0978,
+        "prior_weight": 0.14
+      },
+      {
+        "name": "minimize_variance",
+        "status": "retired",
+        "win_rate": 0.09259259259259259,
+        "evidence_count": 54,
+        "confidence": 0.09259259259259259,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v1"
+        },
+        "created_at": 1771393004.6457043,
+        "updated_at": 1771393004.6457043,
+        "bayesian_score": 0.0926,
+        "prior_weight": 0.357
+      },
+      {
+        "name": "minimize_v3",
+        "status": "retired",
+        "win_rate": 0.043478260869565216,
+        "evidence_count": 23,
+        "confidence": 0.043478260869565216,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v4"
+        },
+        "created_at": 1771393074.3812811,
+        "updated_at": 1771393075.334034,
+        "bayesian_score": 0.0435,
+        "prior_weight": 0.566
+      },
+      {
+        "name": "minimize_variance",
+        "status": "retired",
+        "win_rate": 0.0364963503649635,
+        "evidence_count": 137,
+        "confidence": 0.0364963503649635,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v1"
+        },
+        "created_at": 1771470099.8904839,
+        "updated_at": 1771470445.5682242,
+        "bayesian_score": 0.0365,
+        "prior_weight": 0.18
+      },
+      {
+        "name": "minimize_v3",
+        "status": "retired",
+        "win_rate": 0.021739130434782608,
+        "evidence_count": 46,
+        "confidence": 0.021739130434782608,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v4"
+        },
+        "created_at": 1771470099.8745663,
+        "updated_at": 1771475466.0611854,
+        "bayesian_score": 0.0217,
+        "prior_weight": 0.395
+      },
+      {
+        "name": "maximize_gain",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 23,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "maximize_gain_v1"
+        },
+        "created_at": 1771393004.0522237,
+        "updated_at": 1771393004.0522237,
+        "bayesian_score": 0.283,
+        "prior_weight": 0.566
+      },
+      {
+        "name": "minimize_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 23,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v2"
+        },
+        "created_at": 1771393004.64957,
+        "updated_at": 1771393005.599099,
+        "bayesian_score": 0.283,
+        "prior_weight": 0.566
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 23,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_cost_v2"
+        },
+        "created_at": 1771393011.0276873,
+        "updated_at": 1771393011.0276873,
+        "bayesian_score": 0.283,
+        "prior_weight": 0.566
+      },
+      {
+        "name": "minimize_v1",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 46,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "minimize_v2"
+        },
+        "created_at": 1771470099.885922,
+        "updated_at": 1771470445.5649981,
+        "bayesian_score": 0.1974,
+        "prior_weight": 0.395
+      },
+      {
+        "name": "maximize_gain",
+        "status": "retired",
+        "win_rate": 0.0,
+        "evidence_count": 75,
+        "confidence": 0.0,
+        "description": "",
+        "metadata": {
+          "evolved_into": "maximize_gain_v1"
+        },
+        "created_at": 1771470099.8936832,
+        "updated_at": 1771470445.5717735,
+        "bayesian_score": 0.1429,
+        "prior_weight": 0.286
+      }
+    ],
+    "untested_candidates": [
+      {
+        "name": "maximize_gain_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "maximize_gain"
+        },
+        "created_at": 1771393004.0558338,
+        "updated_at": 1771393004.0558338,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "minimize_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_v1"
+        },
+        "created_at": 1771393005.6029608,
+        "updated_at": 1771393005.6029608,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "minimize_cost_v1",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_cost"
+        },
+        "created_at": 1771393009.8035433,
+        "updated_at": 1771393009.8035433,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "minimize_cost_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_cost_v1"
+        },
+        "created_at": 1771393011.0317342,
+        "updated_at": 1771393011.0317342,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "minimize_v4",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.5,
+        "description": "",
+        "metadata": {
+          "evolved_from": "minimize_v3"
+        },
+        "created_at": 1771393075.3382525,
+        "updated_at": 1771393075.3382525,
+        "bayesian_score": 0.5,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "reduce_holes_v58",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 82.9 vs success 20.2 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 62.7
+        },
+        "created_at": 1771476058.760544,
+        "updated_at": 1771476058.760544,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "reduce_holes_v535",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 90.8 vs success 76.3 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 14.5
+        },
+        "created_at": 1771550535.3984466,
+        "updated_at": 1771550535.3984466,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "reduce_holes_v978",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 58.3 vs success 30.5 avg holes (delta=27.8)",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 27.8
+        },
+        "created_at": 1771551978.0401523,
+        "updated_at": 1771571014.7081757,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "reduce_holes_v601",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 81.7 vs success 34.9 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 46.800000000000004
+        },
+        "created_at": 1771552601.8049533,
+        "updated_at": 1771552601.8049533,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "control_height_v601",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Control height: failure cluster had 16.3 vs success 12.7 avg max height (delta=3.6)",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "height_delta": 3.6
+        },
+        "created_at": 1771552601.8078332,
+        "updated_at": 1771557803.3396804,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "tetra_holes_early_game",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.72,
+        "description": "Penalise holes created in the first 8 pieces more heavily.",
+        "metadata": {
+          "llm_score": 0.72,
+          "llm_priority": "explore",
+          "llm_notes": "Failure clusters show hole count at piece 8 strongly predicts final lines.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553018.7841725,
+        "updated_at": 1771553018.7839253,
+        "bayesian_score": 0.72,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "tetra_reduce_holes_height_gated",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.68,
+        "description": "Reduce holes only when board height exceeds 60% of max.",
+        "metadata": {
+          "llm_score": 0.68,
+          "llm_priority": "test",
+          "llm_notes": "Adds height gate \u2014 hole avoidance matters most when already tall.",
+          "source": "tetra_mutation",
+          "parent_name": "reduce_holes_v601"
+        },
+        "created_at": 1771553018.7873375,
+        "updated_at": 1771553018.7839253,
+        "bayesian_score": 0.68,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "tetra_survive_tall_boards",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.8,
+        "description": "When height > 75%, enter conservative mode: prefer flat placements over lines.",
+        "metadata": {
+          "llm_score": 0.8,
+          "llm_priority": "test",
+          "llm_notes": "Amygdala A/B data shows max_lines advantage at L7 when SURVIVE active.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553048.7064037,
+        "updated_at": 1771553048.7060874,
+        "bayesian_score": 0.8,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "reduce_holes_v48",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Reduce holes: failure cluster had 81.7 vs success 34.9 avg holes",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "hole_delta": 46.800000000000004
+        },
+        "created_at": 1771553048.7249591,
+        "updated_at": 1771553048.7249591,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "control_height_v48",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.4,
+        "description": "Control height: failure cluster had 17.8 vs success 13.8 avg max height",
+        "metadata": {
+          "generated_by": "slow_loop",
+          "height_delta": 4.0
+        },
+        "created_at": 1771553048.728848,
+        "updated_at": 1771553048.728848,
+        "bayesian_score": 0.4,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "your_hypothesis_name_here",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.75,
+        "description": "One or two sentences describing what this hypothesis means strategically.",
+        "metadata": {
+          "llm_score": 0.75,
+          "llm_priority": "explore",
+          "llm_notes": "Why you think this is worth testing \u2014 reference failure clusters, trends, etc.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553463.1613212,
+        "updated_at": 1771553463.1599874,
+        "bayesian_score": 0.75,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "second_hypothesis_name",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.65,
+        "description": "Another hypothesis. Put as many of these blocks in the array as you need.",
+        "metadata": {
+          "llm_score": 0.65,
+          "llm_priority": "test",
+          "llm_notes": "Rationale for why this is promising.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771553463.16556,
+        "updated_at": 1771553463.1599874,
+        "bayesian_score": 0.65,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "new_mutated_hypothesis_name",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.7,
+        "description": "What changed vs the parent hypothesis.",
+        "metadata": {
+          "llm_score": 0.7,
+          "llm_priority": "test",
+          "llm_notes": "Why this mutation is an improvement over the parent.",
+          "source": "tetra_mutation",
+          "parent_name": "name_of_existing_hypothesis_to_mutate_from"
+        },
+        "created_at": 1771553463.1678743,
+        "updated_at": 1771553463.1599874,
+        "bayesian_score": 0.7,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_early_survival_gate",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.81,
+        "description": "At level 7, switch to a survival-first placement policy for the first 12 pieces: avoid creating holes and avoid exposing deep wells before any line-clear setup.",
+        "metadata": {
+          "llm_score": 0.81,
+          "llm_priority": "test",
+          "llm_notes": "Level 7 has the weakest stability (avg_height=19.56, avg_holes=59.94), and failure episodes end after avg_pieces=1.0 with avg_holes=90.64. A strict early-game gate targets the immediate-collapse regime before scoring policy can matter.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771559420.114244,
+        "updated_at": 1771559420.111345,
+        "bayesian_score": 0.81,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "tetra_survive_tall_boards_hole_cap",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.77,
+        "description": "When height > 75%, keep conservative mode but add a hard hole cap: reject placements that increase hole count unless they clear lines immediately.",
+        "metadata": {
+          "llm_score": 0.77,
+          "llm_priority": "test",
+          "llm_notes": "Parent already focuses on tall-board survival. Adding explicit hole-growth control is justified by the failure/success gap (avg_holes 90.64 vs 76.94, delta 13.7) while both operate near terminal height (~19), so hole trajectory is a stronger discriminator than height alone.",
+          "source": "tetra_mutation",
+          "parent_name": "tetra_survive_tall_boards"
+        },
+        "created_at": 1771559420.123965,
+        "updated_at": 1771559420.111345,
+        "bayesian_score": 0.77,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "outlier_entry_pattern_replay",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.72,
+        "description": "Learn and replay opening-to-midgame board patterns from high-surprise outlier episodes to increase the probability of entering the long-survival mode.",
+        "metadata": {
+          "llm_score": 0.72,
+          "llm_priority": "explore",
+          "llm_notes": "Novelty events at level 7 include 243, 206, and 164 lines (surprise up to 5.75), and top 1% outliers average 183.2 lines vs baseline 2.87. This suggests rare but valid trajectories exist; explicitly modeling their entry conditions should improve consistency.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771559420.1273513,
+        "updated_at": 1771559420.111345,
+        "bayesian_score": 0.72,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_cap_12",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.83,
+        "description": "At level 7, enforce a strict opening policy for the first 12 pieces that rejects placements increasing holes unless they immediately clear a line.",
+        "metadata": {
+          "llm_score": 0.83,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes collapse almost immediately (avg_pieces=1.0) with very high holes (avg_holes=90.64), while successful episodes sustain play with lower holes (76.94). A first-12-piece hole cap targets the early-collapse regime before score optimization matters.",
+          "source": "tetra_inbox",
+          "enaction": {
+            "type": "piece_phase",
+            "range": [
+              0,
+              12
+            ],
+            "target": "holes",
+            "multiplier": 2.0
+          },
+          "enaction_note": "Opening phase: double the hole penalty for pieces 0-12",
+          "enaction_patched": true
+        },
+        "created_at": 1771559473.2493405,
+        "updated_at": 1771561650.2682548,
+        "bayesian_score": 0.83,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_bumpiness_guardrail",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.76,
+        "description": "On level 7, prioritize placements that keep local surface transitions smooth; avoid moves that sharply increase bumpiness unless they clear lines.",
+        "metadata": {
+          "llm_score": 0.76,
+          "llm_priority": "test",
+          "llm_notes": "Bumpiness separates outcomes strongly (failure 3.09 vs success 1.38, delta 1.71). Height is similarly terminal in both groups (~19), so controlling surface volatility is a better discriminator than pure height minimization.",
+          "source": "tetra_inbox",
+          "enaction": {
+            "type": "reward_weight",
+            "target": "bumpiness",
+            "multiplier": 1.8
+          },
+          "enaction_note": "Always-on: 1.8x bumpiness penalty to keep surface smooth",
+          "enaction_patched": true
+        },
+        "created_at": 1771559473.2548194,
+        "updated_at": 1771561650.2682548,
+        "bayesian_score": 0.76,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "tetra_survive_tall_boards_hole_cap_opening_gate",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.79,
+        "description": "Keep the tall-board survival + hole-cap logic, but activate a stricter variant during the opening phase (first 12 pieces) to prevent immediate terminal trajectories.",
+        "metadata": {
+          "llm_score": 0.79,
+          "llm_priority": "test",
+          "llm_notes": "Parent focuses on height>75% states, but current failures die at avg_pieces=1.0, indicating the key decision window is earlier. Novel L7 outliers (164-243 lines, surprise up to 5.75) imply viable trajectories exist if the opening avoids catastrophic early board damage.",
+          "source": "tetra_mutation",
+          "parent_name": "tetra_survive_tall_boards_hole_cap",
+          "enaction": {
+            "type": "piece_phase",
+            "range": [
+              0,
+              12
+            ],
+            "target": "holes",
+            "multiplier": 2.5
+          },
+          "enaction_note": "Stricter variant: 2.5x hole penalty in opening phase",
+          "enaction_patched": true
+        },
+        "created_at": 1771559473.2571397,
+        "updated_at": 1771561650.2682548,
+        "bayesian_score": 0.79,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_collapse_gate_85",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.84,
+        "description": "On level-7 style states, switch immediately to survive mode when hole count exceeds collapse territory so the policy prioritizes stabilizing the board over greedy clears.",
+        "metadata": {
+          "llm_score": 0.84,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), with both near terminal height (~20), so a hole-triggered mode gate should separate collapse trajectories better than height-only control.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771581643.2908056,
+        "updated_at": 1771581643.290303,
+        "bayesian_score": 0.84,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.79,
+        "description": "Apply a stronger global penalty to bumpiness so placements favor smoother surfaces and reduce the jagged stacks associated with immediate deaths.",
+        "metadata": {
+          "llm_score": 0.79,
+          "llm_priority": "test",
+          "llm_notes": "Bumpiness is the strongest separator in this brief: failures are 7.92 vs successes 1.44 (delta 6.48), while height differs by only 0.41, indicating surface volatility control is high leverage.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771581643.305308,
+        "updated_at": 1771581643.290303,
+        "bayesian_score": 0.79,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_cap_20",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.76,
+        "description": "Extend the opening anti-hole window from the first 12 pieces to 20 pieces so early-board discipline persists through the fragile transition into midgame.",
+        "metadata": {
+          "llm_score": 0.76,
+          "llm_priority": "explore",
+          "llm_notes": "Failures still end very early (avg_pieces 23.23) with extreme holes (99.66), and success dissection shows outlier early holes are lower than baseline (78.8 vs 85.7), so extending the early hole cap should test whether stability needs a longer runway.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_opening_hole_cap_12"
+        },
+        "created_at": 1771581643.3078845,
+        "updated_at": 1771581643.290303,
+        "bayesian_score": 0.76,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_holes_collapse_gate_90",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.84,
+        "description": "Trigger survival mode when hole count exceeds 90 to prevent terminal collapse trajectories on wide-board runs.",
+        "metadata": {
+          "llm_score": 0.84,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), while height differs by only 0.41 (20.00 vs 19.59), so hole-threshold gating should separate collapse states earlier.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771603723.1486642,
+        "updated_at": 1771603723.1482651,
+        "bayesian_score": 0.84,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_penalty_20",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.79,
+        "description": "Extend strong hole suppression through the first 20 pieces to reduce early-board damage before midgame stabilization.",
+        "metadata": {
+          "llm_score": 0.79,
+          "llm_priority": "test",
+          "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and success dissection shows lower outlier early holes (78.8) than baseline early holes (85.7), so a longer opening discipline window is justified.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771603723.1555011,
+        "updated_at": 1771603723.1482651,
+        "bayesian_score": 0.79,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake_height_gate",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.76,
+        "description": "Keep bumpiness control but activate a stronger survive-mode gate once stack height enters the danger band.",
+        "metadata": {
+          "llm_score": 0.76,
+          "llm_priority": "explore",
+          "llm_notes": "Bumpiness is a large separator (7.92 failure vs 1.44 success), but level-7 average height is already high (19.63), so gating a survival switch at high height should focus anti-volatility behavior where it matters most.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_surface_volatility_brake"
+        },
+        "created_at": 1771603723.1616135,
+        "updated_at": 1771603723.1482651,
+        "bayesian_score": 0.76,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_collapse_mode_gate_90",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.85,
+        "description": "Switch to survival strategy when hole count exceeds 90 so the policy prioritizes stabilization over greedy clears in collapse-prone states.",
+        "metadata": {
+          "llm_score": 0.85,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), while height differs by only 0.41 (20.00 vs 19.59), so a hole-triggered gate should separate collapse trajectories earlier.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771692201.4941027,
+        "updated_at": 1771692201.4916332,
+        "bayesian_score": 0.85,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_penalty_0_20",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.8,
+        "description": "Apply stronger hole suppression during the first 20 pieces to prevent early-board damage before midgame.",
+        "metadata": {
+          "llm_score": 0.8,
+          "llm_priority": "test",
+          "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and success dissection shows lower outlier early holes (78.8) than baseline early holes (85.7), supporting a longer opening discipline window.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771692201.499014,
+        "updated_at": 1771692201.4916332,
+        "bayesian_score": 0.8,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake_height_gate_80",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.77,
+        "description": "Retain bumpiness control but intensify survival behavior once stack height enters the danger band.",
+        "metadata": {
+          "llm_score": 0.77,
+          "llm_priority": "explore",
+          "llm_notes": "Bumpiness is a major separator (7.92 failure vs 1.44 success, delta 6.48), and level-7 average height is already extreme (19.63), so adding a high-height gate should focus anti-volatility behavior at terminal risk.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_surface_volatility_brake"
+        },
+        "created_at": 1771692201.501832,
+        "updated_at": 1771692201.4916332,
+        "bayesian_score": 0.77,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_collapse_mode_gate_95",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.86,
+        "description": "Switch to survival strategy when holes exceed 95 so collapse-prone wide-board states stop prioritizing greedy clears.",
+        "metadata": {
+          "llm_score": 0.86,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44) while height differs by only 0.41, so hole-triggered gating should separate terminal trajectories earlier.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771754435.2615416,
+        "updated_at": 1771754435.2609258,
+        "bayesian_score": 0.86,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_penalty_0_20_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.81,
+        "description": "Apply stronger hole suppression through the first 20 pieces to prevent early-board damage before midgame stabilization.",
+        "metadata": {
+          "llm_score": 0.81,
+          "llm_priority": "test",
+          "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and outlier episodes show lower early holes (78.8) than baseline early holes (85.7), supporting a longer opening discipline window.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771754435.2701037,
+        "updated_at": 1771754435.2609258,
+        "bayesian_score": 0.81,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake_critical_height",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.78,
+        "description": "Increase bumpiness penalty only once the stack is in the critical height band, focusing anti-volatility control near terminal risk.",
+        "metadata": {
+          "llm_score": 0.78,
+          "llm_priority": "explore",
+          "llm_notes": "Bumpiness is a strong separator (7.92 failure vs 1.44 success, delta 6.48), and level-7 avg height is already 19.63, so a critical-height gate should concentrate the penalty where deaths cluster.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_surface_volatility_brake"
+        },
+        "created_at": 1771754435.2727177,
+        "updated_at": 1771754435.2609258,
+        "bayesian_score": 0.78,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_collapse_mode_gate_85",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.87,
+        "description": "Switch to survive mode once hole count enters collapse territory so line-greedy behavior is suppressed in terminal-risk states.",
+        "metadata": {
+          "llm_score": 0.87,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), while max height differs by only 0.41 (20.00 vs 19.59), so hole-threshold gating should separate collapse trajectories earlier than height-only logic.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771787622.7415192,
+        "updated_at": 1771787622.7403512,
+        "bayesian_score": 0.87,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_penalty_0_24",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.82,
+        "description": "Apply stronger hole suppression through the first 24 pieces to stabilize the fragile opening-to-midgame transition.",
+        "metadata": {
+          "llm_score": 0.82,
+          "llm_priority": "test",
+          "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and outlier success openings show lower early holes (78.8) than baseline early holes (85.7), supporting a longer early discipline window.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771787622.7666066,
+        "updated_at": 1771787622.7403512,
+        "bayesian_score": 0.82,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake_critical_height_80",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.78,
+        "description": "Keep bumpiness control but intensify it only in critical-height states to avoid over-penalizing safe boards.",
+        "metadata": {
+          "llm_score": 0.78,
+          "llm_priority": "explore",
+          "llm_notes": "Bumpiness is the largest separator (7.92 failure vs 1.44 success, delta 6.48), and level-7 average height is already 19.63, so a high-height mode gate should focus anti-volatility behavior where deaths cluster.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_surface_volatility_brake"
+        },
+        "created_at": 1771787622.7700455,
+        "updated_at": 1771787622.7403512,
+        "bayesian_score": 0.78,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_emergency_gate_85",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.88,
+        "description": "Switch to survive mode as soon as hole count crosses 85 so collapse-prone boards stop prioritizing greedy line setups.",
+        "metadata": {
+          "llm_score": 0.88,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44) while max height differs by only 0.41, so hole-triggered gating should separate terminal trajectories earlier than height-only control.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771859342.4164147,
+        "updated_at": 1771859342.4159727,
+        "bayesian_score": 0.88,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_penalty_0_24_v2",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.82,
+        "description": "Increase hole penalty through the first 24 pieces to stabilize the opening-to-midgame transition on wide-board runs.",
+        "metadata": {
+          "llm_score": 0.82,
+          "llm_priority": "test",
+          "llm_notes": "Failures end after 23.23 pieces on average with 99.66 holes, and outlier success openings have lower early holes (78.8) than baseline early holes (85.7), supporting a stronger early discipline window.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1771859342.4239204,
+        "updated_at": 1771859342.4159727,
+        "bayesian_score": 0.82,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake_height_critical",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.79,
+        "description": "Keep bumpiness suppression, but only intensify it once stack height is in the critical band so safe boards are not over-constrained.",
+        "metadata": {
+          "llm_score": 0.79,
+          "llm_priority": "explore",
+          "llm_notes": "Bumpiness is the strongest separator (7.92 failure vs 1.44 success, delta 6.48) and level-7 avg height is already 19.63, so a high-height activation should focus anti-volatility pressure where deaths cluster.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_surface_volatility_brake"
+        },
+        "created_at": 1771859342.4282355,
+        "updated_at": 1771859342.4159727,
+        "bayesian_score": 0.79,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_hole_emergency_gate_80",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.89,
+        "description": "Enter survival mode as soon as hole count exceeds 80 to prevent collapse trajectories on level-7-like boards.",
+        "metadata": {
+          "llm_score": 0.89,
+          "llm_priority": "test",
+          "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44) while max height differs by only 0.41 (20.00 vs 19.59), so hole-threshold gating should separate terminal states earlier than height-only control.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1772013650.635677,
+        "updated_at": 1772013650.6330397,
+        "bayesian_score": 0.89,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_opening_hole_penalty_0_24_v3",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.83,
+        "description": "Apply stronger hole suppression for pieces 0-24 to stabilize the opening-to-midgame transition.",
+        "metadata": {
+          "llm_score": 0.83,
+          "llm_priority": "test",
+          "llm_notes": "Failures end after 23.23 pieces on average with 99.66 holes, and outlier episodes show lower early holes (78.8) than baseline early holes (85.7), indicating the fragile window extends beyond the first 12 pieces.",
+          "source": "tetra_inbox"
+        },
+        "created_at": 1772013650.651606,
+        "updated_at": 1772013650.6330397,
+        "bayesian_score": 0.83,
+        "prior_weight": 1.0
+      },
+      {
+        "name": "l7_surface_volatility_brake_height_gate_90",
+        "status": "candidate",
+        "win_rate": 0.0,
+        "evidence_count": 0,
+        "confidence": 0.78,
+        "description": "Keep bumpiness suppression global but intensify survival behavior once stack height exceeds 90% of board capacity.",
+        "metadata": {
+          "llm_score": 0.78,
+          "llm_priority": "explore",
+          "llm_notes": "Bumpiness is the largest separator (7.92 failure vs 1.44 success, delta 6.48), and level 7 average height is already 19.63, so adding a high-height gate tests whether anti-volatility pressure should spike only in terminal-risk states.",
+          "source": "tetra_mutation",
+          "parent_name": "l7_surface_volatility_brake"
+        },
+        "created_at": 1772013650.6539373,
+        "updated_at": 1772013650.6330397,
+        "bayesian_score": 0.78,
+        "prior_weight": 1.0
+      }
+    ],
+    "total": 143,
+    "key_insight": "Top hypothesis 'maximize_lines' wins 89% of the time after 50 evaluations."
+  },
+  "failure_patterns": {
+    "sample_size": 100,
+    "avg_lines": 0.0,
+    "avg_pieces": 23.23,
+    "avg_max_height": 20.0,
+    "avg_holes": 99.66,
+    "avg_bumpiness": 7.92,
+    "common_fail_modes": {
+      "unknown": 100
+    },
+    "active_hypotheses_at_failure": {
+      "unknown": 100
+    },
+    "interpretation": "Failures have avg height=20.0, holes=99.7, bumpiness=7.9. Games end after only 23 pieces."
+  },
+  "success_patterns": {
+    "sample_size": 100,
+    "avg_lines": 70.32,
+    "avg_pieces": 30.07,
+    "avg_max_height": 19.59,
+    "avg_holes": 75.22,
+    "avg_bumpiness": 1.44,
+    "common_hypotheses": {
+      "unknown": 100
+    },
+    "interpretation": "Successes have avg height=19.6, holes=75.2, 70 lines avg.",
+    "delta_vs_failure": {
+      "height_delta": 0.41,
+      "holes_delta": 24.44,
+      "bumpiness_delta": 6.48
+    }
+  },
+  "success_dissection": {
+    "outlier_count": 5,
+    "outlier_threshold_lines": 132,
+    "outlier_avg_lines": 179.0,
+    "baseline_avg_lines": 1.91,
+    "outlier_early_holes": 78.8,
+    "outlier_mid_holes": 78.8,
+    "outlier_late_holes": 78.8,
+    "baseline_early_holes": 85.7,
+    "baseline_mid_holes": 64.68,
+    "outlier_early_height": 19.8,
+    "baseline_early_height": 19.96,
+    "interpretation": "Top 1% episodes (5 games, avg 179 lines).\nIf outlier_early_holes << baseline_early_holes: tetra_holes_early_game is supported.\nIf outlier_mid_holes \u2248 baseline_mid_holes but late_holes diverges: recovery hypothesis needed."
+  },
+  "novelty_events": [
+    {
+      "lines": 6,
+      "surprise": 5.16,
+      "episode": 168,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 3,
+      "surprise": 2.6,
+      "episode": 153,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 5,
+      "surprise": 4.74,
+      "episode": 146,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 3,
+      "surprise": 3.1,
+      "episode": 126,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 4,
+      "surprise": 4.2,
+      "episode": 89,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 3,
+      "surprise": 3.49,
+      "episode": 62,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 4,
+      "surprise": 4.96,
+      "episode": 51,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 3,
+      "surprise": 4.21,
+      "episode": 44,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 2,
+      "surprise": 3.0,
+      "episode": 43,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    },
+    {
+      "lines": 3,
+      "surprise": 4.96,
+      "episode": 39,
+      "level": 7,
+      "session": "91723d1a",
+      "timestamp_str": "2026-02-19 23:18"
+    }
+  ],
+  "open_questions": [
+    "Failures have 24.4 more holes on average \u2014 at what hole count does performance collapse?",
+    "12 hypotheses have been retired vs 9 active \u2014 what do the retired ones have in common? Is there a pattern to what fails?",
+    "45 candidate hypotheses have fewer than 10 evaluations \u2014 they need more evidence: ['maximize_gain_v1', 'minimize_v2', 'minimize_cost_v1', 'minimize_cost_v2', 'minimize_v4']"
+  ],
+  "recommended_focus": [
+    "LEVEL-SPECIFIC HYPOTHESES: Performance varies significantly by level. Consider hypotheses that specify WHEN they apply (e.g., 'at L7, prioritize flat boards')."
+  ],
+  "inbox_schema": {
+    "description": "To update the hypothesis list, write a JSON array to experiments/tetra_inbox.json. The SlowLoop will ingest it at next nightly consolidation and archive the file.",
+    "supported_ops": [
+      {
+        "op": "ADD",
+        "required": [
+          "name",
+          "description"
+        ],
+        "optional": [
+          "llm_score",
+          "llm_priority",
+          "llm_notes",
+          "game"
+        ],
+        "example": {
+          "op": "ADD",
+          "name": "reduce_holes_early",
+          "description": "Prioritise avoiding holes in first 10 pieces.",
+          "llm_score": 0.75,
+          "llm_priority": "explore",
+          "llm_notes": "Failure data shows holes at piece 10 predict outcome.",
+          "game": "tetris"
+        }
+      },
+      {
+        "op": "UPDATE",
+        "required": [
+          "name"
+        ],
+        "optional": [
+          "llm_score",
+          "llm_priority",
+          "llm_notes"
+        ],
+        "example": {
+          "op": "UPDATE",
+          "name": "reduce_holes_v58",
+          "llm_score": 0.4,
+          "llm_priority": "retire",
+          "llm_notes": "Win rate plateaued; superseded by reduce_holes_early."
+        }
+      },
+      {
+        "op": "RETIRE",
+        "required": [
+          "name"
+        ],
+        "optional": [
+          "llm_notes"
+        ],
+        "example": {
+          "op": "RETIRE",
+          "name": "auto_top_fill",
+          "llm_notes": "AutoMetric shows no correlation with outcome."
+        }
+      },
+      {
+        "op": "MUTATE",
+        "required": [
+          "parent",
+          "name",
+          "description"
+        ],
+        "optional": [
+          "llm_score",
+          "llm_priority",
+          "llm_notes",
+          "game"
+        ],
+        "note": "Creates new hypothesis derived from parent; increments generation.",
+        "example": {
+          "op": "MUTATE",
+          "parent": "reduce_holes_v58",
+          "name": "reduce_holes_v59_height_gated",
+          "description": "Reduce holes only when height > 60% of board.",
+          "llm_score": 0.7,
+          "llm_priority": "test",
+          "llm_notes": "Adds height gate based on failure cluster analysis."
+        }
+      }
+    ],
+    "llm_priority_values": {
+      "explore": "New idea, low confidence, worth a quick test.",
+      "test": "Promising \u2014 allocate evidence budget to this.",
+      "retire": "Mark for deprecation after current cycle."
+    },
+    "file_path": "experiments/tetra_inbox.json",
+    "format": "JSON array (even for a single op)"
+  },
+  "prompt_for_tetra": "You are analyzing training data for a tetris AI agent. The agent has run 23221 episodes across 6 levels. There are currently 9 active hypotheses guiding its play. Based on the failure patterns, success patterns, and open questions above, please: (1) identify why the agent fails, (2) suggest 2-3 new hypotheses to test using ADD ops, (3) recommend which candidates should be RETIRE'd, (4) optionally MUTATE a weak hypothesis into a stronger variant. Write your response as a valid JSON array of ops to experiments/tetra_inbox.json. See inbox_schema for the exact format."
+}

@@ -1,0 +1,55 @@
+[
+  {
+    "op": "ADD",
+    "name": "l7_hole_collapse_mode_gate_85",
+    "description": "Switch to survive mode once hole count enters collapse territory so line-greedy behavior is suppressed in terminal-risk states.",
+    "llm_score": 0.87,
+    "llm_priority": "test",
+    "llm_notes": "Failure episodes average 99.66 holes vs 75.22 in successes (delta 24.44), while max height differs by only 0.41 (20.00 vs 19.59), so hole-threshold gating should separate collapse trajectories earlier than height-only logic.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "holes > 85",
+        "strategy": "survive"
+      }
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "l7_opening_hole_penalty_0_24",
+    "description": "Apply stronger hole suppression through the first 24 pieces to stabilize the fragile opening-to-midgame transition.",
+    "llm_score": 0.82,
+    "llm_priority": "test",
+    "llm_notes": "Failures end after only 23.23 pieces on average with 99.66 holes, and outlier success openings show lower early holes (78.8) than baseline early holes (85.7), supporting a longer early discipline window.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "piece_phase",
+        "range": [
+          0,
+          24
+        ],
+        "target": "holes",
+        "multiplier": 2.4
+      }
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "l7_surface_volatility_brake",
+    "name": "l7_surface_volatility_brake_critical_height_80",
+    "description": "Keep bumpiness control but intensify it only in critical-height states to avoid over-penalizing safe boards.",
+    "llm_score": 0.78,
+    "llm_priority": "explore",
+    "llm_notes": "Bumpiness is the largest separator (7.92 failure vs 1.44 success, delta 6.48), and level-7 average height is already 19.63, so a high-height mode gate should focus anti-volatility behavior where deaths cluster.",
+    "game": "tetris",
+    "metadata": {
+      "enaction": {
+        "type": "mode_gate",
+        "condition": "height > 0.80",
+        "strategy": "survive"
+      }
+    }
+  }
+]

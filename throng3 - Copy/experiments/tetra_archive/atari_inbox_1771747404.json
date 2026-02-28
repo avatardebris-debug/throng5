@@ -1,0 +1,29 @@
+[
+  {
+    "op": "ADD",
+    "name": "test_near_death_boost",
+    "description": "Boost near-death transition priority 3x for Montezuma.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.8,
+    "llm_priority": "test",
+    "llm_notes": "disagree_near_terminal_rate=0.74 \u2014 pipeline test hypothesis.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 3.0
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "montezuma_phase_extend",
+    "description": "Extend imitation phase to 5000 steps for Montezuma.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.72,
+    "llm_priority": "explore",
+    "llm_notes": "mean_entropy=2.39 indicates backbone not converged \u2014 pipeline test.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 5000
+    }
+  }
+]

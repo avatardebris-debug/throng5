@@ -1,0 +1,419 @@
+[
+  {
+    "name": "montezuma_near_death_priority_boost",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 3.0
+    },
+    "llm_score": 0.86,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_imitation_phase_extend_7000",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 7000
+    },
+    "llm_score": 0.81,
+    "llm_priority": "test"
+  },
+  {
+    "name": "frogger_high_conf_disagree_boost",
+    "game": "ALE/Frogger-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.5
+    },
+    "llm_score": 0.84,
+    "llm_priority": "test"
+  },
+  {
+    "name": "breakout_disagree_priority_boost",
+    "game": "ALE/Breakout-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "disagree",
+      "multiplier": 2.0
+    },
+    "llm_score": 0.72,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "asterix_high_conf_disagree_boost",
+    "game": "ALE/Asterix-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.0
+    },
+    "llm_score": 0.88,
+    "llm_priority": "test"
+  },
+  {
+    "name": "asterix_imitation_phase_extend_8000",
+    "game": "ALE/Asterix-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 8000
+    },
+    "llm_score": 0.8,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "montezuma_near_death_priority_boost_v2",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 4.0
+    },
+    "llm_score": 0.79,
+    "llm_priority": "test"
+  },
+  {
+    "name": "centipede_near_death_priority_boost",
+    "game": "ALE/Centipede-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 4.5
+    },
+    "llm_score": 0.9,
+    "llm_priority": "test"
+  },
+  {
+    "name": "defender_imitation_phase_extend_10000",
+    "game": "ALE/Defender-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 10000
+    },
+    "llm_score": 0.82,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_imitation_phase_extend_10000",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 10000
+    },
+    "llm_score": 0.8,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_subgoal_shaped_reward",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "shaped_reward",
+      "module": "montezuma_subgoals.ShapedRewardEngine",
+      "subgoal_scale": 1.0,
+      "novelty_scale": 0.3,
+      "death_penalty": -5.0
+    },
+    "llm_score": 0.95,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_novelty_count_bonus",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "novelty_bonus",
+      "bin_size": 8,
+      "novelty_scale": 0.3
+    },
+    "llm_score": 0.88,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_amygdala_trajectory_switch",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "trajectory_survivor",
+      "priority_scale": 10.0,
+      "condition": "new_best_room"
+    },
+    "llm_score": 0.92,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_decoder_key_dual_byte",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "decoder_fix",
+      "decoder": "MontezumaDecoder",
+      "key_check": "RAM[56]==255 AND RAM[65]&0x02"
+    },
+    "llm_score": 0.99,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_frontier_recovery_curriculum",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "curriculum_adjust",
+      "dream_interval": 6,
+      "advisory_rate": 0.62,
+      "promote_threshold": 14,
+      "epsilon_decay": 0.998,
+      "gamma": 0.995,
+      "subgoals": [
+        "first_ladder_contact",
+        "first_key_acquired",
+        "door_unlock_sequence",
+        "safe_return_after_key"
+      ]
+    },
+    "llm_score": 0.86,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "breakout_stability_then_speed",
+    "game": "ALE/Breakout-v5",
+    "enaction": {
+      "type": "parameter_tune",
+      "dream_interval": 12,
+      "advisory_rate": 0.34,
+      "promote_threshold": 22,
+      "epsilon_decay": 0.996,
+      "gamma": 0.985,
+      "focus": "paddle_ball_alignment_and_life_preservation"
+    },
+    "llm_score": 0.68,
+    "llm_priority": "exploit"
+  },
+  {
+    "name": "frogger_lane_phase_model",
+    "game": "ALE/Frogger-v5",
+    "enaction": {
+      "type": "timing_policy_upgrade",
+      "dream_interval": 8,
+      "advisory_rate": 0.44,
+      "promote_threshold": 18,
+      "epsilon_decay": 0.997,
+      "gamma": 0.99,
+      "timing_mode": "phase_window_crossing"
+    },
+    "llm_score": 0.74,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "cartpole_relearn_foundation",
+    "game": "CartPole-v1",
+    "enaction": {
+      "type": "stability_reset",
+      "dream_interval": 20,
+      "advisory_rate": 0.12,
+      "promote_threshold": 35,
+      "epsilon_decay": 0.999,
+      "gamma": 0.995,
+      "reset_condition": "if_recent20_mean_below_20"
+    },
+    "llm_score": 0.9,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "instrumentation_check_dreamer_reliance_lock",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "diagnostic_probe",
+      "checks": [
+        "log_pre_post_calibration_reliance",
+        "verify_meta_adapter_overrides_per_game",
+        "assert_reliance_not_hardclamped"
+      ]
+    },
+    "llm_score": 0.92,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "montezuma_frontier_recovery_curriculum",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "curriculum_adjust",
+      "dream_interval": 6,
+      "advisory_rate": 0.62,
+      "promote_threshold": 14,
+      "epsilon_decay": 0.998,
+      "gamma": 0.995,
+      "subgoals": [
+        "first_ladder_contact",
+        "first_key_acquired",
+        "door_unlock_sequence",
+        "safe_return_after_key"
+      ]
+    },
+    "llm_score": 0.86,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "breakout_stability_then_speed",
+    "game": "ALE/Breakout-v5",
+    "enaction": {
+      "type": "parameter_tune",
+      "dream_interval": 12,
+      "advisory_rate": 0.34,
+      "promote_threshold": 22,
+      "epsilon_decay": 0.996,
+      "gamma": 0.985,
+      "focus": "paddle_ball_alignment_and_life_preservation"
+    },
+    "llm_score": 0.68,
+    "llm_priority": "exploit"
+  },
+  {
+    "name": "frogger_lane_phase_model",
+    "game": "ALE/Frogger-v5",
+    "enaction": {
+      "type": "timing_policy_upgrade",
+      "dream_interval": 8,
+      "advisory_rate": 0.44,
+      "promote_threshold": 18,
+      "epsilon_decay": 0.997,
+      "gamma": 0.99,
+      "timing_mode": "phase_window_crossing"
+    },
+    "llm_score": 0.74,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "cartpole_relearn_foundation",
+    "game": "CartPole-v1",
+    "enaction": {
+      "type": "stability_reset",
+      "dream_interval": 20,
+      "advisory_rate": 0.12,
+      "promote_threshold": 35,
+      "epsilon_decay": 0.999,
+      "gamma": 0.995,
+      "reset_condition": "if_recent20_mean_below_20"
+    },
+    "llm_score": 0.9,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "instrumentation_check_dreamer_reliance_lock",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "diagnostic_probe",
+      "checks": [
+        "log_pre_post_calibration_reliance",
+        "verify_meta_adapter_overrides_per_game",
+        "assert_reliance_not_hardclamped"
+      ]
+    },
+    "llm_score": 0.92,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "montezuma_near_death_priority_boost_v3",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 4.0
+    },
+    "llm_score": 0.86,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_high_entropy_phase_extend_12000",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 12000
+    },
+    "llm_score": 0.8,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "asterix_high_conf_disagree_boost_v2",
+    "game": "ALE/Asterix-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.5
+    },
+    "llm_score": 0.83,
+    "llm_priority": "test"
+  },
+  {
+    "name": "centipede_high_conf_disagree_boost_v2",
+    "game": "ALE/Centipede-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 4.0
+    },
+    "llm_score": 0.87,
+    "llm_priority": "test"
+  },
+  {
+    "name": "asterix_imitation_phase_extend_12000",
+    "game": "ALE/Asterix-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 12000
+    },
+    "llm_score": 0.8,
+    "llm_priority": "test"
+  },
+  {
+    "name": "frogger_near_death_priority_boost_v1",
+    "game": "ALE/Frogger-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 3.0
+    },
+    "llm_score": 0.86,
+    "llm_priority": "test"
+  },
+  {
+    "name": "riverraid_noop_imitation_downweight",
+    "game": "ALE/Riverraid-v5",
+    "enaction": {
+      "type": "imitation_weight",
+      "action": "NOOP",
+      "alpha": 0.7
+    },
+    "llm_score": 0.72,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "montezuma_room_boundary_priority_v1",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "room_boundary",
+      "multiplier": 3.5
+    },
+    "llm_score": 0.88,
+    "llm_priority": "test"
+  },
+  {
+    "name": "montezuma_high_entropy_phase_extend_16000",
+    "game": "ALE/MontezumaRevenge-v5",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 16000
+    },
+    "llm_score": 0.82,
+    "llm_priority": "explore"
+  },
+  {
+    "name": "defender_high_conf_disagree_boost_v1",
+    "game": "ALE/Defender-v5",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.5
+    },
+    "llm_score": 0.86,
+    "llm_priority": "test"
+  }
+]

@@ -1,0 +1,2042 @@
+{
+  "source": "experiments\\montezuma_brain\\recordings\\human_play.jsonl",
+  "frames_analyzed": 2173,
+  "registry": {
+    "position": [
+      {
+        "addr": 0,
+        "addr_hex": "0x00",
+        "label": "pos_x_0x00",
+        "category": "position",
+        "change_freq": 0.9995,
+        "n_values": 64,
+        "range": [
+          3,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 5,
+        "addr_hex": "0x05",
+        "label": "pos_y_0x05",
+        "category": "position",
+        "change_freq": 0.9977,
+        "n_values": 255,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 6,
+        "addr_hex": "0x06",
+        "label": "pos_x_0x06",
+        "category": "position",
+        "change_freq": 0.9968,
+        "n_values": 256,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 30,
+        "addr_hex": "0x1E",
+        "label": "pos_x_0x1e",
+        "category": "position",
+        "change_freq": 0.5821,
+        "n_values": 12,
+        "range": [
+          0,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 34,
+        "addr_hex": "0x22",
+        "label": "pos_x_0x22",
+        "category": "position",
+        "change_freq": 0.416,
+        "n_values": 7,
+        "range": [
+          66,
+          232
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 36,
+        "addr_hex": "0x24",
+        "label": "pos_x_0x24",
+        "category": "position",
+        "change_freq": 0.416,
+        "n_values": 6,
+        "range": [
+          107,
+          214
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 38,
+        "addr_hex": "0x26",
+        "label": "pos_x_0x26",
+        "category": "position",
+        "change_freq": 0.4998,
+        "n_values": 4,
+        "range": [
+          1,
+          4
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 40,
+        "addr_hex": "0x28",
+        "label": "pos_x_0x28",
+        "category": "position",
+        "change_freq": 0.5002,
+        "n_values": 4,
+        "range": [
+          93,
+          158
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 42,
+        "addr_hex": "0x2A",
+        "label": "pos_x_0x2a",
+        "category": "position",
+        "change_freq": 0.405,
+        "n_values": 152,
+        "range": [
+          1,
+          152
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      }
+    ],
+    "state_flag": [
+      {
+        "addr": 1,
+        "addr_hex": "0x01",
+        "label": "item_collected_0x01",
+        "category": "state_flag",
+        "change_freq": 0.0101,
+        "n_values": 2,
+        "range": [
+          0,
+          1
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 4,
+        "addr_hex": "0x04",
+        "label": "item_collected_0x04",
+        "category": "state_flag",
+        "change_freq": 0.0055,
+        "n_values": 3,
+        "range": [
+          0,
+          2
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 23,
+        "addr_hex": "0x17",
+        "label": "item_collected_0x17",
+        "category": "state_flag",
+        "change_freq": 0.0179,
+        "n_values": 3,
+        "range": [
+          209,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 25,
+        "addr_hex": "0x19",
+        "label": "item_collected_0x19",
+        "category": "state_flag",
+        "change_freq": 0.0069,
+        "n_values": 2,
+        "range": [
+          210,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 27,
+        "addr_hex": "0x1B",
+        "label": "item_collected_0x1b",
+        "category": "state_flag",
+        "change_freq": 0.0147,
+        "n_values": 2,
+        "range": [
+          209,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 28,
+        "addr_hex": "0x1C",
+        "label": "item_collected_0x1c",
+        "category": "state_flag",
+        "change_freq": 0.0051,
+        "n_values": 2,
+        "range": [
+          117,
+          124
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 29,
+        "addr_hex": "0x1D",
+        "label": "item_collected_0x1d",
+        "category": "state_flag",
+        "change_freq": 0.0051,
+        "n_values": 2,
+        "range": [
+          209,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 31,
+        "addr_hex": "0x1F",
+        "label": "item_collected_0x1f",
+        "category": "state_flag",
+        "change_freq": 0.0097,
+        "n_values": 2,
+        "range": [
+          208,
+          210
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 33,
+        "addr_hex": "0x21",
+        "label": "item_collected_0x21",
+        "category": "state_flag",
+        "change_freq": 0.0028,
+        "n_values": 2,
+        "range": [
+          208,
+          209
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 35,
+        "addr_hex": "0x23",
+        "label": "item_collected_0x23",
+        "category": "state_flag",
+        "change_freq": 0.0009,
+        "n_values": 2,
+        "range": [
+          209,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 46,
+        "addr_hex": "0x2E",
+        "label": "item_collected_0x2e",
+        "category": "state_flag",
+        "change_freq": 0.0055,
+        "n_values": 3,
+        "range": [
+          228,
+          242
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 48,
+        "addr_hex": "0x30",
+        "label": "item_collected_0x30",
+        "category": "state_flag",
+        "change_freq": 0.0018,
+        "n_values": 2,
+        "range": [
+          0,
+          128
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 51,
+        "addr_hex": "0x33",
+        "label": "item_collected_0x33",
+        "category": "state_flag",
+        "change_freq": 0.0037,
+        "n_values": 2,
+        "range": [
+          0,
+          8
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 60,
+        "addr_hex": "0x3C",
+        "label": "item_collected_0x3c",
+        "category": "state_flag",
+        "change_freq": 0.0014,
+        "n_values": 2,
+        "range": [
+          0,
+          5
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 61,
+        "addr_hex": "0x3D",
+        "label": "item_collected_0x3d",
+        "category": "state_flag",
+        "change_freq": 0.0133,
+        "n_values": 2,
+        "range": [
+          0,
+          8
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 70,
+        "addr_hex": "0x46",
+        "label": "item_collected_0x46",
+        "category": "state_flag",
+        "change_freq": 0.0005,
+        "n_values": 2,
+        "range": [
+          1,
+          1
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 72,
+        "addr_hex": "0x48",
+        "label": "item_collected_0x48",
+        "category": "state_flag",
+        "change_freq": 0.0009,
+        "n_values": 2,
+        "range": [
+          9,
+          25
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 76,
+        "addr_hex": "0x4C",
+        "label": "item_collected_0x4c",
+        "category": "state_flag",
+        "change_freq": 0.0009,
+        "n_values": 2,
+        "range": [
+          32,
+          33
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 84,
+        "addr_hex": "0x54",
+        "label": "item_collected_0x54",
+        "category": "state_flag",
+        "change_freq": 0.0037,
+        "n_values": 3,
+        "range": [
+          0,
+          4
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 85,
+        "addr_hex": "0x55",
+        "label": "item_collected_0x55",
+        "category": "state_flag",
+        "change_freq": 0.0009,
+        "n_values": 2,
+        "range": [
+          0,
+          130
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 87,
+        "addr_hex": "0x57",
+        "label": "item_collected_0x57",
+        "category": "state_flag",
+        "change_freq": 0.006,
+        "n_values": 2,
+        "range": [
+          0,
+          2
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 94,
+        "addr_hex": "0x5E",
+        "label": "item_collected_0x5e",
+        "category": "state_flag",
+        "change_freq": 0.0166,
+        "n_values": 3,
+        "range": [
+          0,
+          2
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 97,
+        "addr_hex": "0x61",
+        "label": "item_collected_0x61",
+        "category": "state_flag",
+        "change_freq": 0.006,
+        "n_values": 2,
+        "range": [
+          185,
+          193
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 99,
+        "addr_hex": "0x63",
+        "label": "item_collected_0x63",
+        "category": "state_flag",
+        "change_freq": 0.006,
+        "n_values": 2,
+        "range": [
+          0,
+          1
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 101,
+        "addr_hex": "0x65",
+        "label": "item_collected_0x65",
+        "category": "state_flag",
+        "change_freq": 0.0041,
+        "n_values": 2,
+        "range": [
+          0,
+          1
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 103,
+        "addr_hex": "0x67",
+        "label": "item_collected_0x67",
+        "category": "state_flag",
+        "change_freq": 0.0156,
+        "n_values": 3,
+        "range": [
+          0,
+          128
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 125,
+        "addr_hex": "0x7D",
+        "label": "item_collected_0x7d",
+        "category": "state_flag",
+        "change_freq": 0.0276,
+        "n_values": 3,
+        "range": [
+          183,
+          252
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      }
+    ],
+    "state": [
+      {
+        "addr": 2,
+        "addr_hex": "0x02",
+        "label": "progress_0x02",
+        "category": "state",
+        "change_freq": 0.0313,
+        "n_values": 4,
+        "range": [
+          2,
+          7
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 3,
+        "addr_hex": "0x03",
+        "label": "progress_0x03",
+        "category": "state",
+        "change_freq": 0.0092,
+        "n_values": 12,
+        "range": [
+          0,
+          20
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 7,
+        "addr_hex": "0x07",
+        "label": "progress_0x07",
+        "category": "state",
+        "change_freq": 0.0041,
+        "n_values": 4,
+        "range": [
+          46,
+          117
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 20,
+        "addr_hex": "0x14",
+        "label": "progress_0x14",
+        "category": "state",
+        "change_freq": 0.0051,
+        "n_values": 6,
+        "range": [
+          0,
+          22
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 32,
+        "addr_hex": "0x20",
+        "label": "progress_0x20",
+        "category": "state",
+        "change_freq": 0.0345,
+        "n_values": 4,
+        "range": [
+          21,
+          216
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 45,
+        "addr_hex": "0x2D",
+        "label": "progress_0x2d",
+        "category": "state",
+        "change_freq": 0.0244,
+        "n_values": 15,
+        "range": [
+          226,
+          254
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 49,
+        "addr_hex": "0x31",
+        "label": "progress_0x31",
+        "category": "state",
+        "change_freq": 0.011,
+        "n_values": 9,
+        "range": [
+          0,
+          10
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 50,
+        "addr_hex": "0x32",
+        "label": "progress_0x32",
+        "category": "state",
+        "change_freq": 0.0092,
+        "n_values": 9,
+        "range": [
+          0,
+          10
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 58,
+        "addr_hex": "0x3A",
+        "label": "progress_0x3a",
+        "category": "state",
+        "change_freq": 0.0078,
+        "n_values": 6,
+        "range": [
+          0,
+          5
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 63,
+        "addr_hex": "0x3F",
+        "label": "progress_0x3f",
+        "category": "state",
+        "change_freq": 0.0239,
+        "n_values": 16,
+        "range": [
+          0,
+          15
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 65,
+        "addr_hex": "0x41",
+        "label": "progress_0x41",
+        "category": "state",
+        "change_freq": 0.0041,
+        "n_values": 4,
+        "range": [
+          0,
+          32
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 66,
+        "addr_hex": "0x42",
+        "label": "progress_0x42",
+        "category": "state",
+        "change_freq": 0.0138,
+        "n_values": 11,
+        "range": [
+          0,
+          15
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 67,
+        "addr_hex": "0x43",
+        "label": "progress_0x43",
+        "category": "state",
+        "change_freq": 0.0051,
+        "n_values": 6,
+        "range": [
+          20,
+          31
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 79,
+        "addr_hex": "0x4F",
+        "label": "progress_0x4f",
+        "category": "state",
+        "change_freq": 0.0078,
+        "n_values": 5,
+        "range": [
+          0,
+          4
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 80,
+        "addr_hex": "0x50",
+        "label": "progress_0x50",
+        "category": "state",
+        "change_freq": 0.0032,
+        "n_values": 4,
+        "range": [
+          0,
+          3
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 81,
+        "addr_hex": "0x51",
+        "label": "progress_0x51",
+        "category": "state",
+        "change_freq": 0.0032,
+        "n_values": 4,
+        "range": [
+          0,
+          182
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 82,
+        "addr_hex": "0x52",
+        "label": "progress_0x52",
+        "category": "state",
+        "change_freq": 0.0032,
+        "n_values": 4,
+        "range": [
+          0,
+          236
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 88,
+        "addr_hex": "0x58",
+        "label": "progress_0x58",
+        "category": "state",
+        "change_freq": 0.023,
+        "n_values": 21,
+        "range": [
+          0,
+          39
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 91,
+        "addr_hex": "0x5B",
+        "label": "progress_0x5b",
+        "category": "state",
+        "change_freq": 0.0276,
+        "n_values": 8,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 95,
+        "addr_hex": "0x5F",
+        "label": "progress_0x5f",
+        "category": "state",
+        "change_freq": 0.0152,
+        "n_values": 5,
+        "range": [
+          0,
+          45
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 96,
+        "addr_hex": "0x60",
+        "label": "progress_0x60",
+        "category": "state",
+        "change_freq": 0.0166,
+        "n_values": 5,
+        "range": [
+          0,
+          5
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 100,
+        "addr_hex": "0x64",
+        "label": "progress_0x64",
+        "category": "state",
+        "change_freq": 0.0097,
+        "n_values": 4,
+        "range": [
+          0,
+          5
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 104,
+        "addr_hex": "0x68",
+        "label": "progress_0x68",
+        "category": "state",
+        "change_freq": 0.0373,
+        "n_values": 81,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 106,
+        "addr_hex": "0x6A",
+        "label": "progress_0x6a",
+        "category": "state",
+        "change_freq": 0.0166,
+        "n_values": 16,
+        "range": [
+          0,
+          15
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 112,
+        "addr_hex": "0x70",
+        "label": "progress_0x70",
+        "category": "state",
+        "change_freq": 0.0244,
+        "n_values": 4,
+        "range": [
+          0,
+          15
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 124,
+        "addr_hex": "0x7C",
+        "label": "progress_0x7c",
+        "category": "state",
+        "change_freq": 0.0276,
+        "n_values": 4,
+        "range": [
+          15,
+          163
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      }
+    ],
+    "dynamic": [
+      {
+        "addr": 22,
+        "addr_hex": "0x16",
+        "label": "byte_0x16",
+        "category": "dynamic",
+        "change_freq": 0.064,
+        "n_values": 12,
+        "range": [
+          10,
+          252
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 24,
+        "addr_hex": "0x18",
+        "label": "byte_0x18",
+        "category": "dynamic",
+        "change_freq": 0.1256,
+        "n_values": 10,
+        "range": [
+          23,
+          129
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 26,
+        "addr_hex": "0x1A",
+        "label": "byte_0x1a",
+        "category": "dynamic",
+        "change_freq": 0.127,
+        "n_values": 5,
+        "range": [
+          117,
+          165
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 37,
+        "addr_hex": "0x25",
+        "label": "byte_0x25",
+        "category": "dynamic",
+        "change_freq": 0.0552,
+        "n_values": 2,
+        "range": [
+          209,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 43,
+        "addr_hex": "0x2B",
+        "label": "byte_0x2b",
+        "category": "dynamic",
+        "change_freq": 0.3152,
+        "n_values": 100,
+        "range": [
+          134,
+          254
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 47,
+        "addr_hex": "0x2F",
+        "label": "byte_0x2f",
+        "category": "dynamic",
+        "change_freq": 0.2347,
+        "n_values": 51,
+        "range": [
+          22,
+          72
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 52,
+        "addr_hex": "0x34",
+        "label": "byte_0x34",
+        "category": "dynamic",
+        "change_freq": 0.0861,
+        "n_values": 18,
+        "range": [
+          0,
+          135
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 53,
+        "addr_hex": "0x35",
+        "label": "byte_0x35",
+        "category": "dynamic",
+        "change_freq": 0.1431,
+        "n_values": 9,
+        "range": [
+          0,
+          30
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 54,
+        "addr_hex": "0x36",
+        "label": "byte_0x36",
+        "category": "dynamic",
+        "change_freq": 0.3102,
+        "n_values": 4,
+        "range": [
+          0,
+          6
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 56,
+        "addr_hex": "0x38",
+        "label": "byte_0x38",
+        "category": "dynamic",
+        "change_freq": 0.0506,
+        "n_values": 2,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 89,
+        "addr_hex": "0x59",
+        "label": "byte_0x59",
+        "category": "dynamic",
+        "change_freq": 0.3907,
+        "n_values": 146,
+        "range": [
+          0,
+          151
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 90,
+        "addr_hex": "0x5A",
+        "label": "byte_0x5a",
+        "category": "dynamic",
+        "change_freq": 0.3148,
+        "n_values": 8,
+        "range": [
+          8,
+          240
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 92,
+        "addr_hex": "0x5C",
+        "label": "byte_0x5c",
+        "category": "dynamic",
+        "change_freq": 0.0529,
+        "n_values": 15,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 93,
+        "addr_hex": "0x5D",
+        "label": "byte_0x5d",
+        "category": "dynamic",
+        "change_freq": 0.0598,
+        "n_values": 16,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 102,
+        "addr_hex": "0x66",
+        "label": "byte_0x66",
+        "category": "dynamic",
+        "change_freq": 0.1132,
+        "n_values": 9,
+        "range": [
+          95,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 107,
+        "addr_hex": "0x6B",
+        "label": "byte_0x6b",
+        "category": "dynamic",
+        "change_freq": 0.3916,
+        "n_values": 29,
+        "range": [
+          1,
+          88
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 109,
+        "addr_hex": "0x6D",
+        "label": "byte_0x6d",
+        "category": "dynamic",
+        "change_freq": 0.0989,
+        "n_values": 13,
+        "range": [
+          0,
+          12
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 110,
+        "addr_hex": "0x6E",
+        "label": "byte_0x6e",
+        "category": "dynamic",
+        "change_freq": 0.0566,
+        "n_values": 13,
+        "range": [
+          0,
+          12
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 111,
+        "addr_hex": "0x6F",
+        "label": "byte_0x6f",
+        "category": "dynamic",
+        "change_freq": 0.1362,
+        "n_values": 7,
+        "range": [
+          0,
+          244
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 126,
+        "addr_hex": "0x7E",
+        "label": "byte_0x7e",
+        "category": "dynamic",
+        "change_freq": 0.1118,
+        "n_values": 25,
+        "range": [
+          6,
+          253
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 127,
+        "addr_hex": "0x7F",
+        "label": "byte_0x7f",
+        "category": "dynamic",
+        "change_freq": 0.0686,
+        "n_values": 9,
+        "range": [
+          177,
+          219
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      }
+    ],
+    "counter_down": [
+      {
+        "addr": 44,
+        "addr_hex": "0x2C",
+        "label": "lives_or_health_0x2c",
+        "category": "counter_down",
+        "change_freq": 0.0874,
+        "n_values": 96,
+        "range": [
+          12,
+          130
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 55,
+        "addr_hex": "0x37",
+        "label": "lives_or_health_0x37",
+        "category": "counter_down",
+        "change_freq": 0.1077,
+        "n_values": 13,
+        "range": [
+          0,
+          12
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 83,
+        "addr_hex": "0x53",
+        "label": "lives_or_health_0x53",
+        "category": "counter_down",
+        "change_freq": 0.2885,
+        "n_values": 10,
+        "range": [
+          0,
+          33
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 86,
+        "addr_hex": "0x56",
+        "label": "lives_or_health_0x56",
+        "category": "counter_down",
+        "change_freq": 0.1404,
+        "n_values": 20,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      }
+    ],
+    "counter_up": [
+      {
+        "addr": 62,
+        "addr_hex": "0x3E",
+        "label": "score_or_timer_0x3e",
+        "category": "counter_up",
+        "change_freq": 0.1197,
+        "n_values": 16,
+        "range": [
+          0,
+          15
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 64,
+        "addr_hex": "0x40",
+        "label": "score_or_timer_0x40",
+        "category": "counter_up",
+        "change_freq": 0.3157,
+        "n_values": 256,
+        "range": [
+          0,
+          255
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      },
+      {
+        "addr": 108,
+        "addr_hex": "0x6C",
+        "label": "score_or_timer_0x6c",
+        "category": "counter_up",
+        "change_freq": 0.058,
+        "n_values": 17,
+        "range": [
+          12,
+          92
+        ],
+        "reward_correlated": true,
+        "death_correlated": false
+      }
+    ]
+  },
+  "subgoal_bytes": [
+    {
+      "addr": 0,
+      "addr_hex": "0x00",
+      "label": "pos_x_0x00",
+      "reward_changes": 1526,
+      "avg_reward": 603.15,
+      "is_binary": false
+    },
+    {
+      "addr": 6,
+      "addr_hex": "0x06",
+      "label": "pos_x_0x06",
+      "reward_changes": 1523,
+      "avg_reward": 603.09,
+      "is_binary": false
+    },
+    {
+      "addr": 5,
+      "addr_hex": "0x05",
+      "label": "pos_y_0x05",
+      "reward_changes": 1522,
+      "avg_reward": 602.1,
+      "is_binary": false
+    },
+    {
+      "addr": 30,
+      "addr_hex": "0x1E",
+      "label": "pos_x_0x1e",
+      "reward_changes": 851,
+      "avg_reward": 598.94,
+      "is_binary": false
+    },
+    {
+      "addr": 40,
+      "addr_hex": "0x28",
+      "label": "pos_x_0x28",
+      "reward_changes": 764,
+      "avg_reward": 601.83,
+      "is_binary": false
+    },
+    {
+      "addr": 38,
+      "addr_hex": "0x26",
+      "label": "pos_x_0x26",
+      "reward_changes": 763,
+      "avg_reward": 602.1,
+      "is_binary": false
+    },
+    {
+      "addr": 64,
+      "addr_hex": "0x40",
+      "label": "score_or_timer_0x40",
+      "reward_changes": 684,
+      "avg_reward": 549.42,
+      "is_binary": false
+    },
+    {
+      "addr": 34,
+      "addr_hex": "0x22",
+      "label": "pos_x_0x22",
+      "reward_changes": 638,
+      "avg_reward": 601.41,
+      "is_binary": false
+    },
+    {
+      "addr": 36,
+      "addr_hex": "0x24",
+      "label": "pos_x_0x24",
+      "reward_changes": 638,
+      "avg_reward": 601.41,
+      "is_binary": false
+    },
+    {
+      "addr": 42,
+      "addr_hex": "0x2A",
+      "label": "pos_x_0x2a",
+      "reward_changes": 601,
+      "avg_reward": 670.05,
+      "is_binary": false
+    },
+    {
+      "addr": 107,
+      "addr_hex": "0x6B",
+      "label": "byte_0x6b",
+      "reward_changes": 586,
+      "avg_reward": 659.39,
+      "is_binary": false
+    },
+    {
+      "addr": 89,
+      "addr_hex": "0x59",
+      "label": "byte_0x59",
+      "reward_changes": 563,
+      "avg_reward": 697.69,
+      "is_binary": false
+    },
+    {
+      "addr": 90,
+      "addr_hex": "0x5A",
+      "label": "byte_0x5a",
+      "reward_changes": 466,
+      "avg_reward": 680.26,
+      "is_binary": false
+    },
+    {
+      "addr": 54,
+      "addr_hex": "0x36",
+      "label": "byte_0x36",
+      "reward_changes": 459,
+      "avg_reward": 679.3,
+      "is_binary": false
+    },
+    {
+      "addr": 43,
+      "addr_hex": "0x2B",
+      "label": "byte_0x2b",
+      "reward_changes": 452,
+      "avg_reward": 669.03,
+      "is_binary": false
+    },
+    {
+      "addr": 83,
+      "addr_hex": "0x53",
+      "label": "lives_or_health_0x53",
+      "reward_changes": 436,
+      "avg_reward": 617.89,
+      "is_binary": false
+    },
+    {
+      "addr": 26,
+      "addr_hex": "0x1A",
+      "label": "byte_0x1a",
+      "reward_changes": 275,
+      "avg_reward": 428.73,
+      "is_binary": false
+    },
+    {
+      "addr": 86,
+      "addr_hex": "0x56",
+      "label": "lives_or_health_0x56",
+      "reward_changes": 220,
+      "avg_reward": 770.45,
+      "is_binary": false
+    },
+    {
+      "addr": 53,
+      "addr_hex": "0x35",
+      "label": "byte_0x35",
+      "reward_changes": 213,
+      "avg_reward": 628.64,
+      "is_binary": false
+    },
+    {
+      "addr": 111,
+      "addr_hex": "0x6F",
+      "label": "byte_0x6f",
+      "reward_changes": 204,
+      "avg_reward": 664.71,
+      "is_binary": false
+    },
+    {
+      "addr": 44,
+      "addr_hex": "0x2C",
+      "label": "lives_or_health_0x2c",
+      "reward_changes": 188,
+      "avg_reward": 442.02,
+      "is_binary": false
+    },
+    {
+      "addr": 55,
+      "addr_hex": "0x37",
+      "label": "lives_or_health_0x37",
+      "reward_changes": 182,
+      "avg_reward": 607.14,
+      "is_binary": false
+    },
+    {
+      "addr": 126,
+      "addr_hex": "0x7E",
+      "label": "byte_0x7e",
+      "reward_changes": 182,
+      "avg_reward": 768.68,
+      "is_binary": false
+    },
+    {
+      "addr": 102,
+      "addr_hex": "0x66",
+      "label": "byte_0x66",
+      "reward_changes": 170,
+      "avg_reward": 537.65,
+      "is_binary": false
+    },
+    {
+      "addr": 109,
+      "addr_hex": "0x6D",
+      "label": "byte_0x6d",
+      "reward_changes": 167,
+      "avg_reward": 724.55,
+      "is_binary": false
+    },
+    {
+      "addr": 22,
+      "addr_hex": "0x16",
+      "label": "byte_0x16",
+      "reward_changes": 134,
+      "avg_reward": 723.13,
+      "is_binary": false
+    },
+    {
+      "addr": 47,
+      "addr_hex": "0x2F",
+      "label": "byte_0x2f",
+      "reward_changes": 133,
+      "avg_reward": 465.41,
+      "is_binary": false
+    },
+    {
+      "addr": 127,
+      "addr_hex": "0x7F",
+      "label": "byte_0x7f",
+      "reward_changes": 118,
+      "avg_reward": 644.92,
+      "is_binary": false
+    },
+    {
+      "addr": 52,
+      "addr_hex": "0x34",
+      "label": "byte_0x34",
+      "reward_changes": 116,
+      "avg_reward": 550.0,
+      "is_binary": false
+    },
+    {
+      "addr": 110,
+      "addr_hex": "0x6E",
+      "label": "byte_0x6e",
+      "reward_changes": 91,
+      "avg_reward": 676.92,
+      "is_binary": false
+    },
+    {
+      "addr": 108,
+      "addr_hex": "0x6C",
+      "label": "score_or_timer_0x6c",
+      "reward_changes": 90,
+      "avg_reward": 625.56,
+      "is_binary": false
+    },
+    {
+      "addr": 37,
+      "addr_hex": "0x25",
+      "label": "byte_0x25",
+      "reward_changes": 81,
+      "avg_reward": 466.67,
+      "is_binary": true
+    },
+    {
+      "addr": 104,
+      "addr_hex": "0x68",
+      "label": "progress_0x68",
+      "reward_changes": 81,
+      "avg_reward": 1600.0,
+      "is_binary": false
+    },
+    {
+      "addr": 56,
+      "addr_hex": "0x38",
+      "label": "byte_0x38",
+      "reward_changes": 76,
+      "avg_reward": 759.21,
+      "is_binary": true
+    },
+    {
+      "addr": 24,
+      "addr_hex": "0x18",
+      "label": "byte_0x18",
+      "reward_changes": 75,
+      "avg_reward": 518.67,
+      "is_binary": false
+    },
+    {
+      "addr": 62,
+      "addr_hex": "0x3E",
+      "label": "score_or_timer_0x3e",
+      "reward_changes": 65,
+      "avg_reward": 470.77,
+      "is_binary": false
+    },
+    {
+      "addr": 93,
+      "addr_hex": "0x5D",
+      "label": "byte_0x5d",
+      "reward_changes": 58,
+      "avg_reward": 365.52,
+      "is_binary": false
+    },
+    {
+      "addr": 45,
+      "addr_hex": "0x2D",
+      "label": "progress_0x2d",
+      "reward_changes": 53,
+      "avg_reward": 520.75,
+      "is_binary": false
+    },
+    {
+      "addr": 2,
+      "addr_hex": "0x02",
+      "label": "progress_0x02",
+      "reward_changes": 52,
+      "avg_reward": 586.54,
+      "is_binary": false
+    },
+    {
+      "addr": 63,
+      "addr_hex": "0x3F",
+      "label": "progress_0x3f",
+      "reward_changes": 52,
+      "avg_reward": 400.0,
+      "is_binary": false
+    },
+    {
+      "addr": 92,
+      "addr_hex": "0x5C",
+      "label": "byte_0x5c",
+      "reward_changes": 50,
+      "avg_reward": 228.0,
+      "is_binary": false
+    },
+    {
+      "addr": 91,
+      "addr_hex": "0x5B",
+      "label": "progress_0x5b",
+      "reward_changes": 47,
+      "avg_reward": 582.98,
+      "is_binary": false
+    },
+    {
+      "addr": 112,
+      "addr_hex": "0x70",
+      "label": "progress_0x70",
+      "reward_changes": 40,
+      "avg_reward": 615.0,
+      "is_binary": false
+    },
+    {
+      "addr": 23,
+      "addr_hex": "0x17",
+      "label": "item_collected_0x17",
+      "reward_changes": 37,
+      "avg_reward": 718.92,
+      "is_binary": true
+    },
+    {
+      "addr": 88,
+      "addr_hex": "0x58",
+      "label": "progress_0x58",
+      "reward_changes": 33,
+      "avg_reward": 706.06,
+      "is_binary": false
+    },
+    {
+      "addr": 27,
+      "addr_hex": "0x1B",
+      "label": "item_collected_0x1b",
+      "reward_changes": 32,
+      "avg_reward": 528.12,
+      "is_binary": true
+    },
+    {
+      "addr": 32,
+      "addr_hex": "0x20",
+      "label": "progress_0x20",
+      "reward_changes": 32,
+      "avg_reward": 500.0,
+      "is_binary": false
+    },
+    {
+      "addr": 66,
+      "addr_hex": "0x42",
+      "label": "progress_0x42",
+      "reward_changes": 26,
+      "avg_reward": 746.15,
+      "is_binary": false
+    },
+    {
+      "addr": 106,
+      "addr_hex": "0x6A",
+      "label": "progress_0x6a",
+      "reward_changes": 25,
+      "avg_reward": 604.0,
+      "is_binary": false
+    },
+    {
+      "addr": 49,
+      "addr_hex": "0x31",
+      "label": "progress_0x31",
+      "reward_changes": 22,
+      "avg_reward": 713.64,
+      "is_binary": false
+    },
+    {
+      "addr": 94,
+      "addr_hex": "0x5E",
+      "label": "item_collected_0x5e",
+      "reward_changes": 20,
+      "avg_reward": 480.0,
+      "is_binary": true
+    },
+    {
+      "addr": 96,
+      "addr_hex": "0x60",
+      "label": "progress_0x60",
+      "reward_changes": 20,
+      "avg_reward": 480.0,
+      "is_binary": false
+    },
+    {
+      "addr": 103,
+      "addr_hex": "0x67",
+      "label": "item_collected_0x67",
+      "reward_changes": 20,
+      "avg_reward": 400.0,
+      "is_binary": true
+    },
+    {
+      "addr": 124,
+      "addr_hex": "0x7C",
+      "label": "progress_0x7c",
+      "reward_changes": 20,
+      "avg_reward": 190.0,
+      "is_binary": false
+    },
+    {
+      "addr": 125,
+      "addr_hex": "0x7D",
+      "label": "item_collected_0x7d",
+      "reward_changes": 20,
+      "avg_reward": 190.0,
+      "is_binary": true
+    },
+    {
+      "addr": 3,
+      "addr_hex": "0x03",
+      "label": "progress_0x03",
+      "reward_changes": 18,
+      "avg_reward": 838.89,
+      "is_binary": false
+    },
+    {
+      "addr": 50,
+      "addr_hex": "0x32",
+      "label": "progress_0x32",
+      "reward_changes": 18,
+      "avg_reward": 838.89,
+      "is_binary": false
+    },
+    {
+      "addr": 100,
+      "addr_hex": "0x64",
+      "label": "progress_0x64",
+      "reward_changes": 17,
+      "avg_reward": 652.94,
+      "is_binary": false
+    },
+    {
+      "addr": 31,
+      "addr_hex": "0x1F",
+      "label": "item_collected_0x1f",
+      "reward_changes": 16,
+      "avg_reward": 406.25,
+      "is_binary": true
+    },
+    {
+      "addr": 1,
+      "addr_hex": "0x01",
+      "label": "item_collected_0x01",
+      "reward_changes": 15,
+      "avg_reward": 386.67,
+      "is_binary": true
+    },
+    {
+      "addr": 79,
+      "addr_hex": "0x4F",
+      "label": "progress_0x4f",
+      "reward_changes": 15,
+      "avg_reward": 773.33,
+      "is_binary": false
+    },
+    {
+      "addr": 4,
+      "addr_hex": "0x04",
+      "label": "item_collected_0x04",
+      "reward_changes": 12,
+      "avg_reward": 950.0,
+      "is_binary": true
+    },
+    {
+      "addr": 25,
+      "addr_hex": "0x19",
+      "label": "item_collected_0x19",
+      "reward_changes": 11,
+      "avg_reward": 790.91,
+      "is_binary": true
+    },
+    {
+      "addr": 46,
+      "addr_hex": "0x2E",
+      "label": "item_collected_0x2e",
+      "reward_changes": 11,
+      "avg_reward": 1018.18,
+      "is_binary": true
+    },
+    {
+      "addr": 58,
+      "addr_hex": "0x3A",
+      "label": "progress_0x3a",
+      "reward_changes": 11,
+      "avg_reward": 545.45,
+      "is_binary": false
+    },
+    {
+      "addr": 97,
+      "addr_hex": "0x61",
+      "label": "item_collected_0x61",
+      "reward_changes": 11,
+      "avg_reward": 845.45,
+      "is_binary": true
+    },
+    {
+      "addr": 99,
+      "addr_hex": "0x63",
+      "label": "item_collected_0x63",
+      "reward_changes": 11,
+      "avg_reward": 845.45,
+      "is_binary": true
+    },
+    {
+      "addr": 95,
+      "addr_hex": "0x5F",
+      "label": "progress_0x5f",
+      "reward_changes": 10,
+      "avg_reward": 320.0,
+      "is_binary": false
+    },
+    {
+      "addr": 7,
+      "addr_hex": "0x07",
+      "label": "progress_0x07",
+      "reward_changes": 9,
+      "avg_reward": 577.78,
+      "is_binary": false
+    },
+    {
+      "addr": 20,
+      "addr_hex": "0x14",
+      "label": "progress_0x14",
+      "reward_changes": 9,
+      "avg_reward": 555.56,
+      "is_binary": false
+    },
+    {
+      "addr": 28,
+      "addr_hex": "0x1C",
+      "label": "item_collected_0x1c",
+      "reward_changes": 9,
+      "avg_reward": 644.44,
+      "is_binary": true
+    },
+    {
+      "addr": 29,
+      "addr_hex": "0x1D",
+      "label": "item_collected_0x1d",
+      "reward_changes": 9,
+      "avg_reward": 644.44,
+      "is_binary": true
+    },
+    {
+      "addr": 65,
+      "addr_hex": "0x41",
+      "label": "progress_0x41",
+      "reward_changes": 9,
+      "avg_reward": 577.78,
+      "is_binary": false
+    },
+    {
+      "addr": 101,
+      "addr_hex": "0x65",
+      "label": "item_collected_0x65",
+      "reward_changes": 9,
+      "avg_reward": 577.78,
+      "is_binary": true
+    },
+    {
+      "addr": 87,
+      "addr_hex": "0x57",
+      "label": "item_collected_0x57",
+      "reward_changes": 8,
+      "avg_reward": 700.0,
+      "is_binary": true
+    },
+    {
+      "addr": 61,
+      "addr_hex": "0x3D",
+      "label": "item_collected_0x3d",
+      "reward_changes": 7,
+      "avg_reward": 457.14,
+      "is_binary": true
+    },
+    {
+      "addr": 67,
+      "addr_hex": "0x43",
+      "label": "progress_0x43",
+      "reward_changes": 7,
+      "avg_reward": 228.57,
+      "is_binary": false
+    },
+    {
+      "addr": 84,
+      "addr_hex": "0x54",
+      "label": "item_collected_0x54",
+      "reward_changes": 7,
+      "avg_reward": 1142.86,
+      "is_binary": true
+    },
+    {
+      "addr": 80,
+      "addr_hex": "0x50",
+      "label": "progress_0x50",
+      "reward_changes": 6,
+      "avg_reward": 900.0,
+      "is_binary": false
+    },
+    {
+      "addr": 81,
+      "addr_hex": "0x51",
+      "label": "progress_0x51",
+      "reward_changes": 6,
+      "avg_reward": 900.0,
+      "is_binary": false
+    },
+    {
+      "addr": 82,
+      "addr_hex": "0x52",
+      "label": "progress_0x52",
+      "reward_changes": 6,
+      "avg_reward": 900.0,
+      "is_binary": false
+    },
+    {
+      "addr": 33,
+      "addr_hex": "0x21",
+      "label": "item_collected_0x21",
+      "reward_changes": 5,
+      "avg_reward": 1520.0,
+      "is_binary": true
+    },
+    {
+      "addr": 48,
+      "addr_hex": "0x30",
+      "label": "item_collected_0x30",
+      "reward_changes": 4,
+      "avg_reward": 400.0,
+      "is_binary": true
+    },
+    {
+      "addr": 35,
+      "addr_hex": "0x23",
+      "label": "item_collected_0x23",
+      "reward_changes": 2,
+      "avg_reward": 1400.0,
+      "is_binary": true
+    },
+    {
+      "addr": 60,
+      "addr_hex": "0x3C",
+      "label": "item_collected_0x3c",
+      "reward_changes": 2,
+      "avg_reward": 400.0,
+      "is_binary": true
+    },
+    {
+      "addr": 51,
+      "addr_hex": "0x33",
+      "label": "item_collected_0x33",
+      "reward_changes": 1,
+      "avg_reward": 400.0,
+      "is_binary": true
+    },
+    {
+      "addr": 70,
+      "addr_hex": "0x46",
+      "label": "item_collected_0x46",
+      "reward_changes": 1,
+      "avg_reward": 500.0,
+      "is_binary": true
+    },
+    {
+      "addr": 72,
+      "addr_hex": "0x48",
+      "label": "item_collected_0x48",
+      "reward_changes": 1,
+      "avg_reward": 1400.0,
+      "is_binary": true
+    },
+    {
+      "addr": 76,
+      "addr_hex": "0x4C",
+      "label": "item_collected_0x4c",
+      "reward_changes": 1,
+      "avg_reward": 1600.0,
+      "is_binary": true
+    },
+    {
+      "addr": 85,
+      "addr_hex": "0x55",
+      "label": "item_collected_0x55",
+      "reward_changes": 1,
+      "avg_reward": 1400.0,
+      "is_binary": true
+    }
+  ],
+  "entity_groups": [
+    {
+      "type": "player",
+      "bytes": [
+        0,
+        5,
+        6,
+        30,
+        34,
+        36,
+        38,
+        40,
+        42
+      ],
+      "labels": [
+        "pos_x_0x00",
+        "pos_y_0x05",
+        "pos_x_0x06",
+        "pos_x_0x1e",
+        "pos_x_0x22",
+        "pos_x_0x24",
+        "pos_x_0x26",
+        "pos_x_0x28",
+        "pos_x_0x2a"
+      ]
+    }
+  ],
+  "report": {
+    "total_observations": 2173,
+    "ram_size": 128,
+    "active_bytes": 90,
+    "categories": {
+      "position": 9,
+      "state_flag": 27,
+      "state": 26,
+      "dynamic": 21,
+      "counter_down": 4,
+      "counter_up": 3
+    },
+    "subgoal_bytes": 90,
+    "entity_groups": 1
+  }
+}

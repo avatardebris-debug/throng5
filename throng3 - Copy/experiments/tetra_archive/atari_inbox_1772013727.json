@@ -1,0 +1,44 @@
+[
+  {
+    "op": "MUTATE",
+    "parent": "asterix_imitation_phase_extend_8000",
+    "name": "asterix_imitation_phase_extend_12000",
+    "description": "Extend imitation-only warmup to 12000 steps for Asterix to reduce globally high uncertainty before RL dominates updates.",
+    "game": "ALE/Asterix-v5",
+    "llm_score": 0.8,
+    "llm_priority": "test",
+    "llm_notes": "Asterix has alignment_rate=0.0292, high_conf_disagree_rate=0.9708, and mean_entropy=2.0533, indicating the policy is both uncertain and confidently misaligned. Extending the imitation phase beyond 8000 should improve representation grounding.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 12000
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "frogger_near_death_priority_boost_v1",
+    "description": "Boost replay priority for near-death transitions in Frogger so survival-critical human moves are oversampled.",
+    "game": "ALE/Frogger-v5",
+    "llm_score": 0.86,
+    "llm_priority": "test",
+    "llm_notes": "Frogger shows alignment_rate=0.0289 with high_conf_disagree_rate=0.9711 and disagree_near_terminal_rate=1.0, so divergence is worst at survival-critical states. A 3x near_death boost directly targets that gap.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 3.0
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "riverraid_noop_imitation_downweight",
+    "description": "Reduce imitation pressure on NOOP in Riverraid to avoid overfitting passive human segments when disagreement actions are yielding higher reward.",
+    "game": "ALE/Riverraid-v5",
+    "llm_score": 0.72,
+    "llm_priority": "explore",
+    "llm_notes": "Riverraid has low alignment_rate=0.0264 and high_conf_disagree_rate=0.9736, but reward_on_disagree=1.3712 exceeds reward_on_agree=0.6696 while NOOP dominates both human and disagreement counts (12245). Downweighting NOOP imitation tests whether agent reward gains are being suppressed by passive imitation.",
+    "enaction": {
+      "type": "imitation_weight",
+      "action": "NOOP",
+      "alpha": 0.7
+    }
+  }
+]

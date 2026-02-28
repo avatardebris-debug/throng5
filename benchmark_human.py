@@ -37,6 +37,7 @@ gym.register_envs(ale_py)
 
 from throng4.learning.portable_agent import PortableNNAgent, AgentConfig
 from throng4.learning.prioritized_replay import PrioritizedReplayBuffer
+from load_atari_ops import AtariActiveOps
 
 DB_PATH     = str(_ROOT / "experiments" / "replay_db.sqlite")
 RESULTS_DIR = _ROOT / "benchmark_results"
@@ -54,6 +55,7 @@ def run_episode(
     n_actions: int,
     max_steps: int = 10_000,
     seed: int | None = None,
+    atari_ops: AtariActiveOps | None = None,
 ) -> dict[str, Any]:
     obs, _ = env.reset(seed=seed)
     ram = np.array(obs, dtype=np.float32) / 255.0
@@ -92,7 +94,11 @@ def run_episode(
         cur_ah[best_action] = 1.0
         cur_feat = np.concatenate([ram, cur_ah])
 
-        buf.push(cur_feat, float(reward), next_feats, done)
+        # Apply Tetra hypothesis priority boosts
+        near_death = bool(done and reward <= 0)
+        flags = {"near_death": near_death, "disagree": False, "high_entropy": False}
+        priority_scale = atari_ops.priority_multiplier(flags) if atari_ops else 1.0
+        buf.push(cur_feat, float(reward) * priority_scale, next_feats, done)
 
         total_reward += reward
         steps += 1
@@ -232,6 +238,15 @@ def benchmark_game(
     n_actions = env.action_space.n
     n_features = 128 + n_actions
 
+    # Load active Tetra ops for this game
+    atari_ops = AtariActiveOps(game_id=game_id, verbose=True)
+
+    base_imitation_steps = 2000
+    resolved_imitation_steps = atari_ops.imitation_phase_steps(base_imitation_steps)
+    if resolved_imitation_steps != base_imitation_steps:
+        print(f"  [atari_ops] imitation_phase_steps overridden: "
+              f"{base_imitation_steps} → {resolved_imitation_steps}")
+
     cfg = AgentConfig(
         n_hidden=256,
         n_hidden2=128,
@@ -248,7 +263,7 @@ def benchmark_game(
         use_imitation_head=True,           # cross-entropy head on frozen backbone
         imitation_n_actions=n_actions,     # exact action space for this game
         imitation_lr=0.002,
-        imitation_phase_steps=2000,        # ~2k steps pure imitation before RL kicks in
+        imitation_phase_steps=resolved_imitation_steps,
         imitation_alpha=0.3,               # Phase 2: 30% imitation, 100% RL
         rl_beta=1.0,
     )
@@ -280,7 +295,8 @@ def benchmark_game(
     for ep in range(n_episodes):
         ep_seed = seed_base + ep
         try:
-            result = run_episode(env, agent, buf, n_actions, seed=ep_seed)
+            result = run_episode(env, agent, buf, n_actions, seed=ep_seed,
+                                 atari_ops=atari_ops)
         except Exception as exc:
             print(f"    ep {ep+1} error: {exc}")
             result = {"reward": 0.0, "steps": 0, "epsilon": agent.epsilon}

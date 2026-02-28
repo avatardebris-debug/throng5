@@ -1,0 +1,43 @@
+[
+  {
+    "op": "ADD",
+    "name": "centipede_near_death_priority_boost",
+    "description": "Boost replay priority on near-death transitions to correct catastrophic divergence in survival-critical moments.",
+    "game": "ALE/Centipede-v5",
+    "llm_score": 0.9,
+    "llm_priority": "test",
+    "llm_notes": "Centipede has alignment_rate=0.0003, high_conf_disagree_rate=0.9997, and disagree_near_terminal_rate=1.0 with mean_entropy=2.0995 across 13,863 steps, so survival-critical disagreement should be heavily oversampled.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 4.5
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "defender_imitation_phase_extend_10000",
+    "description": "Extend imitation-only warmup to stabilize policy priors before RL takeover in an extreme low-alignment regime.",
+    "game": "ALE/Defender-v5",
+    "llm_score": 0.82,
+    "llm_priority": "test",
+    "llm_notes": "Defender shows alignment_rate=0.0434 with mean_entropy=2.0306 and high_conf_disagree_rate=0.9566, while reward_on_agree=16.8449 greatly exceeds reward_on_disagree=1.1278, indicating human behavior is valuable but underlearned.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 10000
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "montezuma_imitation_phase_extend_7000",
+    "name": "montezuma_imitation_phase_extend_10000",
+    "description": "Increase Montezuma imitation-only warmup further to address persistent high-entropy uncertainty and stagnant eval progression.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.8,
+    "llm_priority": "test",
+    "llm_notes": "Montezuma still has mean_entropy=2.3881 with disagree_near_terminal_rate=0.7436 and eval episodes stuck at max_room=1 with total_reward=0.0, so 7000 imitation steps appear insufficient for stable behavior grounding.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 10000
+    }
+  }
+]

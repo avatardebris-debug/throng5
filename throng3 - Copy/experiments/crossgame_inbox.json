@@ -1,0 +1,96 @@
+[
+  {
+    "op": "ADD",
+    "name": "montezuma_frontier_recovery_curriculum",
+    "game": "ALE/MontezumaRevenge-v5",
+    "description": "Montezuma shows collapse to zero recent reward despite long episodes; bias training toward frontier states, recoverable trajectories, and key-door completion micro-goals.",
+    "enaction": {
+      "type": "curriculum_adjust",
+      "dream_interval": 6,
+      "advisory_rate": 0.62,
+      "promote_threshold": 14,
+      "epsilon_decay": 0.998,
+      "gamma": 0.995,
+      "subgoals": [
+        "first_ladder_contact",
+        "first_key_acquired",
+        "door_unlock_sequence",
+        "safe_return_after_key"
+      ]
+    },
+    "llm_score": 0.86,
+    "llm_priority": "explore",
+    "llm_notes": "300 episodes with recent20_mean=0.0 indicates sparse-reward starvation. Increase exploration persistence and shorten dream interval to improve planning frequency."
+  },
+  {
+    "op": "ADD",
+    "name": "breakout_stability_then_speed",
+    "game": "ALE/Breakout-v5",
+    "description": "Breakout is stochastic+dense with low but nonzero reward; prioritize consistency before high-reward streak chasing.",
+    "enaction": {
+      "type": "parameter_tune",
+      "dream_interval": 12,
+      "advisory_rate": 0.34,
+      "promote_threshold": 22,
+      "epsilon_decay": 0.996,
+      "gamma": 0.985,
+      "focus": "paddle_ball_alignment_and_life_preservation"
+    },
+    "llm_score": 0.68,
+    "llm_priority": "exploit",
+    "llm_notes": "500 episodes, recent20_mean=0.8 and flat trend suggest noisy local policy. Slightly lower advisory use and longer horizon should reduce oscillation."
+  },
+  {
+    "op": "ADD",
+    "name": "frogger_lane_phase_model",
+    "game": "ALE/Frogger-v5",
+    "description": "Frogger maintains moderate reward but plateaus; introduce lane-phase timing abstractions and selective risk pulses near completion states.",
+    "enaction": {
+      "type": "timing_policy_upgrade",
+      "dream_interval": 8,
+      "advisory_rate": 0.44,
+      "promote_threshold": 18,
+      "epsilon_decay": 0.997,
+      "gamma": 0.99,
+      "timing_mode": "phase_window_crossing"
+    },
+    "llm_score": 0.74,
+    "llm_priority": "explore",
+    "llm_notes": "500 episodes, recent20_mean above global mean but trend still flat. Improve temporal abstraction rather than raw exploration magnitude."
+  },
+  {
+    "op": "ADD",
+    "name": "cartpole_relearn_foundation",
+    "game": "CartPole-v1",
+    "description": "CartPole performance is far below expected solved regime, indicating value-estimation instability; re-stabilize baseline control objective.",
+    "enaction": {
+      "type": "stability_reset",
+      "dream_interval": 20,
+      "advisory_rate": 0.12,
+      "promote_threshold": 35,
+      "epsilon_decay": 0.999,
+      "gamma": 0.995,
+      "reset_condition": "if_recent20_mean_below_20"
+    },
+    "llm_score": 0.9,
+    "llm_priority": "explore",
+    "llm_notes": "1200 episodes with mean~13 implies core control policy has not consolidated. Treat as diagnostic anchor task and repair before trusting transfer metrics."
+  },
+  {
+    "op": "ADD",
+    "name": "instrumentation_check_dreamer_reliance_lock",
+    "game": "ALE/MontezumaRevenge-v5",
+    "description": "Cross-game diagnostics show dreamer_reliance fixed at 0.5 in all games; verify whether adaptive advisory calibration is disabled or clipped.",
+    "enaction": {
+      "type": "diagnostic_probe",
+      "checks": [
+        "log_pre_post_calibration_reliance",
+        "verify_meta_adapter_overrides_per_game",
+        "assert_reliance_not_hardclamped"
+      ]
+    },
+    "llm_score": 0.92,
+    "llm_priority": "explore",
+    "llm_notes": "No PRINCIPLE ops emitted: the strongest apparent cross-game pattern is an instrumentation confound (constant reliance=0.5), which can invalidate causal conclusions."
+  }
+]

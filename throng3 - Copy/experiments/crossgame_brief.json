@@ -1,0 +1,322 @@
+{
+  "schema_version": "crossgame_v1",
+  "brief_type": "crossgame_principle_brief",
+  "generated_at": "2026-02-23T02:36:29Z",
+  "n_games": 4,
+  "n_games_with_data": 4,
+  "games": [
+    {
+      "game": "ALE/MontezumaRevenge-v5",
+      "environment_type": {
+        "stochastic": false,
+        "reward_type": "sparse",
+        "notes": "Deterministic, very sparse reward, long episodes"
+      },
+      "n_episodes": 300,
+      "reward_stats": {
+        "mean": 1.0,
+        "max": 100.0,
+        "min": 0.0,
+        "recent20_mean": 0.0,
+        "trend": "flat_or_declining"
+      },
+      "step_stats": {
+        "mean": 666.0,
+        "max": 8000
+      },
+      "dreamer_stats": {
+        "mean_reliance": 0.5,
+        "final_reliance": 0.5,
+        "calibrated_by_ep": 0
+      },
+      "episode_sample": [
+        {
+          "game": "ALE/MontezumaRevenge-v5",
+          "episode": 295,
+          "game_reward": 0.0,
+          "steps": 855,
+          "epsilon": 0.22679417751985861,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/MontezumaRevenge-v5",
+          "episode": 296,
+          "game_reward": 0.0,
+          "steps": 1122,
+          "epsilon": 0.22566020663225933,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/MontezumaRevenge-v5",
+          "episode": 297,
+          "game_reward": 0.0,
+          "steps": 1307,
+          "epsilon": 0.22453190559909803,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/MontezumaRevenge-v5",
+          "episode": 298,
+          "game_reward": 0.0,
+          "steps": 1171,
+          "epsilon": 0.22340924607110255,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/MontezumaRevenge-v5",
+          "episode": 299,
+          "game_reward": 0.0,
+          "steps": 1113,
+          "epsilon": 0.22229219984074702,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        }
+      ]
+    },
+    {
+      "game": "ALE/Breakout-v5",
+      "environment_type": {
+        "stochastic": true,
+        "reward_type": "dense",
+        "notes": "Stochastic ball physics, dense brick rewards"
+      },
+      "n_episodes": 600,
+      "reward_stats": {
+        "mean": 0.975,
+        "max": 9.0,
+        "min": 0.0,
+        "recent20_mean": 0.5,
+        "trend": "flat_or_declining"
+      },
+      "step_stats": {
+        "mean": 273.2,
+        "max": 803
+      },
+      "dreamer_stats": {
+        "mean_reliance": 0.5,
+        "final_reliance": 0.5,
+        "calibrated_by_ep": 0
+      },
+      "episode_sample": [
+        {
+          "game": "ALE/Breakout-v5",
+          "episode": 595,
+          "game_reward": 0.0,
+          "steps": 473,
+          "epsilon": 0.05041457663196215,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Breakout-v5",
+          "episode": 596,
+          "game_reward": 0.0,
+          "steps": 415,
+          "epsilon": 0.050162503748802344,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Breakout-v5",
+          "episode": 597,
+          "game_reward": 0.0,
+          "steps": 287,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Breakout-v5",
+          "episode": 598,
+          "game_reward": 1.0,
+          "steps": 425,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Breakout-v5",
+          "episode": 599,
+          "game_reward": 0.0,
+          "steps": 375,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        }
+      ]
+    },
+    {
+      "game": "ALE/Frogger-v5",
+      "environment_type": {
+        "stochastic": true,
+        "reward_type": "sparse",
+        "notes": "Stochastic traffic, sparse crossing rewards"
+      },
+      "n_episodes": 500,
+      "reward_stats": {
+        "mean": 11.33,
+        "max": 25.0,
+        "min": 6.0,
+        "recent20_mean": 13.35,
+        "trend": "flat_or_declining"
+      },
+      "step_stats": {
+        "mean": 318.1,
+        "max": 617
+      },
+      "dreamer_stats": {
+        "mean_reliance": 0.5,
+        "final_reliance": 0.5,
+        "calibrated_by_ep": 0
+      },
+      "episode_sample": [
+        {
+          "game": "ALE/Frogger-v5",
+          "episode": 495,
+          "game_reward": 11.0,
+          "steps": 274,
+          "epsilon": 0.0832238973628649,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Frogger-v5",
+          "episode": 496,
+          "game_reward": 11.0,
+          "steps": 381,
+          "epsilon": 0.08280777787605056,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Frogger-v5",
+          "episode": 497,
+          "game_reward": 14.0,
+          "steps": 279,
+          "epsilon": 0.08239373898667031,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Frogger-v5",
+          "episode": 498,
+          "game_reward": 11.0,
+          "steps": 331,
+          "epsilon": 0.08198177029173696,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "ALE/Frogger-v5",
+          "episode": 499,
+          "game_reward": 11.0,
+          "steps": 279,
+          "epsilon": 0.08157186144027828,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        }
+      ]
+    },
+    {
+      "game": "CartPole-v1",
+      "environment_type": {
+        "stochastic": false,
+        "reward_type": "dense",
+        "notes": "Deterministic, dense (+1/step), fully observable state"
+      },
+      "n_episodes": 1200,
+      "reward_stats": {
+        "mean": 13.189,
+        "max": 114.0,
+        "min": 8.0,
+        "recent20_mean": 13.7,
+        "trend": "flat_or_declining"
+      },
+      "step_stats": {
+        "mean": 13.2,
+        "max": 114
+      },
+      "dreamer_stats": {
+        "mean_reliance": 0.5,
+        "final_reliance": 0.5,
+        "calibrated_by_ep": 0
+      },
+      "episode_sample": [
+        {
+          "game": "CartPole-v1",
+          "episode": 1195,
+          "game_reward": 12.0,
+          "steps": 12,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "CartPole-v1",
+          "episode": 1196,
+          "game_reward": 10.0,
+          "steps": 10,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "CartPole-v1",
+          "episode": 1197,
+          "game_reward": 10.0,
+          "steps": 10,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "CartPole-v1",
+          "episode": 1198,
+          "game_reward": 14.0,
+          "steps": 14,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        },
+        {
+          "game": "CartPole-v1",
+          "episode": 1199,
+          "game_reward": 16.0,
+          "steps": 16,
+          "epsilon": 0.05,
+          "dreamer_calibrated": true,
+          "dreamer_reliance": 0.5
+        }
+      ]
+    }
+  ],
+  "existing_principles": [],
+  "inbox_schema": {
+    "description": "Respond with a valid JSON array of ops. See experiments/CROSSGAME_PROMPT.md for full instructions. Supported ops: ADD (game hypothesis), RETIRE, MUTATE, PRINCIPLE (cross-game).",
+    "principle_op_format": {
+      "op": "PRINCIPLE",
+      "id": "p_<slug>",
+      "text": "Human-readable principle statement",
+      "env_class": {
+        "stochastic": "bool",
+        "sparse": "bool"
+      },
+      "params": {
+        "dream_interval": "int",
+        "advisory_rate": "float 0-1",
+        "promote_threshold": "int",
+        "epsilon_decay": "float",
+        "gamma": "float",
+        "label": "str"
+      },
+      "evidence": [
+        "list of game+ep range strings"
+      ],
+      "confidence": "float 0-1"
+    }
+  }
+}

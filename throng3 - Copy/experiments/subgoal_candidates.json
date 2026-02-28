@@ -1,0 +1,1390 @@
+{
+  "game": "ALE/MontezumaRevenge-v5",
+  "n_reward_events": 3,
+  "n_episode_events": 10798,
+  "method": "reward_log+episode_ram",
+  "n_candidates": 33,
+  "candidates": [
+    {
+      "byte": 56,
+      "value_before": 0,
+      "value_after": 255,
+      "score": 39.896,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "key_flag_primary",
+      "x_at_reward": [
+        67,
+        15
+      ],
+      "y_at_reward": [
+        235,
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_56_transition_0_to_255",
+        "description": "RAM[56] 0\u2192255  (key_flag_primary, score=39.9, freq=2/3 reward events)",
+        "reward": 15.0,
+        "spatial": {
+          "x_range": [
+            0,
+            82
+          ],
+          "y_range": [
+            177,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 91,
+      "value_before": 0,
+      "value_after": 255,
+      "score": 19.948,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        17
+      ],
+      "y_at_reward": [
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_91_transition_0_to_255",
+        "description": "RAM[91] 0\u2192255  (unknown, score=19.9, freq=1/3 reward events)",
+        "reward": 15.0,
+        "spatial": {
+          "x_range": [
+            2,
+            32
+          ],
+          "y_range": [
+            180,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 86,
+      "value_before": 255,
+      "value_after": 16,
+      "score": 19.115,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        67,
+        15
+      ],
+      "y_at_reward": [
+        235,
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_86_transition_255_to_16",
+        "description": "RAM[86] 255\u219216  (unknown, score=19.1, freq=2/3 reward events)",
+        "reward": 15.0,
+        "spatial": {
+          "x_range": [
+            0,
+            82
+          ],
+          "y_range": [
+            177,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 30,
+      "value_before": 0,
+      "value_after": 165,
+      "score": 15.26,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        67,
+        15
+      ],
+      "y_at_reward": [
+        235,
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_30_transition_0_to_165",
+        "description": "RAM[30] 0\u2192165  (unknown, score=15.3, freq=2/3 reward events)",
+        "reward": 15.0,
+        "spatial": {
+          "x_range": [
+            0,
+            82
+          ],
+          "y_range": [
+            177,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 40,
+      "value_before": 93,
+      "value_after": 152,
+      "score": 14.609,
+      "n_reward_events": 3,
+      "n_total_events": 3,
+      "freq": 1.0,
+      "label": "unknown",
+      "x_at_reward": [
+        67,
+        15,
+        17
+      ],
+      "y_at_reward": [
+        235,
+        192,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_40_transition_93_to_152",
+        "description": "RAM[40] 93\u2192152  (unknown, score=14.6, freq=3/3 reward events)",
+        "reward": 14.6,
+        "spatial": {
+          "x_range": [
+            0,
+            82
+          ],
+          "y_range": [
+            177,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 87,
+      "value_before": 2,
+      "value_after": 0,
+      "score": 13.542,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        67,
+        15
+      ],
+      "y_at_reward": [
+        235,
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_87_transition_2_to_0",
+        "description": "RAM[87] 2\u21920  (unknown, score=13.5, freq=2/3 reward events)",
+        "reward": 13.5,
+        "spatial": {
+          "x_range": [
+            0,
+            82
+          ],
+          "y_range": [
+            177,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 65,
+      "value_before": 0,
+      "value_after": 2,
+      "score": 13.542,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "key_flag_secondary",
+      "x_at_reward": [
+        15,
+        17
+      ],
+      "y_at_reward": [
+        192,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_65_transition_0_to_2",
+        "description": "RAM[65] 0\u21922  (key_flag_secondary, score=13.5, freq=2/3 reward events)",
+        "reward": 13.5,
+        "spatial": {
+          "x_range": [
+            0,
+            32
+          ],
+          "y_range": [
+            177,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 20,
+      "value_before": 0,
+      "value_after": 1,
+      "score": 13.438,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        15,
+        17
+      ],
+      "y_at_reward": [
+        192,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_20_transition_0_to_1",
+        "description": "RAM[20] 0\u21921  (unknown, score=13.4, freq=2/3 reward events)",
+        "reward": 13.4,
+        "spatial": {
+          "x_range": [
+            0,
+            32
+          ],
+          "y_range": [
+            177,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 101,
+      "value_before": 0,
+      "value_after": 1,
+      "score": 13.438,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        15,
+        17
+      ],
+      "y_at_reward": [
+        192,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_101_transition_0_to_1",
+        "description": "RAM[101] 0\u21921  (unknown, score=13.4, freq=2/3 reward events)",
+        "reward": 13.4,
+        "spatial": {
+          "x_range": [
+            0,
+            32
+          ],
+          "y_range": [
+            177,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 102,
+      "value_before": 191,
+      "value_after": 255,
+      "score": 10.0,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        17
+      ],
+      "y_at_reward": [
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_102_transition_191_to_255",
+        "description": "RAM[102] 191\u2192255  (unknown, score=10.0, freq=1/3 reward events)",
+        "reward": 10.0,
+        "spatial": {
+          "x_range": [
+            2,
+            32
+          ],
+          "y_range": [
+            180,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 111,
+      "value_before": 0,
+      "value_after": 244,
+      "score": 9.688,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        15
+      ],
+      "y_at_reward": [
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_111_transition_0_to_244",
+        "description": "RAM[111] 0\u2192244  (unknown, score=9.7, freq=1/3 reward events)",
+        "reward": 9.7,
+        "spatial": {
+          "x_range": [
+            0,
+            30
+          ],
+          "y_range": [
+            177,
+            207
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 107,
+      "value_before": 50,
+      "value_after": 2,
+      "score": 9.167,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        17
+      ],
+      "y_at_reward": [
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_107_transition_50_to_2",
+        "description": "RAM[107] 50\u21922  (unknown, score=9.2, freq=1/3 reward events)",
+        "reward": 9.2,
+        "spatial": {
+          "x_range": [
+            2,
+            32
+          ],
+          "y_range": [
+            180,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 90,
+      "value_before": 19,
+      "value_after": 240,
+      "score": 9.089,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        15
+      ],
+      "y_at_reward": [
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_90_transition_19_to_240",
+        "description": "RAM[90] 19\u2192240  (unknown, score=9.1, freq=1/3 reward events)",
+        "reward": 9.1,
+        "spatial": {
+          "x_range": [
+            0,
+            30
+          ],
+          "y_range": [
+            177,
+            207
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 89,
+      "value_before": 18,
+      "value_after": 0,
+      "score": 7.604,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        17
+      ],
+      "y_at_reward": [
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_89_transition_18_to_0",
+        "description": "RAM[89] 18\u21920  (unknown, score=7.6, freq=1/3 reward events)",
+        "reward": 7.6,
+        "spatial": {
+          "x_range": [
+            2,
+            32
+          ],
+          "y_range": [
+            180,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 6,
+      "value_before": 185,
+      "value_after": 33,
+      "score": 7.292,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        15
+      ],
+      "y_at_reward": [
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_6_transition_185_to_33",
+        "description": "RAM[6] 185\u219233  (unknown, score=7.3, freq=1/3 reward events)",
+        "reward": 7.3,
+        "spatial": {
+          "x_range": [
+            0,
+            30
+          ],
+          "y_range": [
+            177,
+            207
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 112,
+      "value_before": 0,
+      "value_after": 12,
+      "score": 7.292,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        15,
+        17
+      ],
+      "y_at_reward": [
+        192,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_112_transition_0_to_12",
+        "description": "RAM[112] 0\u219212  (unknown, score=7.3, freq=2/3 reward events)",
+        "reward": 7.3,
+        "spatial": {
+          "x_range": [
+            0,
+            32
+          ],
+          "y_range": [
+            177,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 83,
+      "value_before": 5,
+      "value_after": 1,
+      "score": 6.875,
+      "n_reward_events": 1,
+      "n_total_events": 3,
+      "freq": 0.3333,
+      "label": "unknown",
+      "x_at_reward": [
+        17
+      ],
+      "y_at_reward": [
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_83_transition_5_to_1",
+        "description": "RAM[83] 5\u21921  (unknown, score=6.9, freq=1/3 reward events)",
+        "reward": 6.9,
+        "spatial": {
+          "x_range": [
+            2,
+            32
+          ],
+          "y_range": [
+            180,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 38,
+      "value_before": 1,
+      "value_after": 4,
+      "score": 6.823,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        67,
+        17
+      ],
+      "y_at_reward": [
+        235,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_38_transition_1_to_4",
+        "description": "RAM[38] 1\u21924  (unknown, score=6.8, freq=2/3 reward events)",
+        "reward": 6.8,
+        "spatial": {
+          "x_range": [
+            2,
+            82
+          ],
+          "y_range": [
+            180,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 53,
+      "value_before": 8,
+      "value_after": 6,
+      "score": 6.771,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        67,
+        15
+      ],
+      "y_at_reward": [
+        235,
+        192
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_53_transition_8_to_6",
+        "description": "RAM[53] 8\u21926  (unknown, score=6.8, freq=2/3 reward events)",
+        "reward": 6.8,
+        "spatial": {
+          "x_range": [
+            0,
+            82
+          ],
+          "y_range": [
+            177,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 2,
+      "value_before": 4,
+      "value_after": 6,
+      "score": 6.771,
+      "n_reward_events": 2,
+      "n_total_events": 3,
+      "freq": 0.6667,
+      "label": "unknown",
+      "x_at_reward": [
+        15,
+        17
+      ],
+      "y_at_reward": [
+        192,
+        195
+      ],
+      "room_at_reward": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_2_transition_4_to_6",
+        "description": "RAM[2] 4\u21926  (unknown, score=6.8, freq=2/3 reward events)",
+        "reward": 6.8,
+        "spatial": {
+          "x_range": [
+            0,
+            32
+          ],
+          "y_range": [
+            177,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 52,
+      "value": 28,
+      "lift": 8.638,
+      "p_near_reward": 0.0392,
+      "p_baseline": 0.0045,
+      "n_near": 49,
+      "label": "unknown",
+      "x_sample": [
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21
+      ],
+      "y_sample": [
+        157,
+        161,
+        161,
+        161,
+        161,
+        161,
+        161,
+        161,
+        161,
+        161
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_52_eq_28",
+        "description": "RAM[52]==28  (unknown, lift=8.6x, p_near=0.039)",
+        "reward": 6.5,
+        "spatial": {
+          "x_range": [
+            6,
+            36
+          ],
+          "y_range": [
+            142,
+            201
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 42,
+      "value": 18,
+      "lift": 8.638,
+      "p_near_reward": 0.0032,
+      "p_baseline": 0.0004,
+      "n_near": 4,
+      "label": "player_x",
+      "x_sample": [
+        18,
+        18,
+        18,
+        18
+      ],
+      "y_sample": [
+        201,
+        192,
+        192,
+        192
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_42_eq_18",
+        "description": "RAM[42]==18  (player_x, lift=8.6x, p_near=0.003)",
+        "reward": 6.5,
+        "spatial": {
+          "x_range": [
+            3,
+            33
+          ],
+          "y_range": [
+            177,
+            216
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 108,
+      "value": 13,
+      "lift": 8.638,
+      "p_near_reward": 0.0016,
+      "p_baseline": 0.0002,
+      "n_near": 2,
+      "label": "unknown",
+      "x_sample": [
+        16,
+        15
+      ],
+      "y_sample": [
+        205,
+        201
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_108_eq_13",
+        "description": "RAM[108]==13  (unknown, lift=8.6x, p_near=0.002)",
+        "reward": 6.5,
+        "spatial": {
+          "x_range": [
+            0,
+            31
+          ],
+          "y_range": [
+            186,
+            220
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 43,
+      "value": 228,
+      "lift": 8.638,
+      "p_near_reward": 0.0016,
+      "p_baseline": 0.0002,
+      "n_near": 2,
+      "label": "player_y",
+      "x_sample": [
+        77,
+        77
+      ],
+      "y_sample": [
+        228,
+        228
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_43_eq_228",
+        "description": "RAM[43]==228  (player_y, lift=8.6x, p_near=0.002)",
+        "reward": 6.5,
+        "spatial": {
+          "x_range": [
+            62,
+            92
+          ],
+          "y_range": [
+            213,
+            243
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 92,
+      "value": 32,
+      "lift": 4.936,
+      "p_near_reward": 0.0032,
+      "p_baseline": 0.0006,
+      "n_near": 4,
+      "label": "unknown",
+      "x_sample": [
+        62,
+        62,
+        62,
+        62
+      ],
+      "y_sample": [
+        159,
+        159,
+        159,
+        159
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_92_eq_32",
+        "description": "RAM[92]==32  (unknown, lift=4.9x, p_near=0.003)",
+        "reward": 5.1,
+        "spatial": {
+          "x_range": [
+            47,
+            77
+          ],
+          "y_range": [
+            144,
+            174
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 1,
+      "value": 3,
+      "lift": 4.049,
+      "p_near_reward": 0.024,
+      "p_baseline": 0.0059,
+      "n_near": 30,
+      "label": "unknown",
+      "x_sample": [
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45,
+        45
+      ],
+      "y_sample": [
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_1_eq_3",
+        "description": "RAM[1]==3  (unknown, lift=4.0x, p_near=0.024)",
+        "reward": 4.7,
+        "spatial": {
+          "x_range": [
+            30,
+            60
+          ],
+          "y_range": [
+            220,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 64,
+      "value": 2,
+      "lift": 3.702,
+      "p_near_reward": 0.0024,
+      "p_baseline": 0.0006,
+      "n_near": 3,
+      "label": "unknown",
+      "x_sample": [
+        16,
+        40,
+        15
+      ],
+      "y_sample": [
+        205,
+        235,
+        201
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_64_eq_2",
+        "description": "RAM[64]==2  (unknown, lift=3.7x, p_near=0.002)",
+        "reward": 4.5,
+        "spatial": {
+          "x_range": [
+            0,
+            55
+          ],
+          "y_range": [
+            186,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 5,
+      "value": 110,
+      "lift": 3.322,
+      "p_near_reward": 0.004,
+      "p_baseline": 0.0012,
+      "n_near": 5,
+      "label": "unknown",
+      "x_sample": [
+        41,
+        24,
+        24,
+        54,
+        130
+      ],
+      "y_sample": [
+        235,
+        235,
+        235,
+        217,
+        235
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_5_eq_110",
+        "description": "RAM[5]==110  (unknown, lift=3.3x, p_near=0.004)",
+        "reward": 4.2,
+        "spatial": {
+          "x_range": [
+            9,
+            145
+          ],
+          "y_range": [
+            202,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 106,
+      "value": 15,
+      "lift": 3.037,
+      "p_near_reward": 0.036,
+      "p_baseline": 0.0119,
+      "n_near": 45,
+      "label": "unknown",
+      "x_sample": [
+        42,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41
+      ],
+      "y_sample": [
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235,
+        235
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_106_eq_15",
+        "description": "RAM[106]==15  (unknown, lift=3.0x, p_near=0.036)",
+        "reward": 4.0,
+        "spatial": {
+          "x_range": [
+            9,
+            57
+          ],
+          "y_range": [
+            220,
+            250
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 58,
+      "value": 2,
+      "lift": 2.863,
+      "p_near_reward": 0.1352,
+      "p_baseline": 0.0472,
+      "n_near": 169,
+      "label": "lives",
+      "x_sample": [
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37
+      ],
+      "y_sample": [
+        148,
+        148,
+        148,
+        148,
+        148,
+        148,
+        148,
+        148,
+        148,
+        148
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_58_eq_2",
+        "description": "RAM[58]==2  (lives, lift=2.9x, p_near=0.135)",
+        "reward": 3.9,
+        "spatial": {
+          "x_range": [
+            22,
+            92
+          ],
+          "y_range": [
+            133,
+            255
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 93,
+      "value": 250,
+      "lift": 2.715,
+      "p_near_reward": 0.0088,
+      "p_baseline": 0.0032,
+      "n_near": 11,
+      "label": "unknown",
+      "x_sample": [
+        39,
+        62,
+        62,
+        62,
+        62,
+        62,
+        62,
+        62,
+        39,
+        55
+      ],
+      "y_sample": [
+        157,
+        159,
+        159,
+        159,
+        159,
+        159,
+        159,
+        159,
+        175,
+        176
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_93_eq_250",
+        "description": "RAM[93]==250  (unknown, lift=2.7x, p_near=0.009)",
+        "reward": 3.8,
+        "spatial": {
+          "x_range": [
+            24,
+            77
+          ],
+          "y_range": [
+            142,
+            191
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 88,
+      "value": 4,
+      "lift": 2.16,
+      "p_near_reward": 0.0024,
+      "p_baseline": 0.0011,
+      "n_near": 3,
+      "label": "unknown",
+      "x_sample": [
+        63,
+        63,
+        55
+      ],
+      "y_sample": [
+        227,
+        227,
+        184
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_88_eq_4",
+        "description": "RAM[88]==4  (unknown, lift=2.2x, p_near=0.002)",
+        "reward": 3.3,
+        "spatial": {
+          "x_range": [
+            40,
+            78
+          ],
+          "y_range": [
+            169,
+            242
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "byte": 126,
+      "value": 187,
+      "lift": 2.003,
+      "p_near_reward": 0.0408,
+      "p_baseline": 0.0204,
+      "n_near": 51,
+      "label": "unknown",
+      "x_sample": [
+        109,
+        109,
+        109,
+        109,
+        109,
+        109,
+        109,
+        109,
+        109,
+        109
+      ],
+      "y_sample": [
+        195,
+        195,
+        195,
+        195,
+        195,
+        195,
+        195,
+        195,
+        195,
+        195
+      ],
+      "room_sample": [
+        1
+      ],
+      "suggested_subgoal": {
+        "name": "byte_126_eq_187",
+        "description": "RAM[126]==187  (unknown, lift=2.0x, p_near=0.041)",
+        "reward": 3.2,
+        "spatial": {
+          "x_range": [
+            94,
+            124
+          ],
+          "y_range": [
+            180,
+            210
+          ],
+          "room": [
+            1
+          ]
+        }
+      }
+    }
+  ],
+  "next_steps": [
+    "1. Review candidates \u2014 focus on high score/lift with known labels",
+    "2. Copy promising ones to experiments/atari_inbox.json as ADD ops",
+    "3. Set op.enaction.type = 'shaped_reward_ram' with byte/value/bonus",
+    "4. Run: python ingest_atari_inbox.py",
+    "5. Update montezuma_subgoals.py with confirmed coordinates"
+  ]
+}

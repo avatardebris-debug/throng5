@@ -1,0 +1,44 @@
+[
+  {
+    "op": "ADD",
+    "name": "asterix_high_conf_disagree_boost",
+    "description": "Boost replay priority for high-confidence disagreements so the agent relearns confident-but-wrong habits from human demonstrations.",
+    "game": "ALE/Asterix-v5",
+    "llm_score": 0.88,
+    "llm_priority": "test",
+    "llm_notes": "Asterix shows alignment_rate=0.0292 with high_conf_disagree_rate=0.9708 and disagree_near_terminal_rate=0.8636, so confident disagreement dominates and should be oversampled.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.0
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "asterix_imitation_phase_extend_8000",
+    "description": "Extend imitation-only warmup to stabilize policy before RL takeover in a high-entropy, low-alignment regime.",
+    "game": "ALE/Asterix-v5",
+    "llm_score": 0.8,
+    "llm_priority": "explore",
+    "llm_notes": "Mean entropy is 2.0533 (>2.0) while alignment is only 0.0292, indicating the policy remains uncertain and poorly aligned; longer imitation should improve backbone action priors.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 8000
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "montezuma_near_death_priority_boost",
+    "name": "montezuma_near_death_priority_boost_v2",
+    "description": "Increase near-death replay emphasis to target persistent disagreement in survival-critical moments.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.79,
+    "llm_priority": "test",
+    "llm_notes": "Montezuma still has disagree_near_terminal_rate=0.7436 and mean_entropy=2.3881 despite existing ops, with eval runs stuck at max_room=1 and total_reward=0.0, so stronger near-death sampling is warranted.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 4.0
+    }
+  }
+]

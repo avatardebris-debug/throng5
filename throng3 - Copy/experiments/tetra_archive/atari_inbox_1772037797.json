@@ -1,0 +1,44 @@
+[
+  {
+    "op": "ADD",
+    "name": "montezuma_room_boundary_priority_v1",
+    "description": "Boost replay priority at room-boundary transitions in Montezuma to force learning of crossing behaviors out of the start room.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.88,
+    "llm_priority": "test",
+    "llm_notes": "Montezuma alignment_rate=0.3924 with mean_entropy=2.434 and disagree_near_terminal_rate=0.8506, while eval episodes remain stuck at max_room=1 with key_collected_any=false. Oversampling boundary transitions targets the no-progression bottleneck directly.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "room_boundary",
+      "multiplier": 3.5
+    }
+  },
+  {
+    "op": "MUTATE",
+    "parent": "montezuma_high_entropy_phase_extend_12000",
+    "name": "montezuma_high_entropy_phase_extend_16000",
+    "description": "Extend Montezuma imitation-only warmup to 16k steps to reduce persistent high-entropy action uncertainty before RL updates dominate.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.82,
+    "llm_priority": "explore",
+    "llm_notes": "Mean entropy remains very high at 2.434 (>2.0 uncertainty threshold) and latest eval trajectories repeatedly show q_entropy around 2.89 with no room progression beyond room 1. A longer imitation phase tests whether representation grounding is still insufficient at 12k.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 16000
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "defender_high_conf_disagree_boost_v1",
+    "description": "Aggressively prioritize high-confidence disagreements in Defender to correct confidently wrong habits where human actions are much more rewarding.",
+    "game": "ALE/Defender-v5",
+    "llm_score": 0.86,
+    "llm_priority": "test",
+    "llm_notes": "Defender has alignment_rate=0.0434, high_conf_disagree_rate=0.9566, and disagree_near_terminal_rate=1.0; importantly reward_on_agree=16.8449 far exceeds reward_on_disagree=1.1278, indicating human actions are strongly superior and misaligned confident choices should be heavily replayed.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.5
+    }
+  }
+]

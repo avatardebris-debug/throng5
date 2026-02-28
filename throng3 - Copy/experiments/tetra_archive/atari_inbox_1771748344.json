@@ -1,0 +1,57 @@
+[
+  {
+    "op": "ADD",
+    "name": "montezuma_near_death_priority_boost",
+    "description": "Boost replay priority for near_death transitions in Montezuma where disagreement spikes.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.86,
+    "llm_priority": "test",
+    "llm_notes": "Montezuma shows disagree_near_terminal_rate=0.7436 with mean_entropy=2.3881 and high_conf_disagree_rate=0.3377 over n_steps=267719. Increase sampling of survival-critical transitions to reduce terminal divergence.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "near_death",
+      "multiplier": 3.0
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "montezuma_imitation_phase_extend_7000",
+    "description": "Extend imitation-only phase for Montezuma before RL takeover.",
+    "game": "ALE/MontezumaRevenge-v5",
+    "llm_score": 0.81,
+    "llm_priority": "test",
+    "llm_notes": "Despite alignment_rate=0.6110, Montezuma remains highly uncertain (mean_entropy=2.3881) and reward_on_disagree (0.5857) exceeds reward_on_agree (0.0520), indicating unstable policy grounding. Extend imitation phase to stabilize action model.",
+    "enaction": {
+      "type": "phase_extend",
+      "phase_steps": 7000
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "frogger_high_conf_disagree_boost",
+    "description": "Prioritize high-confidence disagreement samples in Frogger to correct confident wrong habits.",
+    "game": "ALE/Frogger-v5",
+    "llm_score": 0.84,
+    "llm_priority": "test",
+    "llm_notes": "Frogger has alignment_rate=0.0289 with high_conf_disagree_rate=0.9711 and disagree_near_terminal_rate=1.0 across n_steps=67771. The agent is confidently wrong at death-adjacent states, so oversample high_conf_disagree transitions.",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "high_conf_disagree",
+      "multiplier": 3.5
+    }
+  },
+  {
+    "op": "ADD",
+    "name": "breakout_disagree_priority_boost",
+    "description": "Increase replay weight for disagreement transitions in Breakout to improve imitation alignment.",
+    "game": "ALE/Breakout-v5",
+    "llm_score": 0.72,
+    "llm_priority": "explore",
+    "llm_notes": "Breakout has moderate alignment_rate=0.3691 with high_conf_disagree_rate=0.6309 and disagree_near_terminal_rate=0.5714 over n_steps=12453. A lighter disagreement boost can test whether mismatch reduction improves reward consistency (reward_on_agree=0.0100 vs reward_on_disagree=0.0074).",
+    "enaction": {
+      "type": "priority_boost",
+      "condition": "disagree",
+      "multiplier": 2.0
+    }
+  }
+]
