@@ -108,6 +108,7 @@ class Enemy:
     egg_timer: int = 0       # Egg reverts after this many steps
     asleep: bool = False     # Leeper: permanently asleep
     active: bool = True      # Gol/Skull: inactive until all hearts collected
+    facing: int = 2          # Direction enemy faces (Action enum: 1=UP,2=DOWN,3=LEFT,4=RIGHT)
 
     # Patrol (Don Medusa): oscillates between two positions
     patrol_dir: int = 0      # 0=horizontal, 1=vertical
@@ -357,9 +358,10 @@ class LoloSimulator:
                     e.asleep = True
                     info["leeper_asleep"] = True
 
-            # LOS killers
+            # LOS killers (Medusa/Don Medusa: facing direction only; Gol: all 4)
             if e.etype in LOS_KILLERS and e.active:
-                if self._has_los(e.row, e.col, self.player_row, self.player_col):
+                facing_constraint = e.facing if e.etype in (EnemyType.MEDUSA, EnemyType.DON_MEDUSA) else None
+                if self._has_los(e.row, e.col, self.player_row, self.player_col, facing_constraint):
                     self.alive = False
                     reward += self.R_DEATH
                     info["death"] = f"los_killed_by_{e.etype.name}"
@@ -503,11 +505,30 @@ class LoloSimulator:
 
     def _has_los(
         self, er: int, ec: int, pr: int, pc: int,
+        facing: Optional[int] = None,
     ) -> bool:
-        """Does enemy at (er,ec) have clear LOS to player at (pr,pc)?"""
+        """
+        Does enemy at (er,ec) have clear LOS to player at (pr,pc)?
+
+        If facing is set (Medusa/Don Medusa), only checks the facing direction.
+        facing uses Action enum: 1=UP, 2=DOWN, 3=LEFT, 4=RIGHT.
+        """
         # Must be on same row or column
         if er != pr and ec != pc:
             return False
+
+        # Check facing constraint (Medusa only fires in one direction)
+        if facing is not None:
+            if er == pr:  # Same row → horizontal LOS
+                if pc > ec and facing != Action.RIGHT:
+                    return False
+                if pc < ec and facing != Action.LEFT:
+                    return False
+            else:  # Same col → vertical LOS
+                if pr > er and facing != Action.DOWN:
+                    return False
+                if pr < er and facing != Action.UP:
+                    return False
 
         if er == pr:
             # Same row — check horizontal
@@ -609,7 +630,8 @@ class LoloSimulator:
                     "etype": int(e.etype), "row": e.row, "col": e.col,
                     "alive": e.alive, "is_egg": e.is_egg,
                     "egg_timer": e.egg_timer, "asleep": e.asleep,
-                    "active": e.active, "patrol_dir": e.patrol_dir,
+                    "active": e.active, "facing": e.facing,
+                    "patrol_dir": e.patrol_dir,
                     "patrol_range": e.patrol_range,
                     "patrol_step": e.patrol_step,
                     "patrol_forward": e.patrol_forward,
@@ -642,7 +664,8 @@ class LoloSimulator:
                 row=ed["row"], col=ed["col"],
                 alive=ed["alive"], is_egg=ed["is_egg"],
                 egg_timer=ed["egg_timer"], asleep=ed["asleep"],
-                active=ed["active"], patrol_dir=ed["patrol_dir"],
+                active=ed["active"], facing=ed.get("facing", 2),
+                patrol_dir=ed["patrol_dir"],
                 patrol_range=ed["patrol_range"],
                 patrol_step=ed["patrol_step"],
                 patrol_forward=ed["patrol_forward"],
