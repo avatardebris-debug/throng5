@@ -50,6 +50,7 @@ class LoloFastLearner:
         self._total_episodes = 0
         self._episode_reward = 0.0
         self._prev_state: Optional[tuple] = None
+        self._prev_action: int = 0
 
     def set_simulator(self, sim):
         """Set simulator reference for direct state access."""
@@ -84,11 +85,11 @@ class LoloFastLearner:
         self._total_steps += 1
         self._episode_reward += reward
 
-        # Q-learning update
+        # Q-learning update (uses internally tracked prev_action)
         if self._prev_state is not None:
             q_prev = self._get_q(self._prev_state)
             target = reward if done else reward + self.gamma * np.max(self._get_q(state))
-            q_prev[prev_action] += self.lr * (target - q_prev[prev_action])
+            q_prev[self._prev_action] += self.lr * (target - q_prev[self._prev_action])
 
         # ε-greedy
         q_values = self._get_q(state)
@@ -110,8 +111,10 @@ class LoloFastLearner:
             self._current_chain = []
             self._episode_reward = 0.0
             self._prev_state = None
+            self._prev_action = 0
         else:
             self._prev_state = state
+            self._prev_action = action
 
         return {"action": action}
 
