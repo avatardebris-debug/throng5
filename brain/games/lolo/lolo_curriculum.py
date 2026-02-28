@@ -349,3 +349,45 @@ class LoloCurriculum:
             },
             "generator": self.gen.report(),
         }
+
+    def validate_solvable(
+        self,
+        sim: LoloSimulator,
+        max_episodes: int = 1000,
+        max_steps: int = 300,
+    ) -> bool:
+        """
+        Quick solvability check using TabQ.
+
+        Runs a fast Q-learner on the puzzle. If it solves it at least once
+        in max_episodes, the puzzle is solvable. Otherwise flag it.
+
+        Returns True if solvable.
+        """
+        from brain.games.lolo.lolo_fast_learner import LoloFastLearner
+
+        state = sim.save()
+        validator = LoloFastLearner(n_actions=6, lr=0.3, epsilon_decay=0.995)
+        validator.set_puzzle_id(0)
+
+        for ep in range(max_episodes):
+            sim.load(state)
+            validator.set_simulator(sim)
+            reward = 0.0
+
+            for step in range(max_steps):
+                result = validator.step(reward=reward, done=False)
+                action = result["action"]
+                _, reward, done, _ = sim.step(action)
+                if done:
+                    validator.step(reward=reward, done=True)
+                    break
+            else:
+                validator.step(reward=-1.0, done=True)
+
+            if sim.won:
+                sim.load(state)  # Restore original state
+                return True
+
+        sim.load(state)  # Restore original state
+        return False
