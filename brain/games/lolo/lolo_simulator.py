@@ -884,9 +884,24 @@ class LoloSimulator:
     ENEMY_CHARS = {
         EnemyType.SNAKEY: "s", EnemyType.LEEPER: "l",
         EnemyType.ROCKY: "r", EnemyType.ALMA: "a",
-        EnemyType.MEDUSA: "M", EnemyType.DON_MEDUSA: "D",
         EnemyType.GOL: "G", EnemyType.SKULL: "S",
     }
+
+    # Medusa/Don Medusa use facing-dependent chars
+    _MEDUSA_FACING = {1: "▲", 2: "▼", 3: "◄", 4: "►"}       # UP DOWN LEFT RIGHT
+    _DON_MEDUSA_FACING = {1: "△", 2: "▽", 3: "◁", 4: "▷"}
+
+    def _enemy_char(self, e: 'Enemy') -> str:
+        """Get display character for an enemy, using facing arrows for Medusa."""
+        if e.is_egg:
+            return "O"
+        if e.asleep:
+            return "z"
+        if e.etype == EnemyType.MEDUSA:
+            return self._MEDUSA_FACING.get(e.facing, "M")
+        if e.etype == EnemyType.DON_MEDUSA:
+            return self._DON_MEDUSA_FACING.get(e.facing, "D")
+        return self.ENEMY_CHARS.get(e.etype, "?")
 
     def render_ascii(self) -> str:
         """Render grid as ASCII art."""
@@ -897,21 +912,13 @@ class LoloSimulator:
                 if r == self.player_row and c == self.player_col:
                     row_chars.append("@")
                 else:
-                    # Check for enemy
                     enemy_here = None
                     for e in self.enemies:
                         if e.row == r and e.col == c and e.alive:
                             enemy_here = e
                             break
                     if enemy_here:
-                        if enemy_here.is_egg:
-                            row_chars.append("O")
-                        elif enemy_here.asleep:
-                            row_chars.append("z")
-                        else:
-                            row_chars.append(
-                                self.ENEMY_CHARS.get(enemy_here.etype, "?")
-                            )
+                        row_chars.append(self._enemy_char(enemy_here))
                     else:
                         row_chars.append(
                             self.TILE_CHARS.get(Tile(self.grid[r, c]), "?")
