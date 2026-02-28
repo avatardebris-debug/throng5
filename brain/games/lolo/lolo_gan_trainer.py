@@ -86,8 +86,11 @@ class GanTrainingLoop:
         """
         Seed the GAN discriminator with randomly generated puzzles.
 
-        Generates puzzles with the random generator, labels them via SARSA,
-        and uses the labeled data to pre-train the discriminator.
+        Uses a decaying trial schedule: early puzzles get many SARSA
+        episodes (200) so it can learn the game, later puzzles need
+        fewer because Q-values are built up.
+
+        Schedule: 200 → -10 per puzzle to 100, -5 to 50, -1 to 5
         """
         from brain.games.lolo.lolo_generator import LoloPuzzleGenerator
 
@@ -96,18 +99,17 @@ class GanTrainingLoop:
         bad_grids = []
         solved = 0
         unsolvable_count = 0
+        current_tries = 200
 
         for i in range(n):
-            sim = gen.generate(tier=tier)
+            sim = gen.generate(tier=tier, max_attempts=500)
             if sim is None:
                 continue
 
-            # Convert sim grid to GAN format (143, 9) one-hot
             grid_probs = self._sim_to_gan_grid(sim)
-
-            # Quick SARSA test (5 tries)
             sim_state = sim.save()
-            won = self._try_sarsa(sim, sim_state, self.STAGE1_TRIES)
+
+            won = self._try_sarsa(sim, sim_state, current_tries)
 
             if won:
                 good_grids.append(grid_probs)
@@ -116,10 +118,25 @@ class GanTrainingLoop:
                 bad_grids.append(grid_probs)
                 unsolvable_count += 1
 
+            # Decay trial count
+            if current_tries > 100:
+                current_tries = max(100, current_tries - 10)
+            elif current_tries > 50:
+                current_tries = max(50, current_tries - 5)
+            elif current_tries > 5:
+                current_tries = max(5, current_tries - 1)
+
             # Train GAN periodically
             if len(good_grids) >= 10 and len(bad_grids) >= 5:
                 self.gan.train_step(good_grids[-10:], bad_grids[-5:])
                 self._gan_train_steps += 1
+
+            # Progress reporting
+            if (i + 1) % 50 == 0:
+                rate = solved / (i + 1)
+                print(f"  Seed [{i+1}/{n}] solved={solved} ({rate:.0%}) "
+                      f"tries={current_tries} Q={len(self.sarsa.q_table)}",
+                      flush=True)
 
         # Final training batch
         if good_grids and bad_grids:
@@ -128,7 +145,8 @@ class GanTrainingLoop:
 
         self._seeded = True
         return {"seeded": n, "solved": solved, "unsolvable": unsolvable_count,
-                "gan_steps": self._gan_train_steps}
+                "gan_steps": self._gan_train_steps,
+                "final_tries": current_tries}
 
     def run(
         self,
