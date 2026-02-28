@@ -280,10 +280,53 @@ class LoloGAN:
         self.D = LoloDiscriminator(lr=lr)
         self.rng = np.random.RandomState(42)
 
+        # Solved puzzle bank — generator learns to imitate these
+        self.solved_bank: List[np.ndarray] = []  # (143, 9) one-hot grids
+        self._pretrain_steps = 0
+
         # Training stats
         self._gen_count = 0
         self._d_losses: List[float] = []
         self._g_losses: List[float] = []
+
+    def add_solved(self, grid_probs: np.ndarray) -> None:
+        """Add a solved puzzle grid to the imitation bank."""
+        self.solved_bank.append(grid_probs.copy())
+        if len(self.solved_bank) > 2000:
+            self.solved_bank = self.solved_bank[-2000:]
+
+    def pretrain_from_solved(self, epochs: int = 50, batch_size: int = 16) -> Dict[str, float]:
+        """
+        Supervised pre-training: generator learns to reconstruct solved puzzles.
+
+        For each batch, picks random solved grids as targets and trains the
+        generator to output grids that match them (MSE loss). This teaches
+        the generator what solvable puzzles look like BEFORE adversarial training.
+
+        Returns dict with training metrics.
+        """
+        if len(self.solved_bank) < 2:
+            return {"pretrain_loss": 0.0, "steps": 0, "bank_size": len(self.solved_bank)}
+
+        total_loss = 0.0
+        steps = 0
+
+        for epoch in range(epochs):
+            # Sample a random batch of solved puzzles as targets
+            indices = self.rng.choice(len(self.solved_bank),
+                                      size=min(batch_size, len(self.solved_bank)),
+                                      replace=False)
+
+            for idx in indices:
+                target = self.solved_bank[idx]  # (143, 9) one-hot
+                loss = self._pretrain_step(target)
+                total_loss += loss
+                steps += 1
+                self._pretrain_steps += 1
+
+        avg_loss = total_loss / max(steps, 1)
+        return {"pretrain_loss": float(avg_loss), "steps": steps,
+                "bank_size": len(self.solved_bank)}
 
     def generate(self, tier: int = 1, temperature: float = 0.8) -> Optional[LoloSimulator]:
         """
@@ -474,9 +517,39 @@ class LoloGAN:
 
         return {"d_loss": float(d_loss), "g_loss": float(g_loss)}
 
+    def _pretrain_step(self, target: np.ndarray) -> float:
+        """
+        One supervised pre-training step: generate grid, compute MSE vs target.
+
+        Args:
+            target: (143, 9) one-hot grid of a solved puzzle
+
+        Returns: MSE loss value
+        """
+        z = np.random.randn(self.G.z_dim).astype(np.float32)
+        tier_oh = np.zeros(8, np.float32)
+        tier_oh[0] = 1.0
+
+        probs, cache = self.G.forward(z, tier_oh, temperature=1.0)
+
+        # MSE loss: ||output - target||^2
+        diff = probs - target  # (143, 9)
+        loss = float(np.mean(diff ** 2))
+
+        # Gradient: d(MSE)/d(output) = 2 * (output - target) / N
+        d_output = 2.0 * diff / diff.size
+
+        # Backprop through generator
+        grads = self.G.backward(d_output, cache)
+        self.G.update(grads)
+
+        return loss
+
     def report(self) -> Dict[str, Any]:
         return {
             "generated": self._gen_count,
+            "solved_bank": len(self.solved_bank),
+            "pretrain_steps": self._pretrain_steps,
             "d_loss_avg": float(np.mean(self._d_losses[-50:])) if self._d_losses else 0,
             "g_loss_avg": float(np.mean(self._g_losses[-50:])) if self._g_losses else 0,
             "g_params": sum(p.size for p in self.G._params().values()),

@@ -113,6 +113,7 @@ class GanTrainingLoop:
 
             if won:
                 good_grids.append(grid_probs)
+                self.gan.add_solved(grid_probs)  # Feed to generator bank
                 solved += 1
             else:
                 bad_grids.append(grid_probs)
@@ -126,7 +127,7 @@ class GanTrainingLoop:
             elif current_tries > 5:
                 current_tries = max(5, current_tries - 1)
 
-            # Train GAN periodically
+            # Train GAN discriminator periodically
             if len(good_grids) >= 10 and len(bad_grids) >= 5:
                 self.gan.train_step(good_grids[-10:], bad_grids[-5:])
                 self._gan_train_steps += 1
@@ -138,10 +139,19 @@ class GanTrainingLoop:
                       f"tries={current_tries} Q={len(self.sarsa.q_table)}",
                       flush=True)
 
-        # Final training batch
+        # Final discriminator training
         if good_grids and bad_grids:
             self.gan.train_step(good_grids, bad_grids)
             self._gan_train_steps += 1
+
+        # ── Pre-train generator from solved puzzles ──
+        if self.gan.solved_bank:
+            n_epochs = min(100, max(20, len(self.gan.solved_bank) * 3))
+            print(f"  Pre-training generator on {len(self.gan.solved_bank)} "
+                  f"solved puzzles ({n_epochs} epochs)...", flush=True)
+            pt_result = self.gan.pretrain_from_solved(epochs=n_epochs, batch_size=16)
+            print(f"  Pre-train done: loss={pt_result['pretrain_loss']:.4f}, "
+                  f"steps={pt_result['steps']}", flush=True)
 
         self._seeded = True
         return {"seeded": n, "solved": solved, "unsolvable": unsolvable_count,
