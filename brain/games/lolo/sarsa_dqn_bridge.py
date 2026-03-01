@@ -121,7 +121,24 @@ class SarsaDQNBridge:
         """
         compressed = self._encoder.encode_from_sim(sim)
         compressed_key = self._encoder.encode_key(sim)
+        return self._select_action_impl(compressed, compressed_key)
 
+    def select_action_from_features(self, compressed: np.ndarray) -> Tuple[int, str]:
+        """
+        Select action from pre-computed 84-dim features (for ROM usage).
+
+        Args:
+            compressed: 84-dim float array from encode_from_ram()
+
+        Returns:
+            (action, source) where source is "dqn", "sarsa", or "random"
+        """
+        compressed_key = self._encoder.quantize(compressed)
+        return self._select_action_impl(compressed, compressed_key)
+
+    def _select_action_impl(self, compressed: np.ndarray,
+                            compressed_key: tuple) -> Tuple[int, str]:
+        """Core action selection logic."""
         # Try DQN first
         dqn_q = None
         dqn_confidence = 0.0
@@ -137,25 +154,19 @@ class SarsaDQNBridge:
 
         # Decision logic
         if dqn_q is not None and dqn_confidence > self.confidence_threshold:
-            # DQN is confident → use it
             action = int(np.argmax(dqn_q))
             self._dqn_used += 1
             self._last_source = "dqn"
             return action, "dqn"
 
         if sarsa_q is not None:
-            # DQN uncertain but SARSA knows this state → use SARSA
             action = int(np.argmax(sarsa_q))
             self._sarsa_used += 1
             self._last_source = "sarsa"
-
-            # Queue this for distillation: teach DQN what SARSA knows
             self._distill_queue.append((compressed.copy(), sarsa_q.copy()))
-
             return action, "sarsa"
 
         if dqn_q is not None:
-            # Only DQN available (even if uncertain) → use it
             action = int(np.argmax(dqn_q))
             self._dqn_used += 1
             self._last_source = "dqn"
@@ -197,6 +208,16 @@ class SarsaDQNBridge:
         Call this after each step.
         """
         compressed = self._encoder.encode_from_sim(sim)
+        self._observe_impl(compressed, action, reward, done)
+
+    def observe_from_features(self, compressed: np.ndarray, action: int,
+                               reward: float, done: bool):
+        """Observe from pre-computed features (for ROM usage)."""
+        self._observe_impl(compressed, action, reward, done)
+
+    def _observe_impl(self, compressed: np.ndarray, action: int,
+                       reward: float, done: bool):
+        """Core observe logic."""
         self._step_count += 1
 
         # Track episode for SARSA solution recording
@@ -209,7 +230,6 @@ class SarsaDQNBridge:
             total_reward = sum(self._episode_rewards)
             if total_reward > 0:  # Positive reward = solved
                 for s, a in zip(self._episode_states, self._episode_actions):
-                    # Create one-hot Q target (action that worked gets +1)
                     q_target = np.zeros(self.n_actions, dtype=np.float32)
                     q_target[a] = 1.0
                     self._distill_queue.append((s, q_target))
