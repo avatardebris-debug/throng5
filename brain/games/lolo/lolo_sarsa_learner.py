@@ -77,18 +77,21 @@ class ReplayMemory:
         }
 
 
+from brain.games.lolo.lolo_compressed_state import LoloCompressedState
+
+
 class LoloSarsaLearner:
     """
     On-policy SARSA with hippocampus-style replay for catastrophic forgetting prevention.
 
     Architecture:
-      - Tabular Q-values keyed by (puzzle_id, row, col, hearts_collected)
+      - Tabular Q-values keyed by compressed 84-dim state (quantized to 1 decimal)
       - On-policy SARSA updates for current transitions
       - Periodic off-policy replay from memory buffer (every N episodes)
       - Prioritized by |reward| and success (wins get 5x replay priority)
 
-    State = (puzzle_id, player_row, player_col, hearts_collected)
-    ~700 states per puzzle, scales to 50+ puzzles with replay.
+    State = compressed 84-dim tuple (local grid, enemies, danger, path info)
+    Generalizes across puzzles — same compressed state = same Q-values.
     """
 
     def __init__(
@@ -112,8 +115,11 @@ class LoloSarsaLearner:
         self.replay_interval = replay_interval
         self.replay_batch = replay_batch
 
-        # Q-table: state_key → action → value
+        # Q-table: compressed_state_tuple → action → value
         self.q_table: Dict[tuple, np.ndarray] = {}
+
+        # Compressed state encoder (same for sim and NES RAM)
+        self._encoder = LoloCompressedState()
 
         # Hippocampus-style replay memory
         self.memory = ReplayMemory(
@@ -123,7 +129,6 @@ class LoloSarsaLearner:
 
         # Simulator reference (set by curriculum)
         self._sim = None
-        self._puzzle_id = 0
 
         # Episode tracking
         self._prev_state: Optional[tuple] = None
@@ -141,16 +146,14 @@ class LoloSarsaLearner:
         self._sim = sim
 
     def set_puzzle_id(self, pid: int):
-        self._puzzle_id = pid
+        """Kept for API compat — puzzle_id no longer used in state key."""
+        pass
 
     def _get_state(self) -> tuple:
-        """Read state directly from simulator — no float parsing."""
+        """Compressed 84-dim state — generalizes across puzzles."""
         if self._sim is not None:
-            return (self._puzzle_id,
-                    self._sim.player_row,
-                    self._sim.player_col,
-                    self._sim.hearts_collected)
-        return (self._puzzle_id, 0, 0, 0)
+            return self._encoder.encode_key(self._sim)
+        return tuple(np.zeros(84, dtype=np.float32))
 
     def _get_q(self, state: tuple) -> np.ndarray:
         if state not in self.q_table:
