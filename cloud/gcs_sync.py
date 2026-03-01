@@ -63,7 +63,7 @@ def get_storage_client():
 
 
 def upload_file(client, bucket_name: str, local_path: str, gcs_path: str):
-    """Upload a single file to GCS."""
+    """Upload a single file to GCS with extended timeout for large files."""
     if not os.path.exists(local_path):
         print(f"  ⚠ Skip (not found): {local_path}")
         return False
@@ -72,10 +72,13 @@ def upload_file(client, bucket_name: str, local_path: str, gcs_path: str):
     blob = bucket.blob(gcs_path)
 
     size_mb = os.path.getsize(local_path) / (1024 * 1024)
-    print(f"  ↑ Uploading {local_path} ({size_mb:.1f} MB)...", end="", flush=True)
+    # Scale timeout: 60s base + 10s per MB (920 MB → ~9260s)
+    timeout = max(120, 60 + int(size_mb * 10))
+    print(f"  ↑ Uploading {local_path} ({size_mb:.1f} MB, timeout={timeout}s)...",
+          end="", flush=True)
 
     t0 = time.time()
-    blob.upload_from_filename(local_path)
+    blob.upload_from_filename(local_path, timeout=timeout)
     elapsed = time.time() - t0
 
     print(f" done ({elapsed:.1f}s)")
@@ -105,7 +108,7 @@ def download_file(client, bucket_name: str, gcs_path: str, local_path: str):
     return True
 
 
-def push(bucket_name: str, weights_only: bool = False):
+def push(bucket_name: str, weights_only: bool = False, dqn_only: bool = False):
     """Upload weights (and optionally replay DB) to GCS."""
     client = get_storage_client()
 
@@ -113,12 +116,20 @@ def push(bucket_name: str, weights_only: bool = False):
     print(f"  {'─' * 50}")
 
     uploaded = 0
-    for f in WEIGHT_FILES:
+
+    if dqn_only:
+        # Only push the small DQN weights file
+        f = "brain/games/lolo/dqn_weights.pt"
         gcs_path = GCS_PREFIX + os.path.basename(f)
         if upload_file(client, bucket_name, f, gcs_path):
             uploaded += 1
+    else:
+        for f in WEIGHT_FILES:
+            gcs_path = GCS_PREFIX + os.path.basename(f)
+            if upload_file(client, bucket_name, f, gcs_path):
+                uploaded += 1
 
-    if not weights_only:
+    if not weights_only and not dqn_only:
         for f in REPLAY_FILES:
             gcs_path = GCS_PREFIX + "replay/" + os.path.basename(f)
             if upload_file(client, bucket_name, f, gcs_path):
@@ -177,12 +188,15 @@ def main():
                         help=f"GCS bucket name (default: {DEFAULT_BUCKET})")
     parser.add_argument("--weights-only", action="store_true",
                         help="Only sync weight files (skip replay DB)")
+    parser.add_argument("--dqn-only", action="store_true",
+                        help="Only sync DQN weights (skip large Q-table)")
     parser.add_argument("--replay-only", action="store_true",
                         help="Only sync replay DB (skip weights)")
     args = parser.parse_args()
 
     if args.action == "push":
-        push(args.bucket, weights_only=args.weights_only)
+        push(args.bucket, weights_only=args.weights_only,
+             dqn_only=args.dqn_only)
     elif args.action == "pull":
         pull(args.bucket, weights_only=args.weights_only,
              replay_only=args.replay_only)
