@@ -5,12 +5,14 @@ Wraps:
   - MiniSNN (400-neuron spiking neural network for context matching)
   - WorldModel (learned dynamics model for dream simulation)
   - CompressedState encoder
+  - Habit Network (game-specific DQN for pretrained action selection)
 
 Responsible for:
   - Context recognition via SNN (familiar vs novel states)
   - Running dream simulations via world model look-ahead
   - Procedure/habit selection based on learned patterns
   - Feeding dream results to Amygdala and Hippocampus
+  - Providing pretrained habit Q-values from game-specific DQN
 """
 
 from __future__ import annotations
@@ -94,6 +96,14 @@ class BasalGanglia(BrainRegion):
         self._last_dream_value = 0.0
         self._last_action_values: Optional[np.ndarray] = None
 
+        # ── Habit Network (game-specific DQN) ─────────────────────────
+        # Pretrained on simulator puzzles, provides instant Q-value hints.
+        # Loaded via load_habit_weights() after construction.
+        self._habit_network = None
+        self._habit_encoder = None
+        self._habit_confidence = 0.0
+        self._habit_weight = 0.5  # Blend weight: habit vs dream action values
+
     def set_policy_fn(self, policy_fn: Callable) -> None:
         """
         Set the DQN policy function for dream action selection.
@@ -103,6 +113,72 @@ class BasalGanglia(BrainRegion):
         """
         self._policy_fn = policy_fn
 
+    def load_habit_weights(self, weights_path: str,
+                           game: str = "lolo") -> bool:
+        """
+        Load a pretrained game-specific DQN as the habit network.
+
+        The habit network provides instant action Q-values from
+        compressed game state — like muscle memory from practice.
+
+        Args:
+            weights_path: path to .pt file (from cloud/export_weights.py)
+            game: which game the weights are for (determines encoder)
+
+        Returns:
+            True if loaded successfully
+        """
+        try:
+            if game == "lolo":
+                from brain.games.lolo.lolo_dqn_learner import LoloDQNLearner
+                from brain.games.lolo.lolo_compressed_state import LoloCompressedState
+
+                self._habit_network = LoloDQNLearner(n_actions=6)
+                self._habit_network.load(weights_path)
+                self._habit_network.epsilon = 0.02  # Near-greedy
+                self._habit_encoder = LoloCompressedState()
+                self._habit_confidence = 1.0
+
+                # Also use the DQN as dream policy
+                self._policy_fn = self._habit_policy_fn
+
+                return True
+            else:
+                return False
+        except Exception:
+            return False
+
+    def set_habit_simulator(self, sim) -> None:
+        """
+        Set the simulator reference for the habit network encoder.
+        Call this each step with the current game simulator.
+        """
+        if self._habit_network is not None:
+            self._habit_network.set_simulator(sim)
+
+    def _habit_policy_fn(self, features: np.ndarray,
+                         explore: bool = False):
+        """Policy function wrapper for dream action selection."""
+        if self._habit_network is None:
+            return 0, np.zeros(self.n_actions)
+        q_values = self._habit_network.get_q_values(features[:84])
+        action = int(np.argmax(q_values))
+        return action, q_values
+
+    def get_habit_q_values(self, sim=None) -> Optional[np.ndarray]:
+        """
+        Get Q-values from the habit network for current game state.
+
+        Returns:
+            6-dim array of action Q-values, or None if no habit loaded
+        """
+        if self._habit_network is None or self._habit_encoder is None:
+            return None
+        if sim is not None:
+            compressed = self._habit_encoder.encode_from_sim(sim)
+            return self._habit_network.get_q_values(compressed)
+        return None
+
     def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process context recognition and schedule dream simulations.
@@ -111,26 +187,31 @@ class BasalGanglia(BrainRegion):
             features: np.ndarray — state features (84-dim from CNN/FFT)
             reward: float — current reward
             step: int — current step count
+            sim: optional LoloSimulator for habit network encoding
         """
         features = inputs.get("features")
         reward = inputs.get("reward", 0.0)
+        sim = inputs.get("sim")  # Game-specific simulator for habit encoding
 
         # Context matching via SNN placeholder
         self._context_score = self._compute_context(features, reward)
+
+        # ── Habit Network Q-values (instant, no dreaming needed) ──────
+        habit_q = self.get_habit_q_values(sim=sim)
 
         # Check if we should dream
         self._steps_since_dream += 1
         should_dream = self._steps_since_dream >= self.dream_interval
 
         dream_results = None
-        action_values = None
+        dream_q = None
 
         if should_dream and features is not None:
             self._steps_since_dream = 0
 
             # Run dream through world model
             dream_results = self._run_dream(features)
-            action_values = self._last_action_values
+            dream_q = self._last_action_values
 
             if dream_results:
                 self._total_dreams += 1
@@ -148,28 +229,87 @@ class BasalGanglia(BrainRegion):
                     payload={"dream_results": dream_results},
                 )
 
+        # ── Merge habit + dream action values ─────────────────────────
+        action_values = self._merge_action_values(habit_q, dream_q)
+
         return {
             "context_score": self._context_score,
             "dream_results": dream_results,
             "wm_confidence": self._wm_confidence,
             "dream_action_values": action_values,
+            "habit_active": habit_q is not None,
+            "habit_confidence": self._habit_confidence,
         }
+
+    def _merge_action_values(self, habit_q: Optional[np.ndarray],
+                              dream_q: Optional[np.ndarray]) -> Optional[np.ndarray]:
+        """
+        Blend habit Q-values with dream Q-values.
+
+        If only habit: return habit (padded to n_actions if needed)
+        If only dream: return dream
+        If both: weighted blend based on habit_weight
+        """
+        if habit_q is None and dream_q is None:
+            return None
+
+        if habit_q is not None and dream_q is None:
+            # Pad habit Q (6 actions) to full action space if needed
+            if len(habit_q) < self.n_actions:
+                padded = np.zeros(self.n_actions, dtype=np.float32)
+                padded[:len(habit_q)] = habit_q
+                return padded
+            return habit_q
+
+        if habit_q is None and dream_q is not None:
+            return dream_q
+
+        # Both present: weighted blend
+        w = self._habit_weight * self._habit_confidence
+        # Pad habit if needed
+        if len(habit_q) < self.n_actions:
+            padded = np.zeros(self.n_actions, dtype=np.float32)
+            padded[:len(habit_q)] = habit_q
+            habit_q = padded
+
+        # Normalize both to [0,1] range before blending
+        h_range = habit_q.max() - habit_q.min()
+        d_range = dream_q.max() - dream_q.min()
+        h_norm = (habit_q - habit_q.min()) / max(h_range, 1e-8)
+        d_norm = (dream_q - dream_q.min()) / max(d_range, 1e-8)
+
+        return w * h_norm + (1.0 - w) * d_norm
 
     def learn(self, experience: Dict[str, Any]) -> Dict[str, float]:
         """
-        Update WorldModel from real experience.
+        Update WorldModel and habit network from real experience.
 
         Expected experience:
             state: np.ndarray — current features
             action: int
             next_state: np.ndarray — next features
             reward: float
+            done: bool
+            sim: optional LoloSimulator for habit fine-tuning
         """
         state = experience.get("state")
         action = experience.get("action")
         next_state = experience.get("next_state")
         reward = experience.get("reward", 0.0)
+        done = experience.get("done", False)
 
+        # ── Fine-tune habit network from real gameplay ─────────────────
+        if self._habit_network is not None:
+            sim = experience.get("sim")
+            if sim is not None:
+                self._habit_network.set_simulator(sim)
+            # Feed the experience through the DQN's step (implicit learn)
+            self._habit_network.step(
+                obs=state, prev_action=action,
+                reward=reward, done=done,
+            )
+
+        # ── World model training ──────────────────────────────────────
         if state is None or self._world_model is None:
             self._wm_train_steps += 1
             self._wm_confidence = min(1.0, self._wm_train_steps / 50.0)
@@ -241,6 +381,12 @@ class BasalGanglia(BrainRegion):
         wm_info = {}
         if self._world_model is not None:
             wm_info = self._world_model.report()
+        habit_info = {}
+        if self._habit_network is not None:
+            habit_info = {
+                "habit_" + k: v
+                for k, v in self._habit_network.report().items()
+            }
         return {
             **base,
             "context_score": round(self._context_score, 3),
@@ -252,5 +398,8 @@ class BasalGanglia(BrainRegion):
             "last_dream_value": round(self._last_dream_value, 3),
             "has_world_model": self._world_model is not None,
             "has_policy_fn": self._policy_fn is not None,
+            "has_habit_network": self._habit_network is not None,
+            "habit_confidence": self._habit_confidence,
             **wm_info,
+            **habit_info,
         }
