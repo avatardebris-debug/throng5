@@ -168,6 +168,13 @@ class GanTrainingLoop:
         """
         t0 = time.time()
 
+        # Snapshot bank sizes so we return only THIS run's counts
+        graded_before = len(self.graded_bank)
+        hard_before = len(self.hard_bank)
+        expert_before = len(self.expert_bank)
+        unsolvable_before = len(self.unsolvable)
+        generated_before = self._total_generated
+
         for i in range(n_puzzles):
             # ── Generate puzzle ──
             sim = self.gan.generate(tier=self.tier, temperature=0.8)
@@ -213,12 +220,21 @@ class GanTrainingLoop:
             self._run_stage2(verbose)
 
         elapsed = time.time() - t0
+
+        # Return only THIS run's contribution (delta from snapshot)
+        run_graded = len(self.graded_bank) - graded_before
+        run_hard = len(self.hard_bank) - hard_before
+        run_expert = len(self.expert_bank) - expert_before
+        run_unsolvable = len(self.unsolvable) - unsolvable_before
+        run_generated = self._total_generated - generated_before
+
         return {
-            "generated": self._total_generated,
-            "graded": len(self.graded_bank),
-            "hard": len(self.hard_bank),
-            "expert": len(self.expert_bank),
-            "unsolvable": len(self.unsolvable),
+            "generated": run_generated,
+            "graded": run_graded,
+            "hard": run_hard,
+            "expert": run_expert,
+            "solved": run_graded + run_hard + run_expert,
+            "unsolvable": run_unsolvable,
             "unsolved_remaining": len(self.unsolved_queue),
             "gan_train_steps": self._gan_train_steps,
             "elapsed": round(elapsed, 1),

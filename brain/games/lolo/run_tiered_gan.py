@@ -92,7 +92,7 @@ def run_tier(
         result = trainer.run(n_puzzles=params["puzzles_per_round"], verbose=True)
 
         total = result["generated"]
-        solved = result["graded"] + result["hard"] + result["expert"]
+        solved = result["solved"]
         solvability = solved / max(total, 1)
         round_results.append({
             "round": rnd + 1,
