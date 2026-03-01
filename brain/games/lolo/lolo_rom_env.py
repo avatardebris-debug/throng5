@@ -110,7 +110,7 @@ class LoloROMEnv:
             game=game,
             state=retro.State.NONE,
             inttype=retro.data.Integrations.STABLE,
-            use_restricted_actions=retro.Actions.MULTI_DISCRETE,
+            use_restricted_actions=retro.Actions.ALL,
         )
 
         # State tracking
