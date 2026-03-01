@@ -101,9 +101,9 @@ def main():
         print(f"  Found checkpoint: {checkpoint_path}")
         with open(checkpoint_path) as f:
             cp = json.load(f)
-        print(f"  Completed tiers: {cp['completed_tiers']}")
-        print(f"  Q-states: {cp['total_q_states']}")
-        print(f"  Solved bank: {cp['total_solved_bank']}")
+        print(f"  Completed tiers: {cp.get('completed_tiers', 'N/A')}")
+        print(f"  Q-states: {cp.get('total_q_states', cp.get('q_states', 'N/A'))}")
+        print(f"  Solved bank: {cp.get('total_solved_bank', cp.get('solved_bank', 'N/A'))}")
         print()
 
     # Export what we have
