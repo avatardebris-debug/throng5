@@ -23,6 +23,7 @@ import numpy as np
 
 from brain.games.lolo.lolo_gan import LoloGAN, GRID_CELLS, N_CHANNELS
 from brain.games.lolo.lolo_sarsa_learner import LoloSarsaLearner
+from brain.games.lolo.lolo_dqn_learner import LoloDQNLearner
 from brain.games.lolo.lolo_simulator import Enemy, EnemyType, LoloSimulator
 from brain.games.lolo.lolo_generator import LoloPuzzleGenerator
 
@@ -60,12 +61,18 @@ class GanTrainingLoop:
     def __init__(
         self,
         gan: Optional[LoloGAN] = None,
-        sarsa: Optional[LoloSarsaLearner] = None,
+        sarsa=None,  # LoloSarsaLearner or LoloDQNLearner
         tier: int = 1,
         seed_count: int = 500,
+        use_dqn: bool = False,
     ):
         self.gan = gan or LoloGAN()
-        self.sarsa = sarsa or LoloSarsaLearner(n_actions=6, epsilon_decay=0.999)
+        if sarsa is not None:
+            self.sarsa = sarsa
+        elif use_dqn:
+            self.sarsa = LoloDQNLearner(n_actions=6)
+        else:
+            self.sarsa = LoloSarsaLearner(n_actions=6, epsilon_decay=0.999)
         self.tier = tier
         self.seed_count = seed_count
 
@@ -135,8 +142,11 @@ class GanTrainingLoop:
             # Progress reporting
             if (i + 1) % 50 == 0:
                 rate = solved / (i + 1)
+                r = self.sarsa.report()
+                info = (f"loss={r.get('avg_loss',0):.4f}" if r.get("type") == "LoloDQNLearner"
+                        else f"Q={r.get('q_table_size', 0)}")
                 print(f"  Seed [{i+1}/{n}] solved={solved} ({rate:.0%}) "
-                      f"tries={current_tries} Q={len(self.sarsa.q_table)}",
+                      f"tries={current_tries} {info}",
                       flush=True)
 
         # Final discriminator training

@@ -6,10 +6,9 @@ Strategy per tier:
   2. Pretrain generator from solved puzzle bank
   3. Run GAN pipeline (100 puzzles per round)
   4. If solvability > threshold, advance to next tier
-  5. Carry SARSA Q-knowledge and solved bank forward
+  5. Carry DQN weights and solved bank forward
 
-SARSA learns incrementally — Q-states from tier 1 help with tier 2,
-since basic navigation is a prerequisite for all higher tiers.
+DQN generalizes across puzzles via neural network on 84-dim compressed state.
 """
 
 from __future__ import annotations
@@ -29,6 +28,8 @@ from brain.games.lolo.lolo_gan_trainer import GanTrainingLoop
 
 
 # ── Configuration ─────────────────────────────────────────────────────
+
+USE_DQN = True  # Set False to use tabular SARSA instead
 
 TIER_NAMES = {
     1: "Basic Navigation",
@@ -56,6 +57,15 @@ def p(msg):
     print(msg, flush=True)
 
 
+def learner_size(trainer) -> str:
+    """Get learner size info (works for both SARSA and DQN)."""
+    r = trainer.sarsa.report()
+    if r.get("type") == "LoloDQNLearner":
+        return f"steps={r['total_steps']} learns={r['total_learns']} loss={r.get('avg_loss', 0):.4f}"
+    else:
+        return f"Q={r.get('q_table_size', len(trainer.sarsa.q_table))}"
+
+
 def run_tier(
     trainer: GanTrainingLoop,
     tier: int,
@@ -75,7 +85,7 @@ def run_tier(
     seed_result = trainer.seed_with_random(n=params["seed_n"], tier=tier)
     solved_pct = seed_result["solved"] / max(seed_result["seeded"], 1)
     p(f"  Seed done: {seed_result['solved']}/{seed_result['seeded']} solved "
-      f"({solved_pct:.0%}), Q={len(trainer.sarsa.q_table)}")
+      f"({solved_pct:.0%}), {learner_size(trainer)}")
 
     # Phase 2: GAN rounds
     round_results = []
@@ -106,7 +116,7 @@ def run_tier(
         best_solvability = max(best_solvability, solvability)
 
         p(f"    → Solved {solved}/{total} ({solvability:.0%}), "
-          f"best={best_solvability:.0%}, Q={len(trainer.sarsa.q_table)}")
+          f"best={best_solvability:.0%}, {learner_size(trainer)}")
 
         # Check advance threshold
         if solvability >= params["advance_threshold"]:
@@ -122,14 +132,14 @@ def run_tier(
         "best_solvability": round(best_solvability, 3),
         "advanced": best_solvability >= params["advance_threshold"],
         "rounds": round_results,
-        "q_table_size": len(trainer.sarsa.q_table),
+        "learner_report": trainer.sarsa.report(),
         "solved_bank_size": len(trainer.gan.solved_bank),
         "gan_report": trainer.gan.report(),
     }
 
     p(f"\n  Tier {tier} complete in {elapsed:.0f}s — "
       f"best solvability: {best_solvability:.0%}, "
-      f"Q-states: {len(trainer.sarsa.q_table)}, "
+      f"{learner_size(trainer)}, "
       f"solved bank: {len(trainer.gan.solved_bank)}")
 
     return tier_result
@@ -137,12 +147,13 @@ def run_tier(
 
 def main():
     p("=" * 70)
-    p("  LOLO GAN — TIERED TRAINING (1 → 7)")
+    mode = "DQN" if USE_DQN else "SARSA"
+    p(f"  LOLO GAN — TIERED TRAINING (1 → 7) [{mode}]")
     p("=" * 70)
 
     # Shared GAN and trainer — knowledge carries forward
     gan = LoloGAN(z_dim=32, lr=0.0005)
-    trainer = GanTrainingLoop(gan=gan, tier=1)
+    trainer = GanTrainingLoop(gan=gan, tier=1, use_dqn=USE_DQN)
 
     all_results = []
     overall_t0 = time.time()
@@ -154,9 +165,9 @@ def main():
 
         # Save checkpoint after each tier
         checkpoint = {
+            "learner_type": mode,
             "completed_tiers": [r["tier"] for r in all_results],
             "results": all_results,
-            "total_q_states": len(trainer.sarsa.q_table),
             "total_solved_bank": len(trainer.gan.solved_bank),
             "total_elapsed": round(time.time() - overall_t0, 1),
         }
@@ -164,6 +175,12 @@ def main():
         with open(checkpoint_path, "w") as f:
             json.dump(checkpoint, f, indent=2, default=str)
         p(f"\n  📁 Checkpoint saved: {checkpoint_path}")
+
+        # Save DQN weights after each tier
+        if USE_DQN:
+            dqn_path = os.path.join("brain", "games", "lolo", "dqn_weights.pt")
+            trainer.sarsa.save(dqn_path)
+            p(f"  💾 DQN weights saved: {dqn_path}")
 
         if not tier_result["advanced"]:
             p(f"\n  ⚠️ Tier {tier} not advanced — stopping here.")
@@ -174,18 +191,17 @@ def main():
     # ── Final Report ──
     total_time = time.time() - overall_t0
     p(f"\n{'='*70}")
-    p(f"  FINAL REPORT — {total_time:.0f}s total")
+    p(f"  FINAL REPORT — {total_time:.0f}s total [{mode}]")
     p(f"{'='*70}")
-    p(f"\n  {'Tier':<6} {'Name':<30} {'Best%':<8} {'Q-states':<10} {'Advanced'}")
-    p(f"  {'─'*6} {'─'*30} {'─'*8} {'─'*10} {'─'*8}")
+    p(f"\n  {'Tier':<6} {'Name':<30} {'Best%':<8} {'Advanced'}")
+    p(f"  {'─'*6} {'─'*30} {'─'*8} {'─'*8}")
     for r in all_results:
         p(f"  {r['tier']:<6} {r['name']:<30} {r['best_solvability']:.0%}{'':>4} "
-          f"{r['q_table_size']:<10} {'✅' if r['advanced'] else '❌'}")
+          f"{'✅' if r['advanced'] else '❌'}")
 
-    p(f"\n  Total Q-states: {len(trainer.sarsa.q_table)}")
-    p(f"  Solved bank:    {len(trainer.gan.solved_bank)}")
-    p(f"  SARSA epsilon:  {trainer.sarsa.report()['epsilon']:.4f}")
-    p(f"  GAN report:     {trainer.gan.report()}")
+    p(f"\n  Learner: {trainer.sarsa.report()}")
+    p(f"  Solved bank: {len(trainer.gan.solved_bank)}")
+    p(f"  GAN report:  {trainer.gan.report()}")
 
 
 if __name__ == "__main__":
