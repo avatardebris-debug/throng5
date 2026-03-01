@@ -104,6 +104,11 @@ class BasalGanglia(BrainRegion):
         self._habit_confidence = 0.0
         self._habit_weight = 0.5  # Blend weight: habit vs dream action values
 
+        # ── SARSA↔DQN Bridge (dual-process) ──────────────────────────
+        # When loaded, supersedes standalone habit network.
+        # SARSA handles states DQN is uncertain about; DQN generalizes.
+        self._bridge = None
+
     def set_policy_fn(self, policy_fn: Callable) -> None:
         """
         Set the DQN policy function for dream action selection.
@@ -169,15 +174,73 @@ class BasalGanglia(BrainRegion):
         """
         Get Q-values from the habit network for current game state.
 
+        Uses bridge (dual-process) if available, falls back to standalone DQN.
+
         Returns:
             6-dim array of action Q-values, or None if no habit loaded
         """
+        # Prefer bridge (dual-process: SARSA + DQN)
+        if self._bridge is not None and sim is not None:
+            return self._bridge.get_action_values(sim)
+
+        # Fallback to standalone habit network
         if self._habit_network is None or self._habit_encoder is None:
             return None
         if sim is not None:
             compressed = self._habit_encoder.encode_from_sim(sim)
             return self._habit_network.get_q_values(compressed)
         return None
+
+    def load_bridge(
+        self,
+        sarsa_path: str = "brain/games/lolo/sarsa_qtable.npy",
+        dqn_path: str = "brain/games/lolo/dqn_weights.pt",
+    ) -> bool:
+        """
+        Load the dual-process SARSA↔DQN bridge.
+
+        This supersedes the standalone habit network, providing:
+          - Instant SARSA Q-lookup for known states
+          - DQN generalization for unseen states
+          - Continuous distillation (SARSA → DQN)
+          - Live SARSA solving for new puzzles
+
+        Args:
+            sarsa_path: path to SARSA Q-table (.npy)
+            dqn_path: path to DQN weights (.pt)
+
+        Returns:
+            True if at least one component loaded
+        """
+        try:
+            from brain.games.lolo.sarsa_dqn_bridge import SarsaDQNBridge
+            self._bridge = SarsaDQNBridge(n_actions=6)
+
+            sarsa_ok = self._bridge.load_sarsa(sarsa_path)
+            dqn_ok = self._bridge.load_dqn(dqn_path)
+
+            if sarsa_ok or dqn_ok:
+                self._habit_confidence = 1.0
+                # Wire as dream policy too
+                self._policy_fn = self._bridge_policy_fn
+                return True
+            else:
+                self._bridge = None
+                return False
+        except Exception as e:
+            print(f"  Bridge load failed: {e}")
+            self._bridge = None
+            return False
+
+    def _bridge_policy_fn(self, features: np.ndarray, explore: bool = False):
+        """Policy function using the bridge for dream action selection."""
+        if self._bridge is None:
+            return 0, np.zeros(self.n_actions)
+        # Use bridge's DQN for dreaming (faster than SARSA lookup)
+        if self._bridge._dqn is not None:
+            q_values = self._bridge._dqn.get_q_values(features[:84])
+            return int(np.argmax(q_values)), q_values
+        return 0, np.zeros(self.n_actions)
 
     def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """

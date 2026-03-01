@@ -106,8 +106,10 @@ def main():
     parser = argparse.ArgumentParser(description="Run full brain on Lolo puzzles")
     parser.add_argument("--weights", default="brain/games/lolo/dqn_weights.pt",
                         help="Path to DQN weights (.pt)")
+    parser.add_argument("--sarsa", default="brain/games/lolo/sarsa_qtable.npy",
+                        help="Path to SARSA Q-table (.npy)")
     parser.add_argument("--no-habit", action="store_true",
-                        help="Run brain WITHOUT pretrained DQN (baseline)")
+                        help="Run brain WITHOUT any pretrained knowledge (baseline)")
     parser.add_argument("--tiers", type=int, nargs="+", default=[1, 2, 3],
                         help="Which tiers to test")
     parser.add_argument("--puzzles", type=int, default=20,
@@ -135,27 +137,44 @@ def main():
         use_torch=True,
     )
 
-    # Load habit weights if available
-    habit_loaded = False
-    if not args.no_habit and os.path.exists(args.weights):
-        habit_loaded = brain.basal_ganglia.load_habit_weights(
-            args.weights, game="lolo"
-        )
-        if habit_loaded:
-            print(f"  ✅ DQN habit loaded: {args.weights}")
-        else:
-            print(f"  ⚠️ Failed to load DQN weights: {args.weights}")
-    elif args.no_habit:
-        print("  🚫 Running WITHOUT habit network (baseline)")
+    # Load knowledge (try bridge first, then standalone DQN)
+    mode = "NONE"
+    if not args.no_habit:
+        # Try dual-process bridge (SARSA + DQN)
+        has_sarsa = os.path.exists(args.sarsa)
+        has_dqn = os.path.exists(args.weights)
+
+        if has_sarsa or has_dqn:
+            bridge_ok = brain.basal_ganglia.load_bridge(
+                sarsa_path=args.sarsa, dqn_path=args.weights
+            )
+            if bridge_ok:
+                mode = "BRIDGE (SARSA+DQN)"
+                print(f"  ✅ Dual-process bridge loaded")
+                if has_sarsa:
+                    print(f"     SARSA: {args.sarsa}")
+                if has_dqn:
+                    print(f"     DQN:   {args.weights}")
+            elif has_dqn:
+                # Fallback to standalone DQN
+                habit_loaded = brain.basal_ganglia.load_habit_weights(
+                    args.weights, game="lolo"
+                )
+                if habit_loaded:
+                    mode = "DQN-only"
+                    print(f"  ✅ DQN habit loaded: {args.weights}")
+
+        if mode == "NONE":
+            print(f"  ⚠️ No weights found")
+            print("     Run 'python brain/games/lolo/distill_sarsa_to_dqn.py' first")
+            print("     Or use --no-habit for baseline comparison")
     else:
-        print(f"  ⚠️ No weights found at {args.weights}")
-        print("     Run 'python brain/games/lolo/run_tiered_gan.py' first")
-        print("     Or use --no-habit for baseline comparison")
+        print("  🚫 Running WITHOUT pretrained knowledge (baseline)")
 
     print(f"\n  Tiers: {args.tiers}")
     print(f"  Puzzles per tier: {args.puzzles}")
     print(f"  Max steps: {args.max_steps}")
-    print(f"  Habit network: {'ACTIVE' if habit_loaded else 'NONE'}")
+    print(f"  Mode: {mode}")
 
     # ── Run tests ──
     all_results = {}
