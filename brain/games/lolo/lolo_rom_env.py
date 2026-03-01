@@ -37,21 +37,26 @@ except ImportError:
 # observing RAM changes. Starting points from NES game analysis:
 
 RAM_MAP = {
-    # CONFIRMED via movement testing:
-    "player_facing":    0x0008,     # Direction (1=right, 4=down)
-    "player_y_pixel":   0x0016,     # Y position (pixels) — only changes on vertical movement
-    "hearts_total":     0x003F,     # Total hearts/shots in room (verified: 4 for Room 1)
-    "room_number":      0x0040,     # Room/floor (2 = floor 1?)
-    "player_tile_row":  0x0041,     # Tile row (changes on vertical movement)
-    "player_x_pixel":   0x0075,     # X position (pixels) — changes on horizontal movement
+    # ── CONFIRMED via FCEUX manual play ──────────────────────────
+    "player_facing":    0x004D,     # 1=right, 2=left, 4=down, 8=up
+    "magic_shots":      0x0058,     # Shots remaining (0, 1, or 2)
+    "player_x_pixel":   0x006D,     # X pixel position (smooth, updates every frame)
+    "player_y_pixel":   0x006F,     # Y pixel position (smooth, updates every frame)
+    "player_x_grid":    0x0070,     # X grid/tile position (updates on tile boundary)
+    "player_y_grid":    0x0071,     # Y grid/tile position (updates on tile boundary)
+    "hearts_collected": 0x0087,     # Hearts collected (0→1→2 as hearts picked up)
 
-    # UNVERIFIED — need calibration:
-    "hearts_collected": 0x0042,     # Hearts picked up (was 1 in some dumps)
-    "magic_shots":      0x004B,     # Magic shot count (saw values 4, 60)
-    "alive":            0x0089,     # Alive flag (values: 0, 3, 8, 255)
-    "chest_open":       0x0065,     # Chest opened flag (unverified)
+    # ── PARTIALLY CONFIRMED ─────────────────────────────────────
+    "heart_flag":       0x0040,     # First heart pickup flag (changes to 2)
+    "chest_open":       0x004F,     # Chest/door state (changes when chest opens)
+    "door_open":        0x0050,     # Door state (changes with chest)
+    "enemy_state":      0x0061,     # Enemy/snake state (changed when snake disappeared)
 
-    # Grid data — needs verification
+    # ── UNVERIFIED ──────────────────────────────────────────────
+    "room_number":      0x0040,     # Room/floor number (needs re-verification)
+    "alive":            0x0089,     # Alive flag (needs verification on death)
+
+    # Grid/enemy data — needs verification
     "grid_base":        0x0400,     # Room tile data
     "enemy_base":       0x0300,     # Enemy data
 }
@@ -211,15 +216,18 @@ class LoloROMEnv:
 
         ram = self._ram
 
-        # Player position (pixel → grid cell)
-        px = int(ram[RAM_MAP["player_x_pixel"]])
-        py = int(ram[RAM_MAP["player_y_pixel"]])
-        self.player_row = max(0, min(12, py // 16))
-        self.player_col = max(0, min(10, px // 16))
+        # Player position — use grid coords (confirmed 0x70=X, 0x71=Y)
+        self.player_col = int(ram[RAM_MAP["player_x_grid"]])
+        self.player_row = int(ram[RAM_MAP["player_y_grid"]])
 
-        # Hearts
+        # Hearts (confirmed 0x87 = hearts collected counter)
         self.hearts_collected = int(ram[RAM_MAP["hearts_collected"]])
-        self.hearts_total = int(ram[RAM_MAP["hearts_total"]])
+        # hearts_total: use the higher of 2 or whatever we've seen
+        # Room 1 has 2 hearts (the user confirmed this)
+        self.hearts_total = max(2, self.hearts_collected)
+
+        # Magic shots (confirmed 0x58)
+        self.magic_shots = int(ram[RAM_MAP["magic_shots"]])
 
         # Alive — skip for now, RAM address needs calibration
         # self._alive = bool(ram[RAM_MAP["alive"]])
