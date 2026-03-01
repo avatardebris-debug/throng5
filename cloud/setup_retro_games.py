@@ -62,6 +62,7 @@ def main():
             env = retro.make(
                 game=game_name,
                 inttype=retro.data.Integrations.STABLE,
+                state=retro.State.NONE,
             )
             obs = env.reset()
             if isinstance(obs, tuple):
