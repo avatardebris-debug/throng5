@@ -1,38 +1,45 @@
 {
+  "learner_type": "DQN",
   "completed_tiers": [
     1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7
+    2
   ],
   "results": [
     {
       "tier": 1,
       "name": "Basic Navigation",
-      "elapsed": 389.7,
-      "best_solvability": 0.38,
+      "elapsed": 2532.1,
+      "best_solvability": 0.78,
       "advanced": true,
       "rounds": [
         {
           "round": 1,
           "generated": 100,
-          "solved": 38,
-          "solvability": 0.38,
-          "unsolvable": 62,
-          "gan_steps": 172
+          "solved": 78,
+          "solvability": 0.78,
+          "unsolvable": 22,
+          "gan_steps": 127
         }
       ],
-      "q_table_size": 46259,
-      "solved_bank_size": 63,
+      "learner_report": {
+        "type": "LoloDQNLearner",
+        "device": "cpu",
+        "total_steps": 562677,
+        "total_episodes": 3282,
+        "total_learns": 140605,
+        "epsilon": 0.1937,
+        "avg_loss": 0.004258,
+        "replay_size": 100000,
+        "success_chains": 200,
+        "q_net_params": 19526
+      },
+      "solved_bank_size": 177,
       "gan_report": {
         "generated": 100,
-        "solved_bank": 63,
+        "solved_bank": 177,
         "pretrain_steps": 1600,
-        "d_loss_avg": 13.240069485225822,
-        "g_loss_avg": 19.952623675326166,
+        "d_loss_avg": 13.605028997372983,
+        "g_loss_avg": 19.95262367532617,
         "g_params": 802311,
         "d_params": 791041
       }
@@ -40,173 +47,51 @@
     {
       "tier": 2,
       "name": "Pushable Blocks",
-      "elapsed": 422.8,
-      "best_solvability": 0.58,
+      "elapsed": 14388.5,
+      "best_solvability": 0.98,
       "advanced": true,
       "rounds": [
         {
           "round": 1,
           "generated": 100,
-          "solved": 58,
-          "solvability": 0.58,
-          "unsolvable": 142,
-          "gan_steps": 355
-        }
-      ],
-      "q_table_size": 134471,
-      "solved_bank_size": 105,
-      "gan_report": {
-        "generated": 200,
-        "solved_bank": 105,
-        "pretrain_steps": 3200,
-        "d_loss_avg": 12.91709723333044,
-        "g_loss_avg": 19.952623675326166,
-        "g_params": 802311,
-        "d_params": 791041
-      }
-    },
-    {
-      "tier": 3,
-      "name": "Line of Sight (Medusa)",
-      "elapsed": 463.3,
-      "best_solvability": 0.79,
-      "advanced": true,
-      "rounds": [
+          "solved": 1,
+          "solvability": 0.01,
+          "unsolvable": 99,
+          "gan_steps": 133
+        },
         {
-          "round": 1,
+          "round": 2,
           "generated": 100,
-          "solved": 79,
-          "solvability": 0.79,
-          "unsolvable": 221,
-          "gan_steps": 543
+          "solved": 98,
+          "solvability": 0.98,
+          "unsolvable": 2,
+          "gan_steps": 138
         }
       ],
-      "q_table_size": 229844,
-      "solved_bank_size": 135,
+      "learner_report": {
+        "type": "LoloDQNLearner",
+        "device": "cpu",
+        "total_steps": 4395397,
+        "total_episodes": 16818,
+        "total_learns": 1098785,
+        "epsilon": 0.02,
+        "avg_loss": 0.00524,
+        "replay_size": 100000,
+        "success_chains": 200,
+        "q_net_params": 19526
+      },
+      "solved_bank_size": 186,
       "gan_report": {
         "generated": 300,
-        "solved_bank": 135,
-        "pretrain_steps": 4800,
-        "d_loss_avg": 12.893154084922402,
-        "g_loss_avg": 19.952623675326166,
-        "g_params": 802311,
-        "d_params": 791041
-      }
-    },
-    {
-      "tier": 4,
-      "name": "Enemy Manipulation (Shoot\u2192Egg)",
-      "elapsed": 371.4,
-      "best_solvability": 0.89,
-      "advanced": true,
-      "rounds": [
-        {
-          "round": 1,
-          "generated": 100,
-          "solved": 89,
-          "solvability": 0.89,
-          "unsolvable": 311,
-          "gan_steps": 714
-        }
-      ],
-      "q_table_size": 284363,
-      "solved_bank_size": 171,
-      "gan_report": {
-        "generated": 400,
-        "solved_bank": 171,
-        "pretrain_steps": 6400,
-        "d_loss_avg": 12.974526089294644,
-        "g_loss_avg": 19.952623675326166,
-        "g_params": 802311,
-        "d_params": 791041
-      }
-    },
-    {
-      "tier": 5,
-      "name": "Active Threats (Moving Enemies)",
-      "elapsed": 127.9,
-      "best_solvability": 1.04,
-      "advanced": true,
-      "rounds": [
-        {
-          "round": 1,
-          "generated": 100,
-          "solved": 104,
-          "solvability": 1.04,
-          "unsolvable": 396,
-          "gan_steps": 720
-        }
-      ],
-      "q_table_size": 316771,
-      "solved_bank_size": 178,
-      "gan_report": {
-        "generated": 500,
-        "solved_bank": 178,
-        "pretrain_steps": 8000,
-        "d_loss_avg": 12.586647085084428,
-        "g_loss_avg": 19.952623675326166,
-        "g_params": 802311,
-        "d_params": 791041
-      }
-    },
-    {
-      "tier": 6,
-      "name": "Water Mechanics (Egg\u2192Bridge)",
-      "elapsed": 524.3,
-      "best_solvability": 1.17,
-      "advanced": true,
-      "rounds": [
-        {
-          "round": 1,
-          "generated": 100,
-          "solved": 117,
-          "solvability": 1.17,
-          "unsolvable": 483,
-          "gan_steps": 956
-        }
-      ],
-      "q_table_size": 359913,
-      "solved_bank_size": 203,
-      "gan_report": {
-        "generated": 600,
-        "solved_bank": 203,
-        "pretrain_steps": 9600,
-        "d_loss_avg": 13.001720776375382,
-        "g_loss_avg": 19.95262367532617,
-        "g_params": 802311,
-        "d_params": 791041
-      }
-    },
-    {
-      "tier": 7,
-      "name": "Endgame (All Enemies)",
-      "elapsed": 163.1,
-      "best_solvability": 1.27,
-      "advanced": true,
-      "rounds": [
-        {
-          "round": 1,
-          "generated": 100,
-          "solved": 127,
-          "solvability": 1.27,
-          "unsolvable": 573,
-          "gan_steps": 962
-        }
-      ],
-      "q_table_size": 435810,
-      "solved_bank_size": 206,
-      "gan_report": {
-        "generated": 700,
-        "solved_bank": 206,
-        "pretrain_steps": 11200,
-        "d_loss_avg": 12.692170071957172,
-        "g_loss_avg": 19.95262367532617,
+        "solved_bank": 186,
+        "pretrain_steps": 3200,
+        "d_loss_avg": 13.689495104256894,
+        "g_loss_avg": 19.952623675326173,
         "g_params": 802311,
         "d_params": 791041
       }
     }
   ],
-  "total_q_states": 435810,
-  "total_solved_bank": 206,
-  "total_elapsed": 2462.5
+  "total_solved_bank": 186,
+  "total_elapsed": 16920.9
 }

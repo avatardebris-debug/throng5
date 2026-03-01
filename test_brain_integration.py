@@ -53,11 +53,11 @@ print(f"[PASS] Modes seen: {modes_seen}")
 
 # Check brain report
 report = brain.report()
-assert len(report) == 7, f"Expected 7 regions in report, got {len(report)}"
-for name, r in report.items():
-    assert "name" in r, f"Region {name} missing 'name' in report"
-    assert "step_count" in r, f"Region {name} missing 'step_count' in report"
-print(f"[PASS] Brain report has all 7 regions")
+assert len(report) >= 7, f"Expected at least 7 sections in report, got {len(report)}"
+# Core 7 regions have 'name' and 'step_count'; extra sections (causal, counterfactual, etc.) don't
+core_regions = [n for n, r in report.items() if "step_count" in r]
+assert len(core_regions) == 7, f"Expected 7 core regions, got {len(core_regions)}: {core_regions}"
+print(f"[PASS] Brain report has {len(report)} sections ({len(core_regions)} core regions)")
 
 # Verify each region processed
 for name, r in report.items():
