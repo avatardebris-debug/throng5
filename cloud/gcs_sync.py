@@ -33,7 +33,7 @@ import time
 # ── Configuration ─────────────────────────────────────────────────────
 
 # Set your GCS bucket name here or via env var GCS_BUCKET
-DEFAULT_BUCKET = os.environ.get("GCS_BUCKET", "throng5-weights")
+DEFAULT_BUCKET = os.environ.get("GCS_BUCKET", "throng5-weightsb")
 
 # What to sync
 WEIGHT_FILES = [
