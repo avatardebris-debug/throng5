@@ -130,6 +130,19 @@ class LoloROMEnv:
     def reset(self, **kwargs) -> np.ndarray:
         """Reset the environment. Returns pixel observation."""
         obs, info = self._env.reset(**kwargs)
+
+        # Skip title screen: press START a few times with delays
+        start_btn = np.array([0,0,0,1,0,0,0,0,0], dtype=np.int8)
+        no_btn = np.array([0,0,0,0,0,0,0,0,0], dtype=np.int8)
+        for _ in range(3):  # Press START 3 times (title → file select → game)
+            for _ in range(30):  # Wait 30 frames
+                obs, _, _, _, _ = self._env.step(no_btn)
+            for _ in range(5):  # Hold START for 5 frames
+                obs, _, _, _, _ = self._env.step(start_btn)
+        # Wait for game to initialize
+        for _ in range(60):
+            obs, _, _, _, _ = self._env.step(no_btn)
+
         self._ram = self._env.get_ram()
         self._prev_hearts = 0
         self._total_reward = 0.0
@@ -137,6 +150,8 @@ class LoloROMEnv:
         self._won = False
         self._alive = True
         self._update_state_from_ram()
+        print(f"    [reset] hearts={self.hearts_collected}/{self.hearts_total} "
+              f"pos=({self.player_row},{self.player_col})", flush=True)
         return obs
 
     def step(self, action: int) -> Tuple[np.ndarray, float, bool, bool, dict]:
@@ -202,8 +217,9 @@ class LoloROMEnv:
         self.hearts_collected = int(ram[RAM_MAP["hearts_collected"]])
         self.hearts_total = int(ram[RAM_MAP["hearts_total"]])
 
-        # Alive
-        self._alive = bool(ram[RAM_MAP["alive"]])
+        # Alive — skip for now, RAM address needs calibration
+        # self._alive = bool(ram[RAM_MAP["alive"]])
+        self._alive = True  # Assume alive until we calibrate
 
     def _shape_reward(self, base_reward: float) -> float:
         """Shape reward to match simulator training."""
