@@ -37,19 +37,23 @@ except ImportError:
 # observing RAM changes. Starting points from NES game analysis:
 
 RAM_MAP = {
-    "player_x_pixel": 0x0070,     # Player X position (pixels)
-    "player_y_pixel": 0x0050,     # Player Y position (pixels)
-    "player_facing":  0x0098,     # Direction facing (0-3)
-    "hearts_collected": 0x0062,   # Hearts picked up
-    "hearts_total":     0x0063,   # Total hearts in room
-    "magic_shots":      0x0064,   # Magic shot count
-    "room_number":      0x0040,   # Current room/floor
-    "alive":            0x006A,   # Player alive flag
-    "chest_open":       0x0065,   # Chest opened flag
+    # CONFIRMED via movement testing:
+    "player_facing":    0x0008,     # Direction (1=right, 4=down)
+    "player_y_pixel":   0x0016,     # Y position (pixels) — only changes on vertical movement
+    "hearts_total":     0x003F,     # Total hearts/shots in room (verified: 4 for Room 1)
+    "room_number":      0x0040,     # Room/floor (2 = floor 1?)
+    "player_tile_row":  0x0041,     # Tile row (changes on vertical movement)
+    "player_x_pixel":   0x0075,     # X position (pixels) — changes on horizontal movement
 
-    # Grid data starts around 0x0400 in RAM
-    "grid_base":        0x0400,   # 13 rows × 11 cols
-    "enemy_base":       0x0300,   # Enemy data (8 enemies × 8 bytes)
+    # UNVERIFIED — need calibration:
+    "hearts_collected": 0x0042,     # Hearts picked up (was 1 in some dumps)
+    "magic_shots":      0x004B,     # Magic shot count (saw values 4, 60)
+    "alive":            0x0089,     # Alive flag (values: 0, 3, 8, 255)
+    "chest_open":       0x0065,     # Chest opened flag (unverified)
+
+    # Grid data — needs verification
+    "grid_base":        0x0400,     # Room tile data
+    "enemy_base":       0x0300,     # Enemy data
 }
 
 # Tile type mapping: NES RAM value → simulator tile category
