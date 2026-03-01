@@ -71,12 +71,12 @@ NES_TILE_MAP = {
 # stable-retro uses button arrays: [B, Y, SELECT, START, UP, DOWN, LEFT, RIGHT, A, X, L, R]
 # For NES: [B, _, SELECT, START, UP, DOWN, LEFT, RIGHT, A]
 ACTION_MAP = {
-    0: [0,0,0,0,1,0,0,0,0],  # UP
-    1: [0,0,0,0,0,1,0,0,0],  # DOWN
-    2: [0,0,0,0,0,0,1,0,0],  # LEFT
-    3: [0,0,0,0,0,0,0,1,0],  # RIGHT
-    4: [0,0,0,0,0,0,0,0,1],  # SHOOT (A button)
-    5: [0,0,0,0,0,0,0,0,0],  # WAIT (no buttons)
+    0: np.array([0,0,0,0,1,0,0,0,0], dtype=np.int8),  # UP
+    1: np.array([0,0,0,0,0,1,0,0,0], dtype=np.int8),  # DOWN
+    2: np.array([0,0,0,0,0,0,1,0,0], dtype=np.int8),  # LEFT
+    3: np.array([0,0,0,0,0,0,0,1,0], dtype=np.int8),  # RIGHT
+    4: np.array([0,0,0,0,0,0,0,0,1], dtype=np.int8),  # SHOOT (A button)
+    5: np.array([0,0,0,0,0,0,0,0,0], dtype=np.int8),  # WAIT (no buttons)
 }
 
 
@@ -108,8 +108,9 @@ class LoloROMEnv:
         self._render = render
         self._env = retro.make(
             game=game,
-            state=state,
-            use_restricted_actions=retro.Actions.DISCRETE,
+            state=retro.State.NONE,
+            inttype=retro.data.Integrations.STABLE,
+            use_restricted_actions=retro.Actions.MULTI_DISCRETE,
         )
 
         # State tracking
