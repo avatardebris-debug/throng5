@@ -1,0 +1,36 @@
+{
+    "info": {
+        "lives": {
+            "address": 106,
+            "type": "|u1"
+        },
+        "hearts_collected": {
+            "address": 98,
+            "type": "|u1"
+        },
+        "hearts_total": {
+            "address": 99,
+            "type": "|u1"
+        },
+        "room": {
+            "address": 64,
+            "type": "|u1"
+        },
+        "magic_shots": {
+            "address": 100,
+            "type": "|u1"
+        },
+        "player_x": {
+            "address": 112,
+            "type": "|u1"
+        },
+        "player_y": {
+            "address": 80,
+            "type": "|u1"
+        },
+        "score": {
+            "address": 36,
+            "type": ">u2"
+        }
+    }
+}

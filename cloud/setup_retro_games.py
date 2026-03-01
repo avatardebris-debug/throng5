@@ -59,7 +59,10 @@ def main():
     # Verify
     for game_name in ROM_MAP.values():
         try:
-            env = retro.make(game=game_name)
+            env = retro.make(
+                game=game_name,
+                inttype=retro.data.Integrations.STABLE,
+            )
             obs = env.reset()
             if isinstance(obs, tuple):
                 obs = obs[0]
