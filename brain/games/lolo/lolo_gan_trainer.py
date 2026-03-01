@@ -208,11 +208,15 @@ class GanTrainingLoop:
 
             if verbose and (i + 1) % 50 == 0:
                 elapsed = time.time() - t0
+                rg = len(self.graded_bank) - graded_before
+                rh = len(self.hard_bank) - hard_before
+                re = len(self.expert_bank) - expert_before
+                ru = len(self.unsolvable) - unsolvable_before
                 print(f"  GAN [{i+1}/{n_puzzles}] "
-                      f"graded={len(self.graded_bank)} "
-                      f"hard={len(self.hard_bank)} "
+                      f"graded={rg} hard={rh} "
                       f"unsolved={len(self.unsolved_queue)} "
-                      f"unsolvable={len(self.unsolvable)} "
+                      f"unsolvable={ru} "
+                      f"solved={rg+rh+re}/{self._total_generated - generated_before} "
                       f"| {elapsed:.1f}s", flush=True)
 
         # Process remaining unsolved
