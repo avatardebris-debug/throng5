@@ -174,47 +174,75 @@ def verify_distillation(sarsa: LoloSarsaLearner, dqn: LoloDQNLearner,
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Distill SARSA → DQN")
+    parser.add_argument("--skip-sarsa", action="store_true",
+                        help="Load saved Q-table instead of retraining SARSA")
+    parser.add_argument("--epochs", type=int, default=100,
+                        help="Distillation epochs (default: 100)")
+    parser.add_argument("--batch-size", type=int, default=512,
+                        help="Batch size (default: 512)")
+    args = parser.parse_args()
+
     print("=" * 60)
     print("  SARSA → DQN Distillation")
     print("=" * 60)
 
-    # ── Step 1: Build SARSA with existing knowledge ──
-    # Re-run the GAN trainer seeding to rebuild Q-table, or load from saved state
-    print("\n  Step 1: Building SARSA Q-table via GAN training...")
+    sarsa_path = os.path.join("brain", "games", "lolo", "sarsa_qtable.npy")
 
-    gan = LoloGAN(z_dim=32, lr=0.0005)
-    trainer = GanTrainingLoop(gan=gan, tier=1, use_dqn=False)  # Use SARSA
+    # ── Step 1: Get SARSA Q-table ──
+    if args.skip_sarsa and os.path.exists(sarsa_path):
+        print(f"\n  Step 1: Loading saved Q-table from {sarsa_path}...")
+        q_data = np.load(sarsa_path, allow_pickle=True).item()
 
-    # Train through tiers to build Q-knowledge
-    from brain.games.lolo.run_tiered_gan import TIER_PARAMS
+        # Build a minimal SARSA wrapper with the loaded Q-table
+        sarsa = LoloSarsaLearner(n_actions=6)
+        sarsa.q_table = q_data
+        print(f"  Loaded: {len(sarsa.q_table)} Q-states")
+    else:
+        print("\n  Step 1: Building SARSA Q-table via GAN training...")
 
-    for tier in range(1, 8):
-        params = TIER_PARAMS[tier]
-        trainer.tier = tier
+        gan = LoloGAN(z_dim=32, lr=0.0005)
+        trainer = GanTrainingLoop(gan=gan, tier=1, use_dqn=False)
 
-        print(f"\n  Tier {tier}: Seeding {params['seed_n']} puzzles...")
-        seed_result = trainer.seed_with_random(n=params["seed_n"], tier=tier)
-        solved = seed_result["solved"]
-        total = seed_result["seeded"]
-        print(f"    Solved: {solved}/{total} ({solved/max(total,1):.0%}), "
-              f"Q-states: {len(trainer.sarsa.q_table)}")
+        from brain.games.lolo.run_tiered_gan import TIER_PARAMS
 
-        # Also run 1 round of GAN
-        result = trainer.run(n_puzzles=50, verbose=False)
-        print(f"    GAN round: {result['solved']}/{result['generated']} solved")
+        for tier in range(1, 8):
+            params = TIER_PARAMS[tier]
+            trainer.tier = tier
 
-    sarsa = trainer.sarsa
-    print(f"\n  SARSA built: {len(sarsa.q_table)} Q-states")
+            print(f"\n  Tier {tier}: Seeding {params['seed_n']} puzzles...")
+            seed_result = trainer.seed_with_random(n=params["seed_n"], tier=tier)
+            solved = seed_result["solved"]
+            total = seed_result["seeded"]
+            print(f"    Solved: {solved}/{total} ({solved/max(total,1):.0%}), "
+                  f"Q-states: {len(trainer.sarsa.q_table)}")
+
+            result = trainer.run(n_puzzles=50, verbose=False)
+            print(f"    GAN round: {result['solved']}/{result['generated']} solved")
+
+        sarsa = trainer.sarsa
+        print(f"\n  SARSA built: {len(sarsa.q_table)} Q-states")
+
+        # Save Q-table for next time
+        q_data = {}
+        for k, v in sarsa.q_table.items():
+            q_data[k] = v.copy()
+        np.save(sarsa_path, q_data, allow_pickle=True)
+        sarsa_kb = os.path.getsize(sarsa_path) / 1024
+        print(f"  ✅ SARSA Q-table saved: {sarsa_path} ({sarsa_kb:.0f} KB)")
 
     # ── Step 2: Create DQN and distill ──
-    print("\n  Step 2: Distilling SARSA → DQN...")
+    print(f"\n  Step 2: Distilling SARSA → DQN ({args.epochs} epochs, batch={args.batch_size})...")
     dqn = LoloDQNLearner(n_actions=6)
+    n_params = sum(p.numel() for p in dqn.q_net.parameters())
+    print(f"  Network: {n_params:,} parameters")
 
-    result = distill(sarsa, dqn, epochs=50, batch_size=256)
+    result = distill(sarsa, dqn, epochs=args.epochs, batch_size=args.batch_size)
 
     # ── Step 3: Verify ──
     print("\n  Step 3: Verifying distillation...")
-    verify = verify_distillation(sarsa, dqn, n_samples=min(1000, len(sarsa.q_table)))
+    verify = verify_distillation(sarsa, dqn, n_samples=min(2000, len(sarsa.q_table)))
 
     # ── Step 4: Save weights ──
     weights_path = os.path.join("brain", "games", "lolo", "dqn_weights.pt")
@@ -224,15 +252,7 @@ def main():
     print(f"     Action accuracy: {verify['accuracy']:.0%}")
     print(f"     Q-value MSE: {verify['avg_mse']:.6f}")
 
-    # Also save the SARSA Q-table for the live bridge
-    sarsa_path = os.path.join("brain", "games", "lolo", "sarsa_qtable.npy")
-    q_data = {}
-    for k, v in sarsa.q_table.items():
-        q_data[k] = v.copy()
-    np.save(sarsa_path, q_data, allow_pickle=True)
-    sarsa_kb = os.path.getsize(sarsa_path) / 1024
-    print(f"  ✅ SARSA Q-table saved: {sarsa_path} ({sarsa_kb:.0f} KB)")
-
 
 if __name__ == "__main__":
     main()
+

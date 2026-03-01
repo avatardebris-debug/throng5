@@ -45,11 +45,15 @@ class QNetwork(nn.Module):
     """Small MLP: state(84) → Q(6)."""
 
     def __init__(self, state_dim: int = 84, n_actions: int = 6,
-                 hidden: int = 128):
+                 hidden: int = 256):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(state_dim, hidden),
             nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
+            nn.Dropout(0.1),
             nn.Linear(hidden, hidden // 2),
             nn.ReLU(),
             nn.Linear(hidden // 2, n_actions),
