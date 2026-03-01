@@ -13,6 +13,7 @@ If the auto-skip doesn't work, increase the frame counts.
 import os
 import sys
 import time
+import gzip
 
 sys.path.insert(0, ".")
 import numpy as np
@@ -108,15 +109,15 @@ def main():
     # Save the state
     state = env.em.get_state()
     os.makedirs(SAVE_DIR, exist_ok=True)
-    with open(SAVE_PATH, "wb") as f:
+    with gzip.open(SAVE_PATH, "wb") as f:
         f.write(state)
 
     print(f"\n  ✅ Save state written to: {SAVE_PATH}")
-    print(f"     Size: {len(state)} bytes")
+    print(f"     Size: {len(state)} bytes (gzipped)")
 
     # Also copy to retro's data dir for auto-loading
     retro_dest = os.path.join(retro.data.path(), "stable", GAME, "Start.state")
-    with open(retro_dest, "wb") as f:
+    with gzip.open(retro_dest, "wb") as f:
         f.write(state)
     print(f"  ✅ Copied to retro data: {retro_dest}")
 
