@@ -460,27 +460,8 @@ class WholeBrain:
         action = motor_output.get("action", 0)
         self.profiler.stop("motor")
 
-        # ── 8. Entropy monitoring ────────────────────────────────────
+        # [PURGED] Entropy monitoring — epsilon override + WM noise injection
         epsilon_used = striatum_output.get("epsilon", 0.15)
-        if self.entropy_monitor is not None:
-            try:
-                q_vals = striatum_output.get("q_values")
-                self.entropy_monitor.record_action(
-                    action,
-                    q_values=q_vals if q_vals is not None else None,
-                )
-                # Check for epsilon override
-                override = self.entropy_monitor.get_epsilon_override()
-                if override is not None:
-                    epsilon_used = override
-                # Inject WM noise if collapse + plateau
-                if (self.entropy_monitor.should_inject_noise
-                        and self._step_count % 500 == 0):
-                    wm = getattr(self.basal_ganglia, '_world_model', None)
-                    if wm is not None:
-                        self.entropy_monitor.inject_noise(wm)
-            except Exception:
-                pass
 
         self.profiler.step_end()
 
