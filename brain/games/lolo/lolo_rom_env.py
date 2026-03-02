@@ -39,6 +39,7 @@ except ImportError:
 RAM_MAP = {
     # ── CONFIRMED via FCEUX manual play ──────────────────────────
     "player_facing":    0x004D,     # 1=right, 2=left, 4=down, 8=up
+    "lives":            0x0057,     # Lolo's life count (confirmed via FCEUX)
     "magic_shots":      0x0058,     # Shots remaining (0, 1, or 2)
     "player_x_pixel":   0x006D,     # X pixel position (smooth, updates every frame)
     "player_y_pixel":   0x006F,     # Y pixel position (smooth, updates every frame)
@@ -229,9 +230,8 @@ class LoloROMEnv:
         # Magic shots (confirmed 0x58)
         self.magic_shots = int(ram[RAM_MAP["magic_shots"]])
 
-        # Alive — skip for now, RAM address needs calibration
-        # self._alive = bool(ram[RAM_MAP["alive"]])
-        self._alive = True  # Assume alive until we calibrate
+        # Lives (confirmed 0x57)
+        self._alive = int(ram[RAM_MAP["lives"]]) > 0
 
     def _shape_reward(self, base_reward: float) -> float:
         """Shape reward to match simulator training."""
