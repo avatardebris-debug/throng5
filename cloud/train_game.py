@@ -64,11 +64,22 @@ def train_lolo(hours: float, checkpoint_min: int, output_dir: str, verbose: bool
 
     from brain.games.lolo.run_tiered_gan import TIER_PARAMS
 
+    # ── Load existing checkpoint if available ──
+    if os.path.exists(sarsa_path):
+        try:
+            data = np.load(sarsa_path, allow_pickle=True).item()
+            trainer.sarsa.q_table = data
+            print(f"  ✅ Loaded existing Q-table: {len(data):,} states from {sarsa_path}")
+        except Exception as e:
+            print(f"  ⚠ Could not load Q-table: {e}")
+    else:
+        print(f"  Starting fresh (no existing Q-table)")
+
     stats = {
         "game": "lolo",
         "start_time": time.strftime("%Y-%m-%d %H:%M:%S"),
         "tiers_completed": [],
-        "total_q_states": 0,
+        "total_q_states": len(trainer.sarsa.q_table),
         "checkpoints_saved": 0,
         "rounds": [],
     }
