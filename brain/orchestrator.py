@@ -86,23 +86,19 @@ class WholeBrain:
         self._game_mode = game_mode
 
         # ── Subsystem enable/disable flags (for ablation testing) ─────
+        # NOTE: 7 poisonous subsystems purged after ablation testing:
+        #   curiosity, meta_controller, rehearsal, dead_end_detector,
+        #   surprise_tracker, entropy_monitor, dream_action_bias
         _defaults = {
-            "curiosity": True,
             "world_model": True,
             "dreams": True,
-            "meta_controller": True,
             "causal_model": True,
-            "dead_end_detector": True,
-            "rehearsal": True,
-            "surprise_tracker": True,
             "skill_library": True,
-            "entropy_monitor": True,
             "attribution": True,
             "stage_classifier": True,
             "counterfactual": True,
             "hippocampus_store": True,
             "threat_gating": True,
-            "dream_action_bias": True,
             "probe_runner": True,
         }
         self._enabled = {**_defaults, **(enabled_systems or {})}
@@ -171,55 +167,8 @@ class WholeBrain:
                 self.striatum._torch_dqn.select_action
             )
 
-        # ── Curiosity module (intrinsic motivation) ──────────────────
-        self.curiosity = None
-        if self._enabled["curiosity"]:
-            try:
-                self.curiosity = CuriosityModule(
-                    n_features=n_features, n_actions=n_actions,
-                )
-                if self.basal_ganglia._world_model is not None:
-                    self.curiosity.connect_world_model(
-                        self.basal_ganglia._world_model
-                    )
-            except Exception as e:
-                self._init_errors["curiosity"] = str(e)
-
-        # ── Meta-Controller (learner evolution) ──────────────────────
-        self.meta_controller = None
-        self._active_learner_name = "default"
-        if self._enabled["meta_controller"]:
-            try:
-                MetaControllerClass = _get_meta_controller()
-                if MetaControllerClass is not None:
-                    self.meta_controller = MetaControllerClass(
-                        relevance_window=100,
-                        collapse_threshold=0.02,
-                        min_trials_per_learner=20,
-                    )
-                    SelectorClass, RegistryClass = _get_learner_selector()
-                    if RegistryClass is not None:
-                        registry = RegistryClass()
-                        numpy_dqn = registry.create(
-                            "dqn_builtin", n_features=n_features, n_actions=n_actions,
-                        )
-                        if numpy_dqn:
-                            self.meta_controller.register_learner("numpy_dqn", numpy_dqn)
-                        if use_torch:
-                            try:
-                                torch_dqn = registry.create(
-                                    "dqn_torch", n_features=n_features, n_actions=n_actions,
-                                )
-                                if torch_dqn:
-                                    self.meta_controller.register_learner("torch_dqn", torch_dqn)
-                            except Exception:
-                                pass
-                    if use_torch and "torch_dqn" in self.meta_controller._slots:
-                        self._active_learner_name = "torch_dqn"
-                    elif "numpy_dqn" in self.meta_controller._slots:
-                        self._active_learner_name = "numpy_dqn"
-            except Exception as e:
-                self._init_errors["meta_controller"] = str(e)
+        # [PURGED] Curiosity module — intrinsic reward confused simple envs
+        # [PURGED] Meta-Controller — shadow-trained 2 DQNs, wasted compute
 
         # ── Probe Runner (short empirical algorithm trials) ──────────
         self.probe_runner = None
@@ -244,14 +193,7 @@ class WholeBrain:
         self._plateau_threshold = 0.02    # <2% improvement = plateau
         self._last_plateau_check = 0
 
-        # ── Rehearsal Loop (active pre-training at bottlenecks) ────────
-        self.rehearsal = None
-        if self._enabled["rehearsal"]:
-            try:
-                from brain.rehearsal.rehearsal_loop import RehearsalLoop
-                self.rehearsal = RehearsalLoop(self)
-            except Exception as e:
-                self._init_errors["rehearsal"] = str(e)
+        # [PURGED] Rehearsal Loop — inline rollouts mutated replay buffer
 
         # ── Planning Layer (long-term reasoning) ────────────────────────
         self.planner = None
@@ -267,7 +209,7 @@ class WholeBrain:
 
                 graph = LandmarkGraph()
                 causal = CausalModel()
-                detector = DeadEndDetector(self) if self._enabled["dead_end_detector"] else None
+                detector = None  # [PURGED] DeadEndDetector — 200-trial forward sim per step
                 regressor = GoalRegression(graph, causal_model=causal)
                 self.planner = SubgoalPlanner(
                     self, graph, regressor, detector, causal,
@@ -307,16 +249,7 @@ class WholeBrain:
             except Exception as e:
                 self._init_errors["dreams"] = str(e)
 
-        # ── Surprise Tracker (prediction-vs-reality delta) ─────────────
-        self.surprise_tracker = None
-        if self._enabled["surprise_tracker"]:
-            try:
-                from brain.networks.surprise_tracker import SurpriseTracker
-                wm = getattr(self.basal_ganglia, '_world_model', None)
-                if wm is not None:
-                    self.surprise_tracker = SurpriseTracker(wm)
-            except Exception as e:
-                self._init_errors["surprise_tracker"] = str(e)
+        # [PURGED] Surprise Tracker — positive feedback loop with bad WM data
 
         # ── Decision Attribution ──────────────────────────────────────
         self.attribution = None
@@ -328,21 +261,10 @@ class WholeBrain:
             except Exception as e:
                 self._init_errors["attribution"] = str(e)
 
-        # ── Entropy Monitor ───────────────────────────────────────────
-        self.entropy_monitor = None
-        if self._enabled["entropy_monitor"]:
-            try:
-                from brain.networks.entropy_monitor import EntropyMonitor
-                self.entropy_monitor = EntropyMonitor(n_actions=n_actions)
-            except Exception as e:
-                self._init_errors["entropy_monitor"] = str(e)
+        # [PURGED] Entropy Monitor — overrode epsilon AND injected WM noise
 
-        # ── Throttle intervals for newly wired systems ────────────────
+        # ── Throttle intervals for remaining systems ───────────────────
         self._causal_observe_interval = 2     # Causal model every 2nd step
-        self._rehearsal_check_interval = 50   # Check stuck every 50th step
-        self._dead_end_check_interval = 100   # Dead-end check (puzzle mode)
-        self._surprise_train_interval = 50    # Extra-train WM on surprises
-        self._last_dead_end_ok = True         # Cache: last dead-end result
 
         # ── Inline rehearsal state ────────────────────────────────────
         self._env_ref = None   # Set via set_env() for inline rehearsal
@@ -454,10 +376,7 @@ class WholeBrain:
             self.profiler.stop("hippocampus")
 
         # ── 5. Striatum — action selection ────────────────────────────
-        if self._enabled["dream_action_bias"]:
-            dream_action_values = bg_output.get("dream_action_values")
-            if dream_action_values is not None:
-                self.striatum._action_bias = dream_action_values
+        # [PURGED] dream_action_bias injection — uncalibrated dream values biased DQN
 
         self.profiler.start("striatum_select")
         striatum_output = self.striatum.step({"features": features})
@@ -465,21 +384,14 @@ class WholeBrain:
         self.profiler.stop("striatum_select")
 
         # ── 6. Learning ──────────────────────────────────────────────
-        intrinsic_reward = 0.0
         if self._prev_features is not None:
-            if self._enabled["curiosity"] and self.curiosity is not None:
-                self.profiler.start("curiosity")
-                intrinsic_reward = self.curiosity.compute(
-                    self._prev_features, prev_action, features,
-                )
-                self.profiler.stop("curiosity")
-            augmented_reward = reward + intrinsic_reward
+            # [PURGED] Curiosity intrinsic reward — confused simple envs
 
             self.profiler.start("striatum_learn")
             self.striatum.learn({
                 "state": self._prev_features,
                 "action": prev_action,
-                "reward": augmented_reward,
+                "reward": reward,  # Raw reward, no augmentation
                 "next_state": features,
                 "done": done,
                 "raw_frames": self._prev_raw_frames,
@@ -499,19 +411,7 @@ class WholeBrain:
                 })
             self.profiler.stop("world_model")
 
-            self.profiler.start("meta_shadow")
-            if (self._enabled["meta_controller"]
-                    and self.meta_controller is not None
-                    and (self._step_count % self._shadow_interval == 0)):
-                for name, slot in self.meta_controller._slots.items():
-                    try:
-                        slot.learner.update(
-                            self._prev_features, prev_action,
-                            augmented_reward, features, done,
-                        )
-                    except Exception:
-                        pass
-            self.profiler.stop("meta_shadow")
+            # [PURGED] Meta-Controller shadow training — wasted compute
 
         # ── 6.5 Causal model + subgoal tracking ─────────────────────
         if (self.planner is not None
@@ -526,66 +426,15 @@ class WholeBrain:
                 pass
             self.profiler.stop("causal_observe")
 
-        # ── 6.6 Inline dead-end check (puzzle mode) ─────────────────
-        if (self._game_mode == "puzzle"
-                and self._dead_end_detector is not None
-                and self._step_count % self._dead_end_check_interval == 0
-                and features is not None):
-            self.profiler.start("dead_end_check")
-            try:
-                wm = self.basal_ganglia._world_model
-                wm_conf = getattr(wm, 'confidence', 0.0) if wm else 0.0
-                if wm_conf > 0.5:
-                    is_dead = self._dead_end_detector.check(features, n_trials=200)
-                    self._last_dead_end_ok = not is_dead
-                    if is_dead and self._env_ref is not None:
-                        if self.logger:
-                            self.logger.event("planning", "dead_end",
-                                f"Dead end detected at step {self._step_count}")
-            except Exception:
-                pass
-            self.profiler.stop("dead_end_check")
-
-        # ── 6.7 Inline rehearsal trigger (stuck detection) ───────────
-        if (self.rehearsal is not None
-                and features is not None
-                and self._step_count % self._rehearsal_check_interval == 0
-                and self._env_ref is not None):
-            try:
-                fh = hash(features.tobytes())
-                if self.rehearsal.tracker.is_stuck(fh):
-                    # Auto-trigger advance mode rehearsal
-                    self.profiler.start("inline_rehearsal")
-                    self.rehearsal.run_advance(features, self._env_ref)
-                    self.profiler.stop("inline_rehearsal")
-            except Exception:
-                pass
+        # [PURGED] Dead-end check — 200-trial forward simulation per step
+        # [PURGED] Rehearsal trigger — inline rollouts mutated replay buffer
 
         # Track features and raw frames for next step
         self._prev_features = features
         self._prev_raw_frames = raw_frames
         self._last_features = features
 
-        # ── 6.8 Surprise tracking ────────────────────────────────────
-        surprise_val = 0.0
-        if (self.surprise_tracker is not None
-                and self._prev_features is not None
-                and features is not None):
-            try:
-                surprise_val = self.surprise_tracker.predict_and_compare(
-                    self._prev_features, prev_action, features, reward,
-                    step=self._step_count,
-                )
-                # Extra-train on biggest surprises periodically
-                if self._step_count % self._surprise_train_interval == 0:
-                    self.surprise_tracker.extra_train(n_batches=3)
-                # Feed trend to entropy monitor
-                if self.entropy_monitor is not None:
-                    self.entropy_monitor.set_surprise_trend(
-                        self.surprise_tracker.surprise_trend()
-                    )
-            except Exception:
-                pass
+        # [PURGED] Surprise tracking — positive feedback loop with bad WM data
 
         # ── 7. Skill Library Override ─────────────────────────────────
         skill_override = None
@@ -648,16 +497,13 @@ class WholeBrain:
                         striatum_output.get("q_values", [])
                     ),
                     threat_score=threat_output.get("threat_score", 0.0),
-                    curiosity_bonus=intrinsic_reward,
-                    surprise=surprise_val,
+                    curiosity_bonus=0.0,
+                    surprise=0.0,
                     reward=reward,
                     episode_reward_so_far=self._episode_reward,
                     epsilon=epsilon_used,
-                    dead_end_detected=not self._last_dead_end_ok,
-                    entropy_override=(
-                        self.entropy_monitor.get_epsilon_override() is not None
-                        if self.entropy_monitor else False
-                    ),
+                    dead_end_detected=False,
+                    entropy_override=False,
                     region_times=self.profiler.report(),
                 )
                 self.attribution.record(trace)
