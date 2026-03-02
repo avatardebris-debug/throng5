@@ -79,10 +79,34 @@ class WholeBrain:
         use_cnn: bool = False,
         use_fft: bool = False,
         game_mode: str = "action",  # "action" or "puzzle"
+        enabled_systems: Optional[Dict[str, bool]] = None,
     ):
         self.n_features = n_features
         self.n_actions = n_actions
         self._game_mode = game_mode
+
+        # ── Subsystem enable/disable flags (for ablation testing) ─────
+        _defaults = {
+            "curiosity": True,
+            "world_model": True,
+            "dreams": True,
+            "meta_controller": True,
+            "causal_model": True,
+            "dead_end_detector": True,
+            "rehearsal": True,
+            "surprise_tracker": True,
+            "skill_library": True,
+            "entropy_monitor": True,
+            "attribution": True,
+            "stage_classifier": True,
+            "counterfactual": True,
+            "hippocampus_store": True,
+            "threat_gating": True,
+            "dream_action_bias": True,
+            "probe_runner": True,
+        }
+        self._enabled = {**_defaults, **(enabled_systems or {})}
+        self._init_errors: Dict[str, str] = {}  # Track init failures
 
         # ── Message Bus ───────────────────────────────────────────────
         self.bus = MessageBus(history_size=1000)
@@ -148,66 +172,72 @@ class WholeBrain:
             )
 
         # ── Curiosity module (intrinsic motivation) ──────────────────
-        self.curiosity = CuriosityModule(
-            n_features=n_features, n_actions=n_actions,
-        )
-        if self.basal_ganglia._world_model is not None:
-            self.curiosity.connect_world_model(
-                self.basal_ganglia._world_model
-            )
+        self.curiosity = None
+        if self._enabled["curiosity"]:
+            try:
+                self.curiosity = CuriosityModule(
+                    n_features=n_features, n_actions=n_actions,
+                )
+                if self.basal_ganglia._world_model is not None:
+                    self.curiosity.connect_world_model(
+                        self.basal_ganglia._world_model
+                    )
+            except Exception as e:
+                self._init_errors["curiosity"] = str(e)
 
         # ── Meta-Controller (learner evolution) ──────────────────────
         self.meta_controller = None
         self._active_learner_name = "default"
-        MetaControllerClass = _get_meta_controller()
-        if MetaControllerClass is not None:
-            self.meta_controller = MetaControllerClass(
-                relevance_window=100,
-                collapse_threshold=0.02,
-                min_trials_per_learner=20,
-            )
-            # Register competing learners
-            SelectorClass, RegistryClass = _get_learner_selector()
-            if RegistryClass is not None:
-                registry = RegistryClass()
-                # Register our built-in numpy DQN
-                numpy_dqn = registry.create(
-                    "dqn_builtin", n_features=n_features, n_actions=n_actions,
-                )
-                if numpy_dqn:
-                    self.meta_controller.register_learner("numpy_dqn", numpy_dqn)
-                # Register our built-in torch DQN
-                if use_torch:
-                    try:
-                        torch_dqn = registry.create(
-                            "dqn_torch", n_features=n_features, n_actions=n_actions,
+        if self._enabled["meta_controller"]:
+            try:
+                MetaControllerClass = _get_meta_controller()
+                if MetaControllerClass is not None:
+                    self.meta_controller = MetaControllerClass(
+                        relevance_window=100,
+                        collapse_threshold=0.02,
+                        min_trials_per_learner=20,
+                    )
+                    SelectorClass, RegistryClass = _get_learner_selector()
+                    if RegistryClass is not None:
+                        registry = RegistryClass()
+                        numpy_dqn = registry.create(
+                            "dqn_builtin", n_features=n_features, n_actions=n_actions,
                         )
-                        if torch_dqn:
-                            self.meta_controller.register_learner("torch_dqn", torch_dqn)
-                    except Exception:
-                        pass
-
-            # Set the active learner to match what Striatum is running
-            if use_torch and "torch_dqn" in self.meta_controller._slots:
-                self._active_learner_name = "torch_dqn"
-            elif "numpy_dqn" in self.meta_controller._slots:
-                self._active_learner_name = "numpy_dqn"
+                        if numpy_dqn:
+                            self.meta_controller.register_learner("numpy_dqn", numpy_dqn)
+                        if use_torch:
+                            try:
+                                torch_dqn = registry.create(
+                                    "dqn_torch", n_features=n_features, n_actions=n_actions,
+                                )
+                                if torch_dqn:
+                                    self.meta_controller.register_learner("torch_dqn", torch_dqn)
+                            except Exception:
+                                pass
+                    if use_torch and "torch_dqn" in self.meta_controller._slots:
+                        self._active_learner_name = "torch_dqn"
+                    elif "numpy_dqn" in self.meta_controller._slots:
+                        self._active_learner_name = "numpy_dqn"
+            except Exception as e:
+                self._init_errors["meta_controller"] = str(e)
 
         # ── Probe Runner (short empirical algorithm trials) ──────────
         self.probe_runner = None
-        try:
-            from brain.learning.probe_runner import ProbeRunner
-            self.probe_runner = ProbeRunner(self, probe_steps=500)
-        except ImportError:
-            pass
+        if self._enabled["probe_runner"]:
+            try:
+                from brain.learning.probe_runner import ProbeRunner
+                self.probe_runner = ProbeRunner(self, probe_steps=500)
+            except Exception as e:
+                self._init_errors["probe_runner"] = str(e)
 
         # ── Stage Classifier (per-area learner specialization) ───────
         self.stage_classifier = None
-        try:
-            from brain.learning.stage_classifier import StageClassifier
-            self.stage_classifier = StageClassifier(n_features=n_features)
-        except ImportError:
-            pass
+        if self._enabled["stage_classifier"]:
+            try:
+                from brain.learning.stage_classifier import StageClassifier
+                self.stage_classifier = StageClassifier(n_features=n_features)
+            except Exception as e:
+                self._init_errors["stage_classifier"] = str(e)
 
         # ── Plateau detection for LLM re-evaluation ─────────────────
         self._plateau_window = 200        # Episodes to check for plateau
@@ -216,85 +246,96 @@ class WholeBrain:
 
         # ── Rehearsal Loop (active pre-training at bottlenecks) ────────
         self.rehearsal = None
-        try:
-            from brain.rehearsal.rehearsal_loop import RehearsalLoop
-            self.rehearsal = RehearsalLoop(self)
-        except ImportError:
-            pass
+        if self._enabled["rehearsal"]:
+            try:
+                from brain.rehearsal.rehearsal_loop import RehearsalLoop
+                self.rehearsal = RehearsalLoop(self)
+            except Exception as e:
+                self._init_errors["rehearsal"] = str(e)
 
         # ── Planning Layer (long-term reasoning) ────────────────────────
         self.planner = None
         self._causal_model = None
         self._dead_end_detector = None
-        try:
-            from brain.planning.landmark_graph import LandmarkGraph
-            from brain.planning.dead_end_detector import DeadEndDetector
-            from brain.planning.causal_model import CausalModel
-            from brain.planning.goal_regression import GoalRegression
-            from brain.planning.subgoal_planner import SubgoalPlanner
+        if self._enabled["causal_model"]:
+            try:
+                from brain.planning.landmark_graph import LandmarkGraph
+                from brain.planning.dead_end_detector import DeadEndDetector
+                from brain.planning.causal_model import CausalModel
+                from brain.planning.goal_regression import GoalRegression
+                from brain.planning.subgoal_planner import SubgoalPlanner
 
-            graph = LandmarkGraph()
-            causal = CausalModel()
-            detector = DeadEndDetector(self)
-            regressor = GoalRegression(graph, causal_model=causal)
-            self.planner = SubgoalPlanner(
-                self, graph, regressor, detector, causal,
-            )
-            self._causal_model = causal
-            self._dead_end_detector = detector
-        except ImportError:
-            pass
+                graph = LandmarkGraph()
+                causal = CausalModel()
+                detector = DeadEndDetector(self) if self._enabled["dead_end_detector"] else None
+                regressor = GoalRegression(graph, causal_model=causal)
+                self.planner = SubgoalPlanner(
+                    self, graph, regressor, detector, causal,
+                )
+                self._causal_model = causal
+                self._dead_end_detector = detector
+            except Exception as e:
+                self._init_errors["causal_model"] = str(e)
 
         # ── Skill Library (macro-skills for puzzle solving) ─────────────
         self.skill_library = None
         self._active_skill = None    # Currently executing skill
         self._skill_game_state = {}  # Game state for skill preconditions
-        try:
-            from brain.planning.skill_library import SkillLibrary
-            self.skill_library = SkillLibrary()
-        except ImportError:
-            pass
+        if self._enabled["skill_library"]:
+            try:
+                from brain.planning.skill_library import SkillLibrary
+                self.skill_library = SkillLibrary()
+            except Exception as e:
+                self._init_errors["skill_library"] = str(e)
 
         # ── Counterfactual Reasoner (regret analysis on death) ─────────
         self.counterfactual = None
-        CFClass = _get_counterfactual()
-        if CFClass is not None:
-            self.counterfactual = CFClass(self)
+        if self._enabled["counterfactual"]:
+            try:
+                CFClass = _get_counterfactual()
+                if CFClass is not None:
+                    self.counterfactual = CFClass(self)
+            except Exception as e:
+                self._init_errors["counterfactual"] = str(e)
 
         # ── Overnight Dream Loop ──────────────────────────────────────
         self._dream_loop = None
-        try:
-            from brain.overnight.dream_loop import DreamLoop
-            self._dream_loop = DreamLoop(self, logger=self.logger)
-        except ImportError:
-            pass
+        if self._enabled["dreams"]:
+            try:
+                from brain.overnight.dream_loop import DreamLoop
+                self._dream_loop = DreamLoop(self, logger=self.logger)
+            except Exception as e:
+                self._init_errors["dreams"] = str(e)
 
         # ── Surprise Tracker (prediction-vs-reality delta) ─────────────
         self.surprise_tracker = None
-        try:
-            from brain.networks.surprise_tracker import SurpriseTracker
-            wm = getattr(self.basal_ganglia, '_world_model', None)
-            if wm is not None:
-                self.surprise_tracker = SurpriseTracker(wm)
-        except ImportError:
-            pass
+        if self._enabled["surprise_tracker"]:
+            try:
+                from brain.networks.surprise_tracker import SurpriseTracker
+                wm = getattr(self.basal_ganglia, '_world_model', None)
+                if wm is not None:
+                    self.surprise_tracker = SurpriseTracker(wm)
+            except Exception as e:
+                self._init_errors["surprise_tracker"] = str(e)
 
         # ── Decision Attribution ──────────────────────────────────────
         self.attribution = None
-        try:
-            from brain.telemetry.attribution_logger import AttributionLogger
-            log_dir = f"logs/telemetry/{session_name}"
-            self.attribution = AttributionLogger(log_dir=log_dir)
-        except ImportError:
-            pass
+        if self._enabled["attribution"]:
+            try:
+                from brain.telemetry.attribution_logger import AttributionLogger
+                log_dir = f"logs/telemetry/{session_name}"
+                self.attribution = AttributionLogger(log_dir=log_dir)
+            except Exception as e:
+                self._init_errors["attribution"] = str(e)
 
         # ── Entropy Monitor ───────────────────────────────────────────
         self.entropy_monitor = None
-        try:
-            from brain.networks.entropy_monitor import EntropyMonitor
-            self.entropy_monitor = EntropyMonitor(n_actions=n_actions)
-        except ImportError:
-            pass
+        if self._enabled["entropy_monitor"]:
+            try:
+                from brain.networks.entropy_monitor import EntropyMonitor
+                self.entropy_monitor = EntropyMonitor(n_actions=n_actions)
+            except Exception as e:
+                self._init_errors["entropy_monitor"] = str(e)
 
         # ── Throttle intervals for newly wired systems ────────────────
         self._causal_observe_interval = 2     # Causal model every 2nd step
@@ -399,22 +440,24 @@ class WholeBrain:
         self.profiler.stop("amygdala")
 
         # ── 4. Hippocampus ────────────────────────────────────────────
-        self.profiler.start("hippocampus")
-        if self._prev_features is not None:
-            self.hippocampus.step({
-                "state": self._prev_features,
-                "action": prev_action,
-                "reward": reward,
-                "next_state": features,
-                "done": done,
-                "td_error": 0.0,
-            })
-        self.profiler.stop("hippocampus")
+        if self._enabled["hippocampus_store"]:
+            self.profiler.start("hippocampus")
+            if self._prev_features is not None:
+                self.hippocampus.step({
+                    "state": self._prev_features,
+                    "action": prev_action,
+                    "reward": reward,
+                    "next_state": features,
+                    "done": done,
+                    "td_error": 0.0,
+                })
+            self.profiler.stop("hippocampus")
 
         # ── 5. Striatum — action selection ────────────────────────────
-        dream_action_values = bg_output.get("dream_action_values")
-        if dream_action_values is not None:
-            self.striatum._action_bias = dream_action_values
+        if self._enabled["dream_action_bias"]:
+            dream_action_values = bg_output.get("dream_action_values")
+            if dream_action_values is not None:
+                self.striatum._action_bias = dream_action_values
 
         self.profiler.start("striatum_select")
         striatum_output = self.striatum.step({"features": features})
@@ -424,11 +467,12 @@ class WholeBrain:
         # ── 6. Learning ──────────────────────────────────────────────
         intrinsic_reward = 0.0
         if self._prev_features is not None:
-            self.profiler.start("curiosity")
-            intrinsic_reward = self.curiosity.compute(
-                self._prev_features, prev_action, features,
-            )
-            self.profiler.stop("curiosity")
+            if self._enabled["curiosity"] and self.curiosity is not None:
+                self.profiler.start("curiosity")
+                intrinsic_reward = self.curiosity.compute(
+                    self._prev_features, prev_action, features,
+                )
+                self.profiler.stop("curiosity")
             augmented_reward = reward + intrinsic_reward
 
             self.profiler.start("striatum_learn")
@@ -445,17 +489,20 @@ class WholeBrain:
             self.profiler.stop("striatum_learn")
 
             self.profiler.start("world_model")
-            self.basal_ganglia.learn({
-                "state": self._prev_features,
-                "action": prev_action,
-                "next_state": features,
-                "reward": reward,
-                "skip_train": (self._step_count % self._wm_train_interval != 0),
-            })
+            if self._enabled["world_model"]:
+                self.basal_ganglia.learn({
+                    "state": self._prev_features,
+                    "action": prev_action,
+                    "next_state": features,
+                    "reward": reward,
+                    "skip_train": (self._step_count % self._wm_train_interval != 0),
+                })
             self.profiler.stop("world_model")
 
             self.profiler.start("meta_shadow")
-            if self.meta_controller is not None and (self._step_count % self._shadow_interval == 0):
+            if (self._enabled["meta_controller"]
+                    and self.meta_controller is not None
+                    and (self._step_count % self._shadow_interval == 0)):
                 for name, slot in self.meta_controller._slots.items():
                     try:
                         slot.learner.update(
@@ -867,6 +914,32 @@ class WholeBrain:
         if self.entropy_monitor is not None:
             r["entropy_monitor"] = self.entropy_monitor.report()
         return r
+
+    def get_diagnostic_info(self) -> Dict[str, Any]:
+        """Return full diagnostic information for ablation reporting."""
+        return {
+            "enabled_systems": dict(self._enabled),
+            "init_errors": dict(self._init_errors),
+            "active_subsystems": {
+                "curiosity": self.curiosity is not None,
+                "meta_controller": self.meta_controller is not None,
+                "probe_runner": self.probe_runner is not None,
+                "stage_classifier": self.stage_classifier is not None,
+                "rehearsal": self.rehearsal is not None,
+                "planner": self.planner is not None,
+                "causal_model": self._causal_model is not None,
+                "dead_end_detector": self._dead_end_detector is not None,
+                "skill_library": self.skill_library is not None,
+                "counterfactual": self.counterfactual is not None,
+                "dream_loop": self._dream_loop is not None,
+                "surprise_tracker": self.surprise_tracker is not None,
+                "attribution": self.attribution is not None,
+                "entropy_monitor": self.entropy_monitor is not None,
+            },
+            "step_count": self._step_count,
+            "episode_count": self._episode_count,
+            "profiler_report": self.profiler.report(),
+        }
 
     def close(self) -> None:
         if self.logger:
