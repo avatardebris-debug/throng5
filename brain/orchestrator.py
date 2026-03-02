@@ -502,41 +502,22 @@ class WholeBrain:
             "epsilon": epsilon_used,
             "context_score": bg_output.get("context_score", 0.0),
             "action_source": motor_output.get("source", "unknown"),
-            "intrinsic_reward": intrinsic_reward,
-            "surprise": surprise_val,
         }
 
     def _on_episode_done(self) -> None:
         """Handle episode completion."""
         self._episode_count += 1
 
-        # ── Report to MetaController for learner evolution ────────────
-        if self.meta_controller is not None:
-            self.meta_controller.report_reward(
-                self._active_learner_name,
-                self._episode_reward,
-            )
+        # [PURGED] MetaController report — no longer exists
 
         # ── Feed stage classifier with per-episode learner performance ──
         if self.stage_classifier is not None and self._last_features is not None:
             stage_id = self.stage_classifier.classify(self._last_features)
             self.stage_classifier.record(
-                stage_id, self._active_learner_name, self._episode_reward,
+                stage_id, "default", self._episode_reward,
             )
 
-        # ── Feed death events to rehearsal bottleneck tracker ─────────
-        if self.rehearsal is not None and self._last_features is not None:
-            if self._episode_reward < 0:
-                self.rehearsal.tracker.record_death(
-                    self._last_features,
-                    context={
-                        "episode": self._episode_count,
-                        "episode_reward": self._episode_reward,
-                        "steps": self._step_count,
-                    },
-                )
-            else:
-                self.rehearsal.tracker.record_success(self._last_features)
+        # [PURGED] Rehearsal bottleneck tracker — no longer exists
 
         # ── Counterfactual regret analysis on death ───────────────────
         if (self.counterfactual is not None
@@ -563,14 +544,7 @@ class WholeBrain:
             except Exception:
                 pass
 
-        # ── Export proven chains to Motor Cortex heuristics ───────────
-        if self.rehearsal is not None:
-            try:
-                heuristics = self.rehearsal.chain_store.export_heuristics()
-                if heuristics:
-                    self.motor.install_heuristics(heuristics)
-            except Exception:
-                pass
+        # [PURGED] Rehearsal chain export — no longer exists
 
         # ── Attribution episode summary ───────────────────────────────
         if self.attribution is not None:

@@ -195,7 +195,7 @@ ENVIRONMENTS = {
         "description": "Pick up and deliver passenger, 6 actions",
         "good_score": 8,
     },
-    "CliffWalking-v0": {
+    "CliffWalking-v1": {
         "category": "toy_text",
         "n_features": 1, "n_actions": 4, "max_steps": 200,
         "discrete_obs": True, "discrete_size": 48,
