@@ -84,7 +84,7 @@ class AmygdalaThalamus(BrainRegion):
         self,
         bus: MessageBus,
         # Threat estimator params
-        n_features: int = 18,
+        n_features: int = 84,
         hidden_size: int = 32,
         threat_threshold: float = 0.60,
         # Amygdala params
@@ -129,7 +129,7 @@ class AmygdalaThalamus(BrainRegion):
         self._hysteresis_steps = hysteresis_steps
         self._below_exit_count = 0
         self._mode_counts = {m: 0 for m in OperatingMode}
-        self._transitions: List[tuple] = []
+        self._transitions: deque = deque(maxlen=1000)  # capped to prevent unbounded growth
 
     # ── BrainRegion Interface ─────────────────────────────────────────
 

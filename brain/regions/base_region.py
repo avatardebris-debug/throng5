@@ -118,7 +118,6 @@ class BrainRegion(ABC):
     def resume(self) -> None:
         """Reactivate this region."""
         self._is_active = True
-        self.bus.resume(self.name)
 
     # ── Lifecycle ─────────────────────────────────────────────────────
 

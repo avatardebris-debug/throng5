@@ -417,7 +417,7 @@ class SensoryCortex(BrainRegion):
         elif obs is not None:
             features = self._random_projection_encode(obs)
 
-        # Path 4: Use last features
+        # Path 5: Use last features if all paths failed
         if features is None:
             features = self._last_features
 

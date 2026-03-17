@@ -372,14 +372,12 @@ class BasalGanglia(BrainRegion):
                 reward=reward, done=done,
             )
 
-        # ── World model training ──────────────────────────────────────
-        if state is None or self._world_model is None:
-            self._wm_train_steps += 1
-            self._wm_confidence = min(1.0, self._wm_train_steps / 50.0)
-            return {
-                "wm_train_steps": self._wm_train_steps,
-                "wm_confidence": self._wm_confidence,
-            }
+        # ── World model training ────────────────────────────────────────────
+        if self._world_model is None:
+            return {"wm_available": False}
+
+        if state is None:
+            return {"wm_train_steps": self._wm_train_steps, "wm_confidence": self._wm_confidence}
 
         # Store real transition in world model's replay
         self._world_model.store_transition(state, action, next_state, reward)

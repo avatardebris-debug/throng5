@@ -103,6 +103,7 @@ class Striatum(BrainRegion):
         self._total_updates = 0
         self._episode_reward = 0.0
         self._episode_rewards: deque = deque(maxlen=100)
+
     # ── CNN Integration ────────────────────────────────────────────────
 
     def wire_cnn_encoder(self, encoder_fn, cnn_params) -> None:
@@ -366,9 +367,8 @@ class Striatum(BrainRegion):
                 bias = msg.payload.get("action_bias")
                 if bias is not None:
                     self._action_bias = np.asarray(bias, dtype=np.float32)
-            elif msg.msg_type == "replay_batch":
-                # Queue replay data from hippocampus for learning
-                pass  # Handled in learn() cycle
+            # replay_batch msgs from hippocampus are unused here;
+            # Striatum manages its own _replay deque directly.
 
     # ── Lifecycle ─────────────────────────────────────────────────────
 
