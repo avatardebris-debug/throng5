@@ -32,8 +32,9 @@ from brain.regions.hippocampus import Hippocampus
 from brain.regions.striatum import Striatum
 from brain.regions.prefrontal_cortex import PrefrontalCortex
 from brain.regions.motor_cortex import MotorCortex
-from brain.environments.curiosity import CuriosityModule
+from brain.environments.curiosity import CuriosityModule  # noqa: F401 — referenced by gauntlet
 from brain.telemetry.step_profiler import StepProfiler
+
 
 def _get_counterfactual():
     try:
@@ -41,23 +42,6 @@ def _get_counterfactual():
         return CounterfactualReasoner
     except ImportError:
         return None
-
-
-# Lazy imports for learner evolution
-def _get_meta_controller():
-    try:
-        from brain.learning.meta_controller import MetaController
-        return MetaController
-    except ImportError:
-        return None
-
-def _get_learner_selector():
-    try:
-        from brain.learning.learner_selector import LearnerSelector
-        from brain.learning.rl_registry import RLRegistry
-        return LearnerSelector, RLRegistry
-    except ImportError:
-        return None, None
 
 
 class WholeBrain:
@@ -150,7 +134,6 @@ class WholeBrain:
         # ── Training throttle intervals (reduce per-step cost) ───────
         self._dqn_train_interval = 2    # DQN gradient update every 2nd step
         self._wm_train_interval = 4     # World model train every 4th step
-        self._shadow_interval = 8       # Shadow learners every 8th step
 
         # ── Wire CNN encoder to Striatum for end-to-end learning ──────
         if use_cnn and use_torch and self.sensory._use_cnn:
@@ -266,8 +249,8 @@ class WholeBrain:
         # ── Throttle intervals for remaining systems ───────────────────
         self._causal_observe_interval = 2     # Causal model every 2nd step
 
-        # ── Inline rehearsal state ────────────────────────────────────
-        self._env_ref = None   # Set via set_env() for inline rehearsal
+        # ── Inline rehearsal state (env ref for skill/planning lookups) ─
+        self._env_ref = None
 
         if self.logger:
             self.logger.milestone("init", f"WholeBrain v{VERSION} initialized with {len(self._regions)} regions, mode={self._game_mode}")
@@ -587,63 +570,14 @@ class WholeBrain:
 
     def request_plateau_review(self):
         """
-        Request LLM re-evaluation of algorithm selection on plateau.
-        Returns review result from Prefrontal Cortex.
+        Placeholder for LLM re-evaluation of algorithm selection on plateau.
+        MetaController was purged — this returns None until a replacement is wired.
         """
-        if self.meta_controller is None:
-            return None
-        meta_report = self.meta_controller.report()
-        return self.prefrontal.request_algorithm_review(
-            meta_report,
-            plateau_info={
-                "episode_count": self._episode_count,
-                "step_count": self._step_count,
-            },
-        )
+        return None
 
-    def rehearse(self, mode: str = "advance", env=None, features=None, **kwargs):
-        """
-        Run rehearsal in the specified mode.
-
-        Modes:
-            advance:  Pause → 3-tier validate → execute → repeat
-            frontier: Play from start; Advance on death
-            stuck:    10 failures → train flanking areas
-            free:     Play normally, log stuck points for LLM
-
-        Args:
-            mode: One of 'advance', 'frontier', 'stuck', 'free'
-            env: Environment (required for frontier/stuck/free modes)
-            features: State features (required for advance/stuck modes)
-        """
-        if self.rehearsal is None:
-            return {"status": "not_available"}
-
-        if mode == "advance":
-            if features is None and self._last_features is not None:
-                features = self._last_features
-            if features is None:
-                return {"status": "no_features"}
-            return self.rehearsal.run_advance(features, env, **kwargs)
-
-        elif mode == "frontier":
-            if env is None:
-                return {"status": "no_env"}
-            return self.rehearsal.run_frontier(env, **kwargs)
-
-        elif mode == "stuck":
-            if features is None and self._last_features is not None:
-                features = self._last_features
-            if features is None:
-                return {"status": "no_features"}
-            return self.rehearsal.run_stuck(features, env, **kwargs)
-
-        elif mode == "free":
-            if env is None:
-                return {"status": "no_env"}
-            return self.rehearsal.run_free(env, **kwargs)
-
-        return {"status": "unknown_mode", "mode": mode}
+    def rehearse(self, **kwargs):
+        """[PURGED] Rehearsal loop was removed. Returns not_available."""
+        return {"status": "not_available"}
 
     def plan(self, goal_features=None, goal_hash=None, goal_label="goal"):
         """
@@ -685,14 +619,7 @@ class WholeBrain:
             n_dream_steps=n_dream_steps,
             max_time_seconds=max_time,
         )
-        # Install any heuristics extracted during dreaming
-        if self.rehearsal is not None:
-            try:
-                heuristics = self.rehearsal.chain_store.export_heuristics()
-                if heuristics:
-                    self.motor.install_heuristics(heuristics)
-            except Exception:
-                pass
+        # Heuristics from dream loop installed directly into motor cortex
         return result
 
     def report(self) -> Dict[str, Dict]:
@@ -700,20 +627,14 @@ class WholeBrain:
         r = {name: region.report() for name, region in self._regions.items()}
         if self.stage_classifier is not None:
             r["stage_classifier"] = self.stage_classifier.report()
-        if self.rehearsal is not None:
-            r["rehearsal"] = self.rehearsal.report()
         if self.planner is not None:
             r["planning"] = self.planner.report()
         if self.counterfactual is not None:
             r["counterfactual"] = self.counterfactual.report()
         if self._causal_model is not None:
             r["causal_model"] = self._causal_model.report()
-        if self.surprise_tracker is not None:
-            r["surprise_tracker"] = self.surprise_tracker.report()
         if self.attribution is not None:
             r["attribution"] = self.attribution.report()
-        if self.entropy_monitor is not None:
-            r["entropy_monitor"] = self.entropy_monitor.report()
         return r
 
     def get_diagnostic_info(self) -> Dict[str, Any]:
@@ -722,20 +643,15 @@ class WholeBrain:
             "enabled_systems": dict(self._enabled),
             "init_errors": dict(self._init_errors),
             "active_subsystems": {
-                "curiosity": self.curiosity is not None,
-                "meta_controller": self.meta_controller is not None,
                 "probe_runner": self.probe_runner is not None,
                 "stage_classifier": self.stage_classifier is not None,
-                "rehearsal": self.rehearsal is not None,
                 "planner": self.planner is not None,
                 "causal_model": self._causal_model is not None,
                 "dead_end_detector": self._dead_end_detector is not None,
                 "skill_library": self.skill_library is not None,
                 "counterfactual": self.counterfactual is not None,
                 "dream_loop": self._dream_loop is not None,
-                "surprise_tracker": self.surprise_tracker is not None,
                 "attribution": self.attribution is not None,
-                "entropy_monitor": self.entropy_monitor is not None,
             },
             "step_count": self._step_count,
             "episode_count": self._episode_count,
