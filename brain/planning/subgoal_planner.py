@@ -181,7 +181,8 @@ class SubgoalPlanner:
                 return self._handle_dead_end(features, default_action)
 
         # Check for dangerous actions via causal model
-        n_actions = getattr(self.brain.striatum, '_n_actions', 4)
+        n_actions = getattr(self.brain.striatum, 'n_actions',
+                            getattr(self.brain.striatum, '_n_actions', 4))
         safe_actions = self.causal_model.get_safe_actions(features, n_actions)
 
         # Get route to current subgoal

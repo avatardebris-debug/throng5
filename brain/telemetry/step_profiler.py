@@ -25,8 +25,8 @@ Usage:
 from __future__ import annotations
 
 import time
-from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from collections import defaultdict, deque
+from typing import Any, Dict, Optional
 
 
 class StepProfiler:
@@ -44,7 +44,7 @@ class StepProfiler:
         # Accumulators
         self._totals: Dict[str, float] = defaultdict(float)
         self._counts: Dict[str, int] = defaultdict(int)
-        self._recent: Dict[str, List[float]] = defaultdict(list)
+        self._recent: Dict[str, deque] = defaultdict(lambda: deque(maxlen=window))
 
         # Per-step tracking
         self._current_start: Dict[str, float] = {}
@@ -70,9 +70,7 @@ class StepProfiler:
         self._counts[component] += 1
 
         recent = self._recent[component]
-        recent.append(elapsed)
-        if len(recent) > self.window:
-            recent.pop(0)
+        recent.append(elapsed)  # deque auto-trims at maxlen — O(1)
 
     def tick(self) -> None:
         """Mark the end of one full brain step."""

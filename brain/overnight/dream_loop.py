@@ -243,12 +243,15 @@ class DreamLoop:
                 q_values = striatum._forward(dream_state)
                 action = int(np.argmax(q_values))
 
-                # "Imagine" next state via simple prediction
-                # (Full WorldModel integration would use DreamerEngine here)
-                # For now: perturb state based on action embedding
-                noise = np.random.randn(len(dream_state)).astype(np.float32) * 0.05
-                predicted_next = dream_state + noise
-                predicted_reward = float(np.random.randn() * 0.3)
+                # Use real WorldModel if available, otherwise fall back to noise
+                wm = getattr(basal_ganglia, '_world_model', None)
+                if wm is not None and wm.is_ready:
+                    predicted_next, predicted_reward = wm.predict(dream_state, action)
+                else:
+                    # WorldModel not ready yet — light noise placeholder
+                    noise = np.random.randn(len(dream_state)).astype(np.float32) * 0.05
+                    predicted_next = dream_state + noise
+                    predicted_reward = 0.0
 
                 trajectory["actions"].append(action)
                 trajectory["rewards"].append(predicted_reward)
