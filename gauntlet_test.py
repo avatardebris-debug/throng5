@@ -152,6 +152,63 @@ class GymEnv:
         return obs
 
 
+# ── MountainCar with reward shaping ──────────────────────────────────
+
+class MountainCarEnv:
+    """
+    MountainCar-v0 with potential-based reward shaping.
+
+    Raw MountainCar gives -1/step with a win bonus only when reaching
+    position >= 0.45.  A random agent or untrained DQN essentially never
+    reach the flag in 200 steps, so no learning signal ever arrives.
+
+    Shaping (additive, does not change optimal policy by potential theory):
+      - Progress bonus: how much closer to flag position (0.45) vs last step
+      - Velocity bonus: small reward for moving right at speed
+    """
+    def __init__(self, max_steps=200):
+        self.env = gym.make("MountainCar-v0")
+        self.n_actions = 3
+        self.max_steps = max_steps
+        self._steps = 0
+        self._prev_potential = 0.0
+        # Obs bounds
+        self._low = np.array([-1.2, -0.07], dtype=np.float32)
+        self._high = np.array([0.6, 0.07], dtype=np.float32)
+
+    def _potential(self, obs):
+        """Height-based potential (penalize low position)."""
+        pos, vel = obs[0], obs[1]
+        # Height of car: h = sin(3*pos) * 0.45  (MountainCar track formula)
+        height = np.sin(3 * pos) * 0.45 + 0.55  # Shift to 0-1 range
+        return height
+
+    def reset(self):
+        obs, _ = self.env.reset()
+        self._steps = 0
+        self._prev_potential = self._potential(obs)
+        return self._norm(obs)
+
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(int(action))
+        self._steps += 1
+        done = terminated or truncated or self._steps >= self.max_steps
+
+        # Potential-based shaping: F = gamma * phi(s') - phi(s)
+        new_potential = self._potential(obs)
+        shaping = 10.0 * (0.99 * new_potential - self._prev_potential)
+        self._prev_potential = new_potential
+
+        shaped_reward = reward + shaping
+        return self._norm(obs), shaped_reward, done, info
+
+    def _norm(self, obs):
+        obs = np.asarray(obs, dtype=np.float32)
+        r = self._high - self._low
+        return np.clip((obs - self._low) / r, 0.0, 1.0)
+
+
+
 # ── Environment Registry ────────────────────────────────────────────
 
 ENVIRONMENTS = {
@@ -232,6 +289,8 @@ def make_env(name: str) -> Any:
         return GridWorldEnv()
     elif name == "MorrisWaterMaze":
         return MorrisWaterMaze()
+    elif name == "MountainCar-v0":
+        return MountainCarEnv(max_steps=config["max_steps"])
     elif name == "FrozenLake-v1":
         env = gym.make("FrozenLake-v1", is_slippery=True)
         class FLWrap:
