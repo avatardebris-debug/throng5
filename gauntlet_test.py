@@ -335,7 +335,9 @@ def make_env(name: str) -> Any:
 # ════════════════════════════════════════════════════════════════════════
 
 def run_agent(agent_name: str, env_name: str, config: dict, n_episodes: int,
-              brain_kwargs: Optional[dict] = None) -> Dict[str, Any]:
+              brain_kwargs: Optional[dict] = None,
+              checkpoint_path: Optional[str] = None,
+              resume: bool = False) -> Dict[str, Any]:
     """Run an agent on an environment and return results."""
     result = {
         "agent": agent_name,
@@ -352,6 +354,8 @@ def run_agent(agent_name: str, env_name: str, config: dict, n_episodes: int,
         "wall_time_sec": 0.0,
         "ms_per_step": 0.0,
         "total_steps": 0,
+        "checkpoint_loaded": False,
+        "checkpoint_saved": False,
     }
 
     if agent_name == "random":
@@ -359,19 +363,37 @@ def run_agent(agent_name: str, env_name: str, config: dict, n_episodes: int,
 
     # WholeBrain agent
     from brain.orchestrator import WholeBrain
-    try:
-        brain = WholeBrain(
-            n_features=config["n_features"],
-            n_actions=config["n_actions"],
-            session_name=f"gauntlet_{agent_name}_{env_name}",
-            enable_logging=False,
-            use_torch=False,
-            **(brain_kwargs or {}),
-        )
-    except Exception as e:
-        result["status"] = "INIT_FAIL"
-        result["error"] = f"{type(e).__name__}: {e}"
-        return result
+    from brain.scaling.brain_state import BrainState
+
+    brain = None
+
+    # ── Resume from checkpoint if requested ───────────────────────────
+    if resume and checkpoint_path and Path(checkpoint_path).exists():
+        try:
+            brain = BrainState.load(checkpoint_path)
+            info = BrainState.info(checkpoint_path)
+            result["checkpoint_loaded"] = True
+            print(f"      ✅ Resumed: ep={info['episode_count']} step={info['step_count']} "
+                  f"({info['size_mb']:.1f}MB)")
+        except Exception as e:
+            print(f"      ⚠️  Checkpoint load failed ({e}), starting fresh")
+            brain = None
+
+    # ── Fresh init if no checkpoint loaded ───────────────────────────
+    if brain is None:
+        try:
+            brain = WholeBrain(
+                n_features=config["n_features"],
+                n_actions=config["n_actions"],
+                session_name=f"gauntlet_{agent_name}_{env_name}",
+                enable_logging=False,
+                use_torch=False,
+                **(brain_kwargs or {}),
+            )
+        except Exception as e:
+            result["status"] = "INIT_FAIL"
+            result["error"] = f"{type(e).__name__}: {e}"
+            return result
 
     all_rewards = []
     total_steps = 0
@@ -422,6 +444,14 @@ def run_agent(agent_name: str, env_name: str, config: dict, n_episodes: int,
     elapsed = time.time() - t_start
     try: brain.close()
     except: pass
+
+    # ── Save checkpoint ───────────────────────────────────────────────
+    if checkpoint_path:
+        try:
+            BrainState.save(brain, checkpoint_path)
+            result["checkpoint_saved"] = True
+        except Exception as e:
+            print(f"      ⚠️  Checkpoint save failed: {e}")
 
     return _analyze(result, all_rewards, total_steps, step_times, elapsed)
 
@@ -570,6 +600,10 @@ def main():
     parser.add_argument("--envs", nargs="+", default=None,
                         help="Run specific environments only")
     parser.add_argument("--out-dir", type=str, default="gauntlet_results")
+    parser.add_argument("--checkpoint-dir", type=str, default=None,
+                        help="Directory to save/load .brain checkpoints per env+agent")
+    parser.add_argument("--resume", action="store_true",
+                        help="Resume from existing checkpoints (requires --checkpoint-dir)")
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -608,6 +642,23 @@ def main():
     all_results = {}  # env_name -> [results per agent]
     run_idx = 0
 
+    # ── Checkpoint directory ──────────────────────────────────────────
+    ckpt_dir = None
+    if args.checkpoint_dir:
+        ckpt_dir = Path(args.checkpoint_dir)
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        if args.resume:
+            print(f"  📂 Resuming from checkpoints in: {ckpt_dir}")
+        else:
+            print(f"  💾 Saving checkpoints to: {ckpt_dir}")
+
+    def _ckpt_path(env_name, agent_name):
+        """Checkpoint path for a specific env+agent pair."""
+        if ckpt_dir is None or agent_name == "random":
+            return None
+        safe = env_name.lower().replace("-", "_").replace(".", "_")
+        return str(ckpt_dir / f"{safe}_{agent_name}.brain")
+
     for env_name, config in envs_to_test.items():
         all_results[env_name] = []
         for agent_name, brain_kwargs in agents:
@@ -623,6 +674,8 @@ def main():
                 config=config,
                 n_episodes=args.episodes,
                 brain_kwargs=brain_kwargs,
+                checkpoint_path=_ckpt_path(env_name, agent_name),
+                resume=args.resume,
             )
             all_results[env_name].append(result)
 
