@@ -136,11 +136,25 @@ class Striatum(BrainRegion):
         self._episode_reward = 0.0
         self._episode_rewards: deque = deque(maxlen=100)
         self._msg_poll_counter = 0  # Throttle message polling to every 5 steps
+        self._episode_count = 0     # For elite fraction schedule
+        self._elite_buf = None      # Set by set_elite_buffer() after init
 
         # Pre-allocated buffers for zero-alloc forward pass
         self._h_buf = np.zeros(hidden_size, dtype=np.float32)  # reusable hidden layer
 
-    # ── CNN Integration ────────────────────────────────────────────────
+    # ── Elite Buffer wiring ───────────────────────────────────────────
+
+    def set_elite_buffer(self, elite) -> None:
+        """
+        Wire an EliteReplayBuffer from the Hippocampus.
+
+        Called once by the orchestrator after both regions are created.
+        Once set, the Striatum will blend elite transitions into every
+        training batch at the decaying fraction elite.elite_fraction(ep).
+        """
+        self._elite_buf = elite
+
+    # ── CNN Integration ───────────────────────────────────────────────
 
     def wire_cnn_encoder(self, encoder_fn, cnn_params) -> None:
         """
@@ -291,24 +305,38 @@ class Striatum(BrainRegion):
         if done:
             self._episode_rewards.append(self._episode_reward)
             self._episode_reward = 0.0
+            self._episode_count += 1
 
         # Batch learning from replay
         if len(self._replay) < self.batch_size:
             return {"loss": 0.0, "buffer_size": len(self._replay)}
 
-        # Sample batch
-        indices = np.random.choice(len(self._replay), self.batch_size, replace=False)
-        batch = [self._replay[i] for i in indices]
+        # ── Elite + normal batch blending ──────────────────────────────
+        elite_transitions = []
+        if self._elite_buf is not None and not self._elite_buf.is_empty:
+            frac = self._elite_buf.elite_fraction(self._episode_count)
+            elite_n = max(0, round(self.batch_size * frac))
+            if elite_n > 0:
+                elite_transitions = self._elite_buf.sample(elite_n)
+        normal_n = self.batch_size - len(elite_transitions)
 
-        states = np.array([b[0] for b in batch])
-        actions = np.array([b[1] for b in batch])
-        rewards = np.array([b[2] for b in batch])
-        next_states = np.array([b[3] for b in batch])
+        # Normal replay sample
+        normal_indices = np.random.choice(len(self._replay), min(normal_n, len(self._replay)), replace=False)
+        batch = [self._replay[i] for i in normal_indices] + elite_transitions
+
+        if not batch:
+            return {"loss": 0.0, "buffer_size": len(self._replay)}
+        actual_bs = len(batch)
+
+        states = np.array([b[0] for b in batch], dtype=np.float32)
+        actions = np.array([b[1] for b in batch], dtype=np.int32)
+        rewards = np.array([b[2] for b in batch], dtype=np.float32)
+        next_states = np.array([b[3] for b in batch], dtype=np.float32)
         dones = np.array([b[4] for b in batch], dtype=np.float32)
 
         # Forward: online Q-values
         q_values = self._forward_batch(states)
-        q_selected = q_values[np.arange(self.batch_size), actions]
+        q_selected = q_values[np.arange(actual_bs), actions]
 
         # Forward: target Q-values
         q_next = self._forward_target_batch(next_states)
@@ -319,17 +347,20 @@ class Striatum(BrainRegion):
         loss = float(np.mean(td_error ** 2))
 
         # Backward: gradient update
-        self._backward(states, actions, td_error)
+        self._backward_dynamic(states, actions, td_error, actual_bs)
 
         self._total_updates += 1
         if self._total_updates % self.target_update_freq == 0:
             self._sync_target()
 
+        elite_frac = getattr(self._elite_buf, 'elite_fraction', lambda _: 0.0)(self._episode_count) if self._elite_buf else 0.0
         return {
             "loss": loss,
             "td_error_mean": float(np.mean(np.abs(td_error))),
             "buffer_size": len(self._replay),
             "total_updates": self._total_updates,
+            "elite_in_batch": len(elite_transitions),
+            "elite_fraction": round(elite_frac, 3),
         }
 
     def report(self) -> Dict[str, Any]:
@@ -369,12 +400,17 @@ class Striatum(BrainRegion):
         return hidden @ self._tW2 + self._tb2
 
     def _backward(self, states: np.ndarray, actions: np.ndarray, td_error: np.ndarray) -> None:
-        """Single backward pass for DQN update."""
+        """Single backward pass for DQN update (fixed batch_size)."""
+        self._backward_dynamic(states, actions, td_error, self.batch_size)
+
+    def _backward_dynamic(self, states: np.ndarray, actions: np.ndarray,
+                          td_error: np.ndarray, batch_size: int) -> None:
+        """Backward pass supporting variable batch sizes (elite + normal blending)."""
         hidden = np.maximum(0, states @ self._W1 + self._b1)
 
         # dL/dQ for selected actions
-        dQ = np.zeros((self.batch_size, self.n_actions))
-        dQ[np.arange(self.batch_size), actions] = -2 * td_error / self.batch_size
+        dQ = np.zeros((batch_size, self.n_actions))
+        dQ[np.arange(batch_size), actions] = -2 * td_error / batch_size
 
         # Layer 2 gradients
         dW2 = hidden.T @ dQ

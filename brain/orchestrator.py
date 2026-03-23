@@ -134,6 +134,9 @@ class WholeBrain:
             "motor_cortex": self.motor,
         }
 
+        # ── Wire Elite Replay: hippocampus tracks best episodes, striatum uses them ─
+        self.striatum.set_elite_buffer(self.hippocampus.elite)
+
         # ── State ─────────────────────────────────────────────────────
         self._step_count = 0
         self._episode_count = 0

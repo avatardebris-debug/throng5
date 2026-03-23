@@ -20,6 +20,7 @@ import numpy as np
 from brain.message_bus import MessageBus, Priority
 from brain.regions.base_region import BrainRegion
 from brain.overnight.replay_scheduler import ReplayScheduler
+from brain.learning.elite_replay import EliteReplayBuffer
 
 
 class Hippocampus(BrainRegion):
@@ -62,6 +63,18 @@ class Hippocampus(BrainRegion):
         self._total_stored = 0
         self._total_replayed = 0
 
+        # ── Elite Replay Buffer ───────────────────────────────────────
+        # Keeps top-3 episodes by reward; samples at 80% → 20% decay schedule
+        self.elite: EliteReplayBuffer = EliteReplayBuffer(
+            top_k=3,
+            start_fraction=0.80,
+            floor_fraction=0.20,
+            halflife=200.0,
+        )
+        # Buffer for current in-progress episode transitions
+        self._current_episode_transitions: List[Tuple] = []
+        self._current_episode_reward: float = 0.0
+
     def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Store a transition and optionally produce a replay batch.
@@ -101,6 +114,16 @@ class Hippocampus(BrainRegion):
             self._priorities.append(priority)
             self._total_stored += 1
 
+            # Track current episode for elite buffer
+            self._current_episode_transitions.append((
+                np.asarray(state, dtype=np.float32),
+                action,
+                reward,
+                np.asarray(next_state, dtype=np.float32),
+                done,
+            ))
+            self._current_episode_reward += reward
+
             # Feed overnight replay scheduler
             self._replay_scheduler.add(
                 idx=self._total_stored - 1,
@@ -112,9 +135,19 @@ class Hippocampus(BrainRegion):
             if is_edge_case:
                 self._edge_cases.append(self._total_stored - 1)
 
-        # End of episode: store summary
+        # End of episode: store summary + try to add to elite archive
         if done:
             self._store_episode_summary(inputs)
+            # Offer this episode to the elite archive
+            if self._current_episode_transitions:
+                self.elite.try_add_episode(
+                    transitions=self._current_episode_transitions,
+                    total_reward=self._current_episode_reward,
+                    label="agent",
+                )
+            # Reset episode accumulator
+            self._current_episode_transitions = []
+            self._current_episode_reward = 0.0
 
         return {
             "buffer_size": len(self._transitions),
@@ -215,4 +248,5 @@ class Hippocampus(BrainRegion):
             "episode_summaries": len(self._episode_summaries),
             "dream_results": len(self._dream_results),
             "replay_scheduler": self._replay_scheduler.stats(),
+            "elite": self.elite.report(),
         }
