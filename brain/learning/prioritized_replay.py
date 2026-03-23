@@ -298,55 +298,73 @@ class PrioritizedReplayBuffer:
     # Sample (in-memory path)
     # ------------------------------------------------------------------ #
 
-    def sample(self, batch_size: int) -> List[Tuple[np.ndarray, float, List[np.ndarray], bool]]:
+    def sample(
+        self, batch_size: int
+    ) -> Tuple[List[Tuple[np.ndarray, float, List[np.ndarray], bool]], List[int]]:
         """
-        Return a stratified priority-weighted batch.
+        Return a stratified priority-weighted batch AND the buffer indices
+        so callers can feed back TD errors via update_priorities().
 
-        Return format is identical to the old ``ReplayBuffer.sample()``
-        so that ``_train_batch`` requires no changes::
-
-            [(x, reward, next_x_list, done), ...]
-
-        Sampling strategy
-        -----------------
-        Split ``batch_size`` across three flag buckets; within each
-        bucket draw proportional to ``priority_clipped``.  If a bucket
-        has fewer entries than its allocation, the deficit is added to
-        the largest bucket.
+        Returns
+        -------
+        (transitions, indices)
+        transitions : List of (x, reward, next_x_list, done)
+        indices     : List[int] — positions in _buffer for TD-error feedback
         """
         buf = list(self._buffer)
         n = len(buf)
         if n == 0:
-            return []
+            return [], []
 
-        # Bucket membership
-        bucket_a = [e for e in buf if e.human_agent_disagree]
-        bucket_b = [e for e in buf if not e.human_agent_disagree and e.near_death]
-        bucket_c = [e for e in buf if not e.human_agent_disagree and not e.near_death]
+        # Bucket membership (with buffer-level indices tracked)
+        bucket_a = [(i, e) for i, e in enumerate(buf) if e.human_agent_disagree]
+        bucket_b = [(i, e) for i, e in enumerate(buf) if not e.human_agent_disagree and e.near_death]
+        bucket_c = [(i, e) for i, e in enumerate(buf) if not e.human_agent_disagree and not e.near_death]
 
         alloc_a = batch_size // 3
         alloc_b = batch_size // 3
         alloc_c = batch_size - alloc_a - alloc_b
 
-        samples: List[_Entry] = []
-        samples += self._sample_bucket(bucket_a, alloc_a)
-        samples += self._sample_bucket(bucket_b, alloc_b)
-        # Drain bucket_c with whatever's left (includes alloc_c + any a/b shortfall)
-        remaining_c = batch_size - len(samples)
-        samples += self._sample_bucket(bucket_c, remaining_c)
+        sampled: List[Tuple[int, '_Entry']] = []
+        sampled += self._sample_bucket_indexed(bucket_a, alloc_a)
+        sampled += self._sample_bucket_indexed(bucket_b, alloc_b)
+        remaining_c = batch_size - len(sampled)
+        sampled += self._sample_bucket_indexed(bucket_c, remaining_c)
 
-        # Final fallback: guarantee exactly batch_size via uniform with replacement
-        remaining = batch_size - len(samples)
+        # Final fallback: priority-weighted (MINOR-3 fix — was uniform)
+        remaining = batch_size - len(sampled)
         if remaining > 0 and buf:
-            extra_idx = self.rng.choice(n, size=remaining, replace=True)
-            samples += [buf[i] for i in extra_idx]
+            priorities = np.array([e.priority_clipped for e in buf], dtype=np.float64)
+            probs = priorities / priorities.sum()
+            extra_idx = self.rng.choice(n, size=remaining, replace=True, p=probs)
+            sampled += [(int(i), buf[i]) for i in extra_idx]
 
-        # Return in (x, reward, next_x_list, done) format to match old API
-        return [(e.x, e.reward, e.next_x_list, e.done) for e in samples]
+        indices = [i for i, _ in sampled]
+        transitions = [(e.x, e.reward, e.next_x_list, e.done) for _, e in sampled]
+        return transitions, indices
 
+    def _sample_bucket_indexed(
+        self, bucket: List[Tuple[int, '_Entry']], k: int
+    ) -> List[Tuple[int, '_Entry']]:
+        """Priority-weighted sample of k (index, entry) pairs from a bucket."""
+        if not bucket or k <= 0:
+            return []
+        k = min(k, len(bucket))
+        priorities = np.array([e.priority_clipped for _, e in bucket], dtype=np.float64)
+        total = priorities.sum()
+        if total <= 0.0:
+            probs = None
+        else:
+            probs = priorities / total
+            probs = probs / probs.sum()   # guard float rounding
+        replace = k > len(bucket)
+        chosen = self.rng.choice(len(bucket), size=k, replace=replace, p=probs)
+        return [bucket[i] for i in chosen]
+
+    # Legacy helper — kept for internal compatibility
     def _sample_bucket(
-        self, bucket: List[_Entry], k: int
-    ) -> List[_Entry]:
+        self, bucket: List['_Entry'], k: int
+    ) -> List['_Entry']:
         """Priority-weighted sample of k items from a bucket (no replacement)."""
         if not bucket or k <= 0:
             return []
@@ -357,9 +375,8 @@ class PrioritizedReplayBuffer:
             probs = None  # uniform
         else:
             probs = priorities / total
-            # Guard against float rounding making sum != 1.0 exactly
             probs = probs / probs.sum()
-        replace = k > len(bucket)   # replacement only if we MUST over-sample
+        replace = k > len(bucket)
         indices = self.rng.choice(len(bucket), size=k, replace=replace, p=probs)
         return [bucket[i] for i in indices]
 
@@ -371,14 +388,29 @@ class PrioritizedReplayBuffer:
         self,
         indices: Sequence[int],
         td_errors: Sequence[float],
+        alpha: float = 0.6,
+        epsilon: float = 1e-6,
     ) -> None:
         """
-        Update priority for specific buffer entries by index.
+        Update priority for specific buffer entries by index (CRITICAL-1 fix).
 
-        Currently a no-op stub — will be wired to TD-error PER once the
-        value head is added.  Signature matches standard PER libraries.
+        Uses standard PER formula: priority = (|td_error| + epsilon)^alpha
+        This ensures high-error transitions are sampled more frequently,
+        providing the core PER benefit that was previously a no-op stub.
+
+        Parameters
+        ----------
+        indices   : Buffer positions returned by sample()
+        td_errors : Corresponding |TD-error| values from train_step()
+        alpha     : Priority exponent (0.6 standard, 0=uniform, 1=full PER)
+        epsilon   : Small constant preventing zero priority
         """
-        pass  # TODO: wire to |td_error| once value head exists
+        buf = list(self._buffer)   # needed to index by position
+        for idx, err in zip(indices, td_errors):
+            if 0 <= idx < len(buf):
+                raw = float((abs(float(err)) + epsilon) ** alpha)
+                buf[idx].priority_raw = raw
+                buf[idx].priority_clipped = float(min(max(raw, 0.1), 10.0))
 
     # ------------------------------------------------------------------ #
     # DB-backed sampling (optional)

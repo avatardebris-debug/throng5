@@ -307,7 +307,7 @@ class RainbowDQN:
         tau: float = 0.005,
         batch_size: int = 32,
         grad_clip: float = 10.0,
-        std_init: float = 0.5,        # NoisyLinear init std
+        std_init: float = 0.17,       # NoisyLinear init std (0.17 for non-Atari; paper used 0.5 for pixel nets)
         device: Optional[str] = None,
     ):
         if not TORCH_AVAILABLE:
@@ -401,7 +401,7 @@ class RainbowDQN:
         Otherwise, this is a no-op (Striatum drives batch construction).
         """
         if batch is None or len(batch) == 0:
-            return {"loss": 0.0, "backend": "rainbow"}
+            return {"loss": 0.0, "backend": "rainbow"}, np.array([])
 
         n = len(batch)
         states     = torch.FloatTensor(np.array([t[0] for t in batch])).to(self.device)
@@ -416,9 +416,8 @@ class RainbowDQN:
         else:
             weights = torch.ones(n, device=self.device)
 
-        # Reset noise before forward
+        # Reset noise before forward (online only — target should be deterministic)
         self.online_net.reset_noise()
-        self.target_net.reset_noise()
         self.online_net.train()
 
         # Double DQN: online selects, target evaluates
@@ -452,8 +451,12 @@ class RainbowDQN:
         nn.utils.clip_grad_norm_(self.online_net.parameters(), self.grad_clip)
         self.optimizer.step()
 
-        # Soft update target
+        # Soft update target network (Q-value)
         for t_p, o_p in zip(self.target_net.parameters(), self.online_net.parameters()):
+            t_p.data.copy_(self.tau * o_p.data + (1 - self.tau) * t_p.data)
+
+        # EMA update SPR target encoder (CRITICAL-7: without this, SPR loss is noise)
+        for t_p, o_p in zip(self.spr_head_target.parameters(), self.spr_head.parameters()):
             t_p.data.copy_(self.tau * o_p.data + (1 - self.tau) * t_p.data)
 
         self._total_updates += 1

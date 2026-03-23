@@ -144,7 +144,11 @@ class Striatum(BrainRegion):
         # StratifiedReplayDeque: 30% near-death / 70% normal, TD-error weighted
         self._replay: StratifiedReplayDeque = StratifiedReplayDeque(capacity=buffer_size)
         # NStepBuffer: accumulates n=4 steps, flushes G_t discounted returns
-        self._nstep: NStepBuffer = NStepBuffer(n=4, gamma=gamma, downstream=self._replay)
+        self._n_steps = 4  # Keep in sync with NStepBuffer below
+        self._nstep: NStepBuffer = NStepBuffer(n=self._n_steps, gamma=gamma, downstream=self._replay)
+        # Precompute gamma^n for n-step Bellman target
+        self._gamma = gamma
+        self._gamma_n = gamma ** self._n_steps  # e.g. 0.99^4 ≈ 0.9606
 
         # ── State ─────────────────────────────────────────────────────
         self._epsilon = 0.15  # Default (EXECUTE mode)
@@ -353,7 +357,10 @@ class Striatum(BrainRegion):
 
         # Forward: target Q-values
         q_next = self._forward_target_batch(next_states)
-        q_target = rewards + self.gamma * np.max(q_next, axis=1) * (1 - dones)
+        # MAJOR-9 fix: NStepBuffer flushes G_t (sum of n discounted rewards) + s_n.
+        # The remaining bootstrap must be discounted by gamma^n, not gamma^1.
+        # Old: gamma * max Q(s_n) — systematic underestimation by (gamma^n - gamma).
+        q_target = rewards + self._gamma_n * np.max(q_next, axis=1) * (1 - dones)
 
         # TD error
         td_error = q_target - q_selected

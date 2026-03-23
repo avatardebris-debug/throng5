@@ -60,11 +60,13 @@ class HERReplayBuffer:
         sparse_reward_threshold: float = 0.0,
         goal_reward: float = 1.0,
         goal_dims: Optional[List[int]] = None,
+        strategy: str = "future",   # "future" or "final"
     ):
         self.k = k
         self.sparse_reward_threshold = sparse_reward_threshold
         self.goal_reward = goal_reward
         self.goal_dims = goal_dims
+        self.strategy = strategy
         self._episodes_relabelled = 0
         self._transitions_generated = 0
 
@@ -78,50 +80,61 @@ class HERReplayBuffer:
         self,
         transitions: List[Transition],
         total_reward: Optional[float] = None,
+        strategy: Optional[str] = None,
     ) -> List[Transition]:
         """
-        Apply HER "future" strategy to a complete episode.
+        Apply HER to a complete episode.
 
-        For each transition (s_t, a_t, r_t, s_{t+1}, done_t):
-          Sample k future states s_g from the episode (t < g ≤ T)
-          Relabel:  goal = s_g
-                    reward = goal_reward  (reached whatever we were trying to reach)
-                    done = True           (episode ends when goal reached)
-
-        The relabelled transitions are ADDED to the original transitions —
-        call sites push both original and relabelled sets into the replay buffer.
+        Strategies:
+        - "future"  (default): for each step t, sample k random future states
+        - "final":  use the last episode state as goal for all steps (best for
+                    deterministic goal envs like GridWorld where last state = goal)
 
         Returns
         -------
-        List of relabelled Transition tuples (may be empty if episode too short).
+        List of relabelled Transition tuples.
         """
         if len(transitions) < 2:
             return []
 
+        strat = strategy or self.strategy
         relabelled: List[Transition] = []
 
+        # "final": the last next_state is the achieved goal for the whole episode
+        if strat == "final":
+            final_goal = transitions[-1][3]
+            for s, a, r, s2, done in transitions[:-1]:
+                rl_reward = self._compute_reward(s2, final_goal)
+                relabelled.append((
+                    np.asarray(s, dtype=np.float32), a,
+                    float(rl_reward),
+                    np.asarray(final_goal, dtype=np.float32),
+                    True,   # MINOR-5: goal is always "reached" in hindsight
+                ))
+                self._transitions_generated += 1
+            if relabelled:
+                self._episodes_relabelled += 1
+            return relabelled
+
+        # "future": default strategy
         for t_idx, (s, a, r, s2, done) in enumerate(transitions):
-            # Future states are those after this step
             future_range = list(range(t_idx + 1, len(transitions)))
             if not future_range:
                 continue
 
-            # Sample up to k future indices
             k = min(self.k, len(future_range))
             goal_indices = random.sample(future_range, k)
 
             for g_idx in goal_indices:
                 achieved_state = transitions[g_idx][3]  # next_state at g_idx
-                # Compute relabelled reward
                 rl_reward = self._compute_reward(s2, achieved_state)
-                rl_done = (g_idx == len(transitions) - 1)  # done at last goal step
-
+                # MINOR-5: done=True — the agent "reached" this relabelled goal
                 relabelled.append((
                     np.asarray(s, dtype=np.float32),
                     a,
                     float(rl_reward),
                     np.asarray(achieved_state, dtype=np.float32),
-                    rl_done,
+                    True,
                 ))
                 self._transitions_generated += 1
 
@@ -140,17 +153,21 @@ class HERReplayBuffer:
         """
         Compute hindsight reward for reaching a goal state.
 
-        Default: simple sparse — +goal_reward if states match closely.
-        If goal_dims is set: use L2 distance on those dims.
+        - With goal_dims: L2 distance on those dims → +1 if close, -0.01 otherwise
+        - Without goal_dims (MAJOR-4 fix): L2-distance-weighted shaping so the
+          agent gets gradient toward actual goal states, not a uniform +1 for
+          any future state regardless of position.
         """
         if self.goal_dims is not None:
             dist = float(np.linalg.norm(
                 achieved[self.goal_dims] - goal[self.goal_dims]
             ))
             return self.goal_reward if dist < 0.1 else -0.01
-        # No structured goal — the future-strategy makes any future state a goal,
-        # so just give a flat positive signal for relabelled transitions
-        return self.goal_reward
+        # No structured goal: shape reward by L2 similarity between achieved and goal.
+        # At achieved==goal: reward=goal_reward. At large distance: reward→0.
+        dist = float(np.linalg.norm(achieved - goal))
+        scale = float(np.linalg.norm(goal)) + 1e-8
+        return self.goal_reward * float(np.clip(1.0 - dist / scale, 0.0, 1.0))
 
     # ── Stats ─────────────────────────────────────────────────────────
 

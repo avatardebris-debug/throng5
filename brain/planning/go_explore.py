@@ -78,11 +78,16 @@ class GoExploreCell:
 
     @property
     def score(self) -> float:
-        """Selection score: prefer rarely-visited, high-reward cells."""
-        # Combine novelty (1/visits) + reward signal
-        novelty = 1.0 / (self.visits + 1)
-        reward_bonus = max(0.0, self.best_reward)
-        return novelty + 0.5 * reward_bonus
+        """
+        Selection score: prefer rarely-visited AND high-reward cells.
+
+        Raw formula (old): novelty + 0.5*reward — visits=1,reward=0 beat
+        visits=10,reward=1 (0.5 > 0.37), so reward signal was always drowned out.
+
+        New: simple count-based score = 1/(visits+1), matching Go-Explore paper
+        default. Reward is used as a tiebreaker in select_return_state 'mixed'.
+        """
+        return 1.0 / (self.visits + 1)
 
 
 class GoExploreArchive:

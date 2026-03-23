@@ -289,6 +289,9 @@ class DreamLoop:
                         "actions": [s["action"] for s in latent_traj],
                         "rewards": [s["predicted_reward"] for s in latent_traj],
                         "total_reward": traj_reward, "source": "dreamer_latent",
+                        # MINOR-17: priority boost — dreamer transitions land in near_death
+                        # bucket (2x multiplier) in StratifiedReplayDeque
+                        "near_death": True,
                     })
                     self._total_dreams += 1
 
