@@ -103,6 +103,76 @@ class DuelingDQNNet(nn.Module):
         return q_values
 
 
+# ── SPR: Self-Predictive Representations (Schwarzer et al 2021) ───────────
+
+
+class SPRHead(nn.Module):
+    """
+    Projection head: maps encoder output → latent representation for SPR loss.
+
+    Two-layer MLP: h(s) → z ∈ R^latent_dim  (L2 normalized).
+    Attached to the online encoder; a stop-gradient copy used for targets.
+
+    SPR prevents representation collapse by enforcing that:
+        predictor(z_t, a_t) ≈ stop_grad(z_{t+1})
+    using cosine similarity as the loss (no contrastive negatives needed).
+    """
+
+    def __init__(self, in_dim: int, latent_dim: int = 128):
+        super().__init__()
+        self.proj = nn.Sequential(
+            nn.Linear(in_dim, 256),
+            nn.ReLU(),
+            nn.Linear(256, latent_dim),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        z = self.proj(x)
+        return F.normalize(z, p=2, dim=-1)   # L2 norm → unit sphere
+
+
+class SPRTransitionPredictor(nn.Module):
+    """
+    Latent transition predictor: (z_t, a_t) → z_{t+1}_pred.
+
+    Concatenates current latent z_t with a one-hot action embedding,
+    then applies a 2-layer MLP to predict next-state latent.
+    """
+
+    def __init__(self, latent_dim: int = 128, n_actions: int = 18):
+        super().__init__()
+        self.n_actions = n_actions
+        self.predictor = nn.Sequential(
+            nn.Linear(latent_dim + n_actions, 256),
+            nn.ReLU(),
+            nn.Linear(256, latent_dim),
+        )
+
+    def forward(
+        self, z: torch.Tensor, actions: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        z       : (batch, latent_dim)
+        actions : (batch,) — integer action indices
+        returns : (batch, latent_dim) predicted next latent (normalized)
+        """
+        a_onehot = F.one_hot(actions, num_classes=self.n_actions).float()
+        inp = torch.cat([z, a_onehot], dim=-1)
+        z_pred = self.predictor(inp)
+        return F.normalize(z_pred, p=2, dim=-1)
+
+
+def spr_loss(
+    z_pred: torch.Tensor,
+    z_target: torch.Tensor,
+) -> torch.Tensor:
+    """
+    Cosine similarity loss: L = -mean(cosine_sim(z_pred, stop_grad(z_target))).
+    Range [-1, 1] → target is 0 (identical) direction.
+    """
+    return -(z_pred * z_target.detach()).sum(dim=-1).mean()
+
+
 # ── NoisyLinear (Fortunato et al 2017) ────────────────────────────────────
 
 
@@ -275,6 +345,15 @@ class RainbowDQN:
         # Pre-alloc
         self._state_buffer = torch.zeros(1, n_features, device=self.device)
 
+        # ── SPR: Self-Predictive Representations ───────────────────────
+        # shared encoder dim = last hidden size before noisy streams
+        _enc_dim = hidden_sizes[-2] if len(hidden_sizes) >= 2 else 256
+        self.spr_head = SPRHead(in_dim=_enc_dim, latent_dim=128)
+        self.spr_head_target = SPRHead(in_dim=_enc_dim, latent_dim=128)
+        self.spr_head_target.load_state_dict(self.spr_head.state_dict())
+        self.spr_predictor = SPRTransitionPredictor(latent_dim=128, n_actions=n_actions)
+
+
     # ── Action selection ──────────────────────────────────────────────
 
     def select_action(
@@ -353,10 +432,20 @@ class RainbowDQN:
             target_q = rewards + self.gamma * next_q * (1.0 - dones)
 
         td_errors = (current_q - target_q).abs().detach()
+        # SPR auxiliary loss: encoder predicts next-state latent
+        try:
+            shared_feat = self.online_net.shared(states)
+            with torch.no_grad():
+                next_shared_feat = self.spr_head_target(self.online_net.shared(next_states))
+            z_pred = self.spr_predictor(self.spr_head(shared_feat), actions)
+            spr_aux = spr_loss(z_pred, next_shared_feat)
+        except Exception:
+            spr_aux = torch.tensor(0.0, device=self.device)
+
 
         # IS-weighted Huber loss
         elementwise = F.smooth_l1_loss(current_q, target_q, reduction="none")
-        loss = (weights * elementwise).mean()
+        loss = (weights * elementwise).mean() + 0.1 * spr_aux
 
         self.optimizer.zero_grad()
         loss.backward()
