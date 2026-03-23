@@ -22,6 +22,7 @@ from brain.regions.base_region import BrainRegion
 from brain.overnight.replay_scheduler import ReplayScheduler
 from brain.learning.elite_replay import EliteReplayBuffer
 from brain.learning.her_replay import HERReplayBuffer
+from brain.planning.go_explore import GoExploreArchive
 
 
 class Hippocampus(BrainRegion):
@@ -87,6 +88,16 @@ class Hippocampus(BrainRegion):
         # External ref to striatum for HER injection (set by orchestrator)
         self._striatum_ref = None
 
+        # ── Go-Explore State Archive ─────────────────────────────────────
+        # Cell-based archive of interesting states. on sparse episodes,
+        # select_return_state() gives a good re-entry point for next episode.
+        self.go_explore: GoExploreArchive = GoExploreArchive(
+            max_cells=5000,
+            resolution=0.10,
+            min_steps_before_return=5,
+        )
+        self._go_explore_return_state: Optional[np.ndarray] = None
+
     def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Store a transition and optionally produce a replay batch.
@@ -125,6 +136,13 @@ class Hippocampus(BrainRegion):
             ))
             self._priorities.append(priority)
             self._total_stored += 1
+
+            # Go-Explore: track every state visit
+            try:
+                ep_step = len(self._current_episode_transitions)
+                self.go_explore.add_state(state, reward=reward, step=ep_step)
+            except Exception:
+                pass
 
             # Track current episode for elite buffer
             self._current_episode_transitions.append((
@@ -175,6 +193,13 @@ class Hippocampus(BrainRegion):
                             self._priorities.append(1.0)
                             self._total_stored += 1
 
+                # ── Go-Explore: pick return state for next ep ─────────
+                if self.her.should_relabel(self._current_episode_reward):
+                    ret_state, _ = self.go_explore.select_return_state(strategy="mixed")
+                    self._go_explore_return_state = ret_state  # orchestrator may use
+                else:
+                    self._go_explore_return_state = None
+
             # Reset episode accumulator
             self._current_episode_transitions = []
             self._current_episode_reward = 0.0
@@ -182,6 +207,7 @@ class Hippocampus(BrainRegion):
         return {
             "buffer_size": len(self._transitions),
             "total_stored": self._total_stored,
+            "go_explore_cells": len(self.go_explore),
         }
 
     def set_striatum_ref(self, striatum) -> None:
