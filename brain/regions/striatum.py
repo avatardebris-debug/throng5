@@ -24,6 +24,38 @@ import numpy as np
 from brain.message_bus import MessageBus, Priority
 from brain.regions.base_region import BrainRegion
 
+# ── Optional Numba JIT for hot forward pass ────────────────────────────
+try:
+    from numba import njit as _njit
+    _NUMBA = True
+except ImportError:
+    _NUMBA = False
+    def _njit(fn=None, **kw):           # noqa: E302 — passthrough decorator
+        if fn is not None: return fn
+        def _inner(f): return f
+        return _inner
+
+
+@_njit(cache=True)
+def _dqn_forward_nb(
+    x: np.ndarray,
+    W1: np.ndarray,
+    b1: np.ndarray,
+    W2: np.ndarray,
+    b2: np.ndarray,
+) -> np.ndarray:
+    """
+    Two-layer ReLU DQN forward pass.
+    When compile with Numba this runs at C speed (~10-50x vs pure numpy).
+    When Numba is absent, falls back to equivalent numpy.
+    """
+    hidden = x @ W1 + b1
+    # ReLU
+    for i in range(len(hidden)):
+        if hidden[i] < 0.0:
+            hidden[i] = 0.0
+    return hidden @ W2 + b2
+
 
 class Striatum(BrainRegion):
     """
@@ -103,6 +135,10 @@ class Striatum(BrainRegion):
         self._total_updates = 0
         self._episode_reward = 0.0
         self._episode_rewards: deque = deque(maxlen=100)
+        self._msg_poll_counter = 0  # Throttle message polling to every 5 steps
+
+        # Pre-allocated buffers for zero-alloc forward pass
+        self._h_buf = np.zeros(hidden_size, dtype=np.float32)  # reusable hidden layer
 
     # ── CNN Integration ────────────────────────────────────────────────
 
@@ -139,8 +175,11 @@ class Striatum(BrainRegion):
         if features is None:
             return {"action": 0, "q_values": np.zeros(self.n_actions)}
 
-        # Check for incoming messages (threat assessment, strategy)
-        self._process_messages()
+        # Throttle message polling: strategy/threat updates don't need per-step precision
+        self._msg_poll_counter += 1
+        if self._msg_poll_counter >= 5:
+            self._msg_poll_counter = 0
+            self._process_messages()
 
         features_arr = np.asarray(features, dtype=np.float32)
 
@@ -312,8 +351,14 @@ class Striatum(BrainRegion):
     # ── Internal: DQN ─────────────────────────────────────────────────
 
     def _forward(self, x: np.ndarray) -> np.ndarray:
-        hidden = np.maximum(0, x @ self._W1 + self._b1)
-        return hidden @ self._W2 + self._b2
+        """One-sample forward pass. Uses Numba JIT when available."""
+        if _NUMBA:
+            return _dqn_forward_nb(x, self._W1, self._b1, self._W2, self._b2)
+        # Numpy fallback with pre-allocated buffer
+        np.dot(x, self._W1, out=self._h_buf)
+        self._h_buf += self._b1
+        np.maximum(self._h_buf, 0, out=self._h_buf)
+        return self._h_buf @ self._W2 + self._b2
 
     def _forward_batch(self, X: np.ndarray) -> np.ndarray:
         hidden = np.maximum(0, X @ self._W1 + self._b1)

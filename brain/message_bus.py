@@ -31,6 +31,76 @@ class Priority(IntEnum):
     EMERGENCY = 2  # Amygdala override — halt higher functions
 
 
+# ────────────────────────────────────────────────────────────────────────────
+# FastSlotBus — zero-allocation hot-path messaging
+# ────────────────────────────────────────────────────────────────────────────
+
+class FastSlotBus:
+    """
+    Zero-allocation inter-region signalling for the hot path.
+
+    Instead of creating a BrainMessage dataclass + time.time() + payload dict
+    on every send, regions write into pre-allocated slots (plain Python dicts
+    reused across steps). Readers call read_slot() which returns the same dict
+    object — no copy, no GC pressure.
+
+    Emergency and broadcast messages still go through the full MessageBus.
+
+    Usage:
+        fast_bus = FastSlotBus()
+        fast_bus.register_slot("amygdala", "threat_score", 0.0)
+        fast_bus.write("amygdala", threat_score=0.7, operating_mode="execute")
+        score = fast_bus.read("amygdala", "threat_score")  # 0.7, no alloc
+    """
+
+    __slots__ = ('_slots', '_halted')
+
+    def __init__(self):
+        # _slots[source_name] = dict of key->value (mutable, reused each step)
+        self._slots: Dict[str, Dict[str, Any]] = {}
+        self._halted: set = set()
+
+    def register(self, region_name: str, defaults: Dict[str, Any]) -> None:
+        """Register a region with its default slot values."""
+        self._slots[region_name] = dict(defaults)
+
+    def write(self, region_name: str, **kwargs) -> None:
+        """
+        Update a region's slot values in-place.
+
+        Zero allocation when region is pre-registered: just updates existing dict.
+        """
+        slot = self._slots.get(region_name)
+        if slot is None:
+            self._slots[region_name] = kwargs
+        else:
+            slot.update(kwargs)
+
+    def read(self, region_name: str, key: str, default: Any = None) -> Any:
+        """Read a single value from a region's slot. No allocation."""
+        slot = self._slots.get(region_name)
+        if slot is None:
+            return default
+        return slot.get(key, default)
+
+    def read_slot(self, region_name: str) -> Dict[str, Any]:
+        """Return the entire slot dict for a region (same object, not a copy)."""
+        return self._slots.get(region_name, {})
+
+    def is_halted(self, region_name: str) -> bool:
+        return region_name in self._halted
+
+    def halt(self, region_name: str) -> None:
+        self._halted.add(region_name)
+
+    def resume(self, region_name: str) -> None:
+        self._halted.discard(region_name)
+
+    def resume_all(self) -> None:
+        self._halted.clear()
+
+
+
 @dataclass
 class BrainMessage:
     """
@@ -81,11 +151,12 @@ class MessageBus:
     - Message history for telemetry/debugging
     """
 
-    def __init__(self, history_size: int = 500):
+    def __init__(self, history_size: int = 500, enable_history: bool = False):
         self._inboxes: Dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
         self._callbacks: Dict[str, List[Callable]] = defaultdict(list)
         self._registered_regions: set = set()
-        self._history: deque = deque(maxlen=history_size)
+        self._enable_history = enable_history
+        self._history: deque = deque(maxlen=history_size) if enable_history else deque(maxlen=0)
         self._stats: Dict[str, Dict[str, int]] = defaultdict(lambda: {"sent": 0, "received": 0})
         self._halted_regions: set = set()  # Regions currently halted by amygdala
 
@@ -108,7 +179,8 @@ class MessageBus:
         Emergency messages (priority=2) are processed immediately.
         Other messages are queued in the target's inbox.
         """
-        self._history.append(message)
+        if self._enable_history:
+            self._history.append(message)
         self._stats[message.source]["sent"] += 1
 
         if message.is_broadcast():

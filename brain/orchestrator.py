@@ -89,7 +89,21 @@ class WholeBrain:
         self._init_errors: Dict[str, str] = {}  # Track init failures
 
         # ── Message Bus ───────────────────────────────────────────────
-        self.bus = MessageBus(history_size=1000)
+        # history disabled by default: was appending every BrainMessage every step
+        self.bus = MessageBus(history_size=1000, enable_history=False)
+
+        # FastSlotBus: zero-allocation signalling for hot-path inter-region data
+        from brain.message_bus import FastSlotBus
+        self.fast_bus = FastSlotBus()
+        self.fast_bus.register("amygdala", {
+            "threat_score": 0.0, "operating_mode": "execute", "epsilon": 0.15,
+        })
+        self.fast_bus.register("basal_ganglia", {
+            "context_score": 0.0, "dream_results": None,
+        })
+        self.fast_bus.register("motor", {
+            "action": 0, "source": "striatum",
+        })
 
         # ── Logger ────────────────────────────────────────────────────
         self.logger = SessionLogger(session_name) if enable_logging else None
@@ -131,9 +145,11 @@ class WholeBrain:
         # ── Step Profiler ───────────────────────────────────────────
         self.profiler = StepProfiler(enabled=True)
 
-        # ── Training throttle intervals (reduce per-step cost) ───────
+        # ── Training throttle intervals (replace dict-lookup enable checks) ──
+        # Using plain int counters: cheaper than self._enabled["x"] dict lookup
         self._dqn_train_interval = 2    # DQN gradient update every 2nd step
         self._wm_train_interval = 4     # World model train every 4th step
+        self._causal_interval = 2       # Causal model observe every 2nd step
 
         # ── Wire CNN encoder to Striatum for end-to-end learning ──────
         if use_cnn and use_torch and self.sensory._use_cnn:
@@ -247,7 +263,16 @@ class WholeBrain:
         # [PURGED] Entropy Monitor — overrode epsilon AND injected WM noise
 
         # ── Throttle intervals for remaining systems ───────────────────
-        self._causal_observe_interval = 2     # Causal model every 2nd step
+        self._causal_observe_interval = self._causal_interval  # kept for compat
+        # Bool cache: avoid dict lookup on every hot-path step
+        self._wm_enabled = self._enabled["world_model"]
+        self._causal_enabled = (self.planner is not None)
+
+        # ── Pre-allocated step return dict (updated in-place each step) ─
+        self._step_result: Dict[str, Any] = {
+            "action": 0, "threat_score": 0.0, "operating_mode": "execute",
+            "epsilon": 0.15, "context_score": 0.0, "action_source": "striatum",
+        }
 
         # ── Inline rehearsal state (env ref for skill/planning lookups) ─
         self._env_ref = None
@@ -478,14 +503,14 @@ class WholeBrain:
         if done:
             self._on_episode_done()
 
-        return {
-            "action": action,
-            "threat_score": threat_output.get("threat_score", 0.0),
-            "operating_mode": threat_output.get("operating_mode", "execute"),
-            "epsilon": epsilon_used,
-            "context_score": bg_output.get("context_score", 0.0),
-            "action_source": motor_output.get("source", "unknown"),
-        }
+        # Update pre-allocated return dict in-place (no new dict allocation)
+        self._step_result["action"] = action
+        self._step_result["threat_score"] = threat_output.get("threat_score", 0.0)
+        self._step_result["operating_mode"] = threat_output.get("operating_mode", "execute")
+        self._step_result["epsilon"] = epsilon_used
+        self._step_result["context_score"] = bg_output.get("context_score", 0.0)
+        self._step_result["action_source"] = motor_output.get("source", "unknown")
+        return self._step_result
 
     def _on_episode_done(self) -> None:
         """Handle episode completion."""
