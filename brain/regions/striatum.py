@@ -23,6 +23,7 @@ import numpy as np
 
 from brain.message_bus import MessageBus, Priority
 from brain.regions.base_region import BrainRegion
+from brain.learning.replay_adapters import StratifiedReplayDeque, NStepBuffer
 
 # ── Optional Numba JIT for hot forward pass ────────────────────────────
 try:
@@ -126,8 +127,11 @@ class Striatum(BrainRegion):
         self._tW2 = self._W2.copy()
         self._tb2 = self._b2.copy()
 
-        # ── Replay Buffer ─────────────────────────────────────────────
-        self._replay: deque = deque(maxlen=buffer_size)
+        # ── Replay Buffer (PER-stratified) ──────────────────────────────
+        # StratifiedReplayDeque: 30% near-death / 70% normal, TD-error weighted
+        self._replay: StratifiedReplayDeque = StratifiedReplayDeque(capacity=buffer_size)
+        # NStepBuffer: accumulates n=4 steps, flushes G_t discounted returns
+        self._nstep: NStepBuffer = NStepBuffer(n=4, gamma=gamma, downstream=self._replay)
 
         # ── State ─────────────────────────────────────────────────────
         self._epsilon = 0.15  # Default (EXECUTE mode)
@@ -292,14 +296,10 @@ class Striatum(BrainRegion):
             return result
 
         # ── NumPy fallback ────────────────────────────────────────────
-        # Store transition
-        self._replay.append((
-            state_arr,
-            action,
-            reward,
-            next_state_arr,
-            done,
-        ))
+        # Push via n-step buffer → StratifiedReplayDeque (PER)
+        near_death = bool(reward < -0.5 or (done and reward <= 0))
+        self._nstep.push(state_arr, action, reward, next_state_arr, done,
+                         near_death=near_death)
 
         self._episode_reward += reward
         if done:
@@ -311,7 +311,7 @@ class Striatum(BrainRegion):
         if len(self._replay) < self.batch_size:
             return {"loss": 0.0, "buffer_size": len(self._replay)}
 
-        # ── Elite + normal batch blending ──────────────────────────────
+        # ── PER-stratified batch ──────────────────────────────────
         elite_transitions = []
         if self._elite_buf is not None and not self._elite_buf.is_empty:
             frac = self._elite_buf.elite_fraction(self._episode_count)
@@ -320,9 +320,9 @@ class Striatum(BrainRegion):
                 elite_transitions = self._elite_buf.sample(elite_n)
         normal_n = self.batch_size - len(elite_transitions)
 
-        # Normal replay sample
-        normal_indices = np.random.choice(len(self._replay), min(normal_n, len(self._replay)), replace=False)
-        batch = [self._replay[i] for i in normal_indices] + elite_transitions
+        # Normal replay: PER-stratified sample
+        normal_transitions, sampled_indices = self._replay.sample(min(normal_n, len(self._replay)))
+        batch = normal_transitions + elite_transitions
 
         if not batch:
             return {"loss": 0.0, "buffer_size": len(self._replay)}
@@ -348,6 +348,10 @@ class Striatum(BrainRegion):
 
         # Backward: gradient update
         self._backward_dynamic(states, actions, td_error, actual_bs)
+
+        # PER: update priorities for the normal (non-elite) transitions
+        if len(sampled_indices) > 0:
+            self._replay.update_priorities(sampled_indices, td_error[:len(sampled_indices)])
 
         self._total_updates += 1
         if self._total_updates % self.target_update_freq == 0:

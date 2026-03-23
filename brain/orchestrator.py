@@ -136,6 +136,8 @@ class WholeBrain:
 
         # ── Wire Elite Replay: hippocampus tracks best episodes, striatum uses them ─
         self.striatum.set_elite_buffer(self.hippocampus.elite)
+        # ── Wire HER: hippocampus injects relabelled transitions into striatum._nstep ─
+        self.hippocampus.set_striatum_ref(self.striatum)
 
         # ── State ─────────────────────────────────────────────────────
         self._step_count = 0

@@ -21,6 +21,7 @@ from brain.message_bus import MessageBus, Priority
 from brain.regions.base_region import BrainRegion
 from brain.overnight.replay_scheduler import ReplayScheduler
 from brain.learning.elite_replay import EliteReplayBuffer
+from brain.learning.her_replay import HERReplayBuffer
 
 
 class Hippocampus(BrainRegion):
@@ -74,6 +75,17 @@ class Hippocampus(BrainRegion):
         # Buffer for current in-progress episode transitions
         self._current_episode_transitions: List[Tuple] = []
         self._current_episode_reward: float = 0.0
+
+        # ── Hindsight Experience Replay (HER) ─────────────────────────
+        # Active for sparse-reward envs (total_reward ≤ 0 at done).
+        # Relabels failed trajectories with future-state hindsight goals.
+        self.her: HERReplayBuffer = HERReplayBuffer(
+            k=4,                        # future goals per transition
+            sparse_reward_threshold=0.0,# activate when episode reward ≤ 0
+            goal_reward=1.0,            # reward given to relabelled successes
+        )
+        # External ref to striatum for HER injection (set by orchestrator)
+        self._striatum_ref = None
 
     def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -145,6 +157,24 @@ class Hippocampus(BrainRegion):
                     total_reward=self._current_episode_reward,
                     label="agent",
                 )
+                # ── HER: relabel sparse/failed episodes ──────────────
+                if self.her.should_relabel(self._current_episode_reward):
+                    relabelled = self.her.relabel_episode(
+                        self._current_episode_transitions,
+                        total_reward=self._current_episode_reward,
+                    )
+                    for (rs, ra, rr, rs2, rdone) in relabelled:
+                        if self._striatum_ref is not None:
+                            # Push directly into striatum's n-step buffer
+                            self._striatum_ref._nstep.push(
+                                rs, ra, rr, rs2, rdone, near_death=False,
+                            )
+                        else:
+                            # Fallback: push to own transitions deque
+                            self._transitions.append((rs, ra, rr, rs2, rdone))
+                            self._priorities.append(1.0)
+                            self._total_stored += 1
+
             # Reset episode accumulator
             self._current_episode_transitions = []
             self._current_episode_reward = 0.0
@@ -153,6 +183,10 @@ class Hippocampus(BrainRegion):
             "buffer_size": len(self._transitions),
             "total_stored": self._total_stored,
         }
+
+    def set_striatum_ref(self, striatum) -> None:
+        """Wire reference to Striatum for direct HER injection. Call from orchestrator."""
+        self._striatum_ref = striatum
 
     def learn(self, experience: Dict[str, Any]) -> Dict[str, float]:
         """
