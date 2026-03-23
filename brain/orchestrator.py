@@ -288,6 +288,21 @@ class WholeBrain:
         except Exception as e:
             self.near_death_replayer = None
             self._init_errors["near_death_replayer"] = str(e)
+        # ── Adaptive Knob Self-Tuner ───────────────────────────────────
+        try:
+            from brain.learning.adaptive_knobs import AdaptiveKnobController
+            self.knob_tuner = AdaptiveKnobController(
+                window=20, tune_every=3, step_size=0.10, explore_every=10,
+            )
+            if self.near_death_replayer is not None:
+                self.knob_tuner.attach(
+                    self.near_death_replayer,
+                    self.hippocampus.elite,
+                    self,
+                )
+        except Exception as e:
+            self.knob_tuner = None
+            self._init_errors["knob_tuner"] = str(e)
 
         # ── Inline rehearsal state (env ref for skill/planning lookups) ─
         self._env_ref = None
@@ -578,6 +593,8 @@ class WholeBrain:
                     elite_buf=self.hippocampus.elite,
                     striatum=self.striatum,
                 )
+                if self.knob_tuner is not None:
+                    self.knob_tuner.record_trigger()
                 if self.logger and injected > 0:
                     self.logger.event(
                         "near_death_replay", "trigger",
@@ -607,6 +624,12 @@ class WholeBrain:
             region.reset_episode()
 
         self.bus.resume_all()
+        # Knob tuner: record episode reward before resetting
+        if self.knob_tuner is not None:
+            try:
+                self.knob_tuner.record_episode(self._episode_reward)
+            except Exception:
+                pass
         self._episode_reward = 0.0
 
     # ── Probe & Plateau API ──────────────────────────────────────────
