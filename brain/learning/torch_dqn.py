@@ -103,6 +103,315 @@ class DuelingDQNNet(nn.Module):
         return q_values
 
 
+# ── NoisyLinear (Fortunato et al 2017) ────────────────────────────────────
+
+
+class NoisyLinear(nn.Module):
+    """
+    Linear layer with factorized Gaussian noise — replaces ε-greedy exploration.
+
+    Each weight: w = μ_w + σ_w ⊙ ε_w  (factorized noise: ε = ε_p ⊗ ε_q)
+    Noise is refreshed every forward pass during training, frozen during eval.
+
+    Advantages over ε-greedy:
+    - Per-weight exploration (state-dependent, not uniform)
+    - Exploration collapses automatically as training progresses (σ → 0)
+    - No separate epsilon schedule needed
+    """
+
+    def __init__(self, in_features: int, out_features: int, std_init: float = 0.5):
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.std_init = std_init
+
+        # Learnable: mean and std for weights and biases
+        self.weight_mu = nn.Parameter(torch.empty(out_features, in_features))
+        self.weight_sigma = nn.Parameter(torch.empty(out_features, in_features))
+        self.bias_mu = nn.Parameter(torch.empty(out_features))
+        self.bias_sigma = nn.Parameter(torch.empty(out_features))
+
+        # Noise buffers (not learnable)
+        self.register_buffer("weight_epsilon", torch.empty(out_features, in_features))
+        self.register_buffer("bias_epsilon", torch.empty(out_features))
+
+        self.reset_parameters()
+        self.reset_noise()
+
+    def reset_parameters(self) -> None:
+        bound = 1.0 / self.in_features ** 0.5
+        nn.init.uniform_(self.weight_mu, -bound, bound)
+        nn.init.constant_(self.weight_sigma, self.std_init / self.in_features ** 0.5)
+        nn.init.uniform_(self.bias_mu, -bound, bound)
+        nn.init.constant_(self.bias_sigma, self.std_init / self.out_features ** 0.5)
+
+    @staticmethod
+    def _scale_noise(size: int) -> torch.Tensor:
+        x = torch.randn(size)
+        return x.sign() * x.abs().sqrt()
+
+    def reset_noise(self) -> None:
+        """Refresh factorized noise — call once per step during training."""
+        p = self._scale_noise(self.in_features)
+        q = self._scale_noise(self.out_features)
+        self.weight_epsilon.copy_(q.outer(p))
+        self.bias_epsilon.copy_(q)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.training:
+            weight = self.weight_mu + self.weight_sigma * self.weight_epsilon
+            bias = self.bias_mu + self.bias_sigma * self.bias_epsilon
+        else:
+            weight = self.weight_mu
+            bias = self.bias_mu
+        return F.linear(x, weight, bias)
+
+
+class RainbowDQNNet(nn.Module):
+    """
+    Rainbow network: Dueling architecture with NoisyLinear streams.
+
+    Shared feature extractor uses standard Linear layers (fast).
+    Value and advantage streams use NoisyLinear (exploration).
+    """
+
+    def __init__(
+        self,
+        n_features: int,
+        n_actions: int,
+        hidden_sizes: Tuple[int, ...] = (256, 256, 128),
+        std_init: float = 0.5,
+    ):
+        super().__init__()
+        self.n_features = n_features
+        self.n_actions = n_actions
+
+        # Shared (deterministic) feature extractor
+        layers = []
+        in_size = n_features
+        for h in hidden_sizes[:-1]:
+            layers.extend([nn.Linear(in_size, h), nn.LayerNorm(h), nn.ReLU()])
+            in_size = h
+        self.shared = nn.Sequential(*layers)
+
+        # Noisy value stream V(s)
+        self.value_1 = NoisyLinear(in_size, hidden_sizes[-1], std_init)
+        self.value_2 = NoisyLinear(hidden_sizes[-1], 1, std_init)
+
+        # Noisy advantage stream A(s,a)
+        self.adv_1 = NoisyLinear(in_size, hidden_sizes[-1], std_init)
+        self.adv_2 = NoisyLinear(hidden_sizes[-1], n_actions, std_init)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        feat = self.shared(x)
+        value = self.value_2(F.relu(self.value_1(feat)))
+        adv = self.adv_2(F.relu(self.adv_1(feat)))
+        return value + adv - adv.mean(dim=-1, keepdim=True)
+
+    def reset_noise(self) -> None:
+        """Refresh all NoisyLinear noise — call once per training step."""
+        for m in [self.value_1, self.value_2, self.adv_1, self.adv_2]:
+            m.reset_noise()
+
+
+class RainbowDQN:
+    """
+    Rainbow DQN — drop-in replacement for TorchDQN.
+
+    Improvements over TorchDQN (which already has Double DQN + Dueling):
+    ✓ Noisy Nets: replaces ε-greedy with learned per-weight noise (state-dependent)
+    ✓ IS-weighted Huber loss: respects PER importance-sampling weights
+    ~ N-step returns: handled upstream by NStepBuffer (Phase 1B)
+    ~ PER: handled upstream by StratifiedReplayDeque (Phase 1A)
+
+    Interface is identical to TorchDQN: same select_action/train_step/save/load.
+    """
+
+    def __init__(
+        self,
+        n_features: int = 84,
+        n_actions: int = 18,
+        hidden_sizes: Tuple[int, ...] = (256, 256, 128),
+        lr: float = 6.25e-5,          # Rainbow paper default
+        gamma: float = 0.99,
+        tau: float = 0.005,
+        batch_size: int = 32,
+        grad_clip: float = 10.0,
+        std_init: float = 0.5,        # NoisyLinear init std
+        device: Optional[str] = None,
+    ):
+        if not TORCH_AVAILABLE:
+            raise ImportError("PyTorch required. Install: pip install torch")
+
+        self.n_features = n_features
+        self.n_actions = n_actions
+        self.gamma = gamma
+        self.tau = tau
+        self.batch_size = batch_size
+        self.grad_clip = grad_clip
+        self.device = device or get_device()
+
+        # Networks
+        self.online_net = RainbowDQNNet(
+            n_features, n_actions, hidden_sizes, std_init
+        ).to(self.device)
+        self.target_net = RainbowDQNNet(
+            n_features, n_actions, hidden_sizes, std_init
+        ).to(self.device)
+        self.target_net.load_state_dict(self.online_net.state_dict())
+        self.target_net.eval()
+
+        self.optimizer = optim.Adam(self.online_net.parameters(), lr=lr)
+
+        # NoisyNets → no ε-greedy needed; expose epsilon=0 for compatibility
+        self.epsilon = 0.0
+        self.cnn = None                    # CNN not used by Rainbow currently
+
+        # Stats
+        self._total_updates = 0
+        self._total_steps = 0
+        self._losses: deque = deque(maxlen=100)
+
+        # Pre-alloc
+        self._state_buffer = torch.zeros(1, n_features, device=self.device)
+
+    # ── Action selection ──────────────────────────────────────────────
+
+    def select_action(
+        self,
+        features: np.ndarray,
+        explore: bool = True,
+    ) -> Tuple[int, np.ndarray]:
+        """Select action using noisy network (no ε-greedy)."""
+        self._total_steps += 1
+        self.online_net.train(explore)   # Enable noise during exploration
+        with torch.no_grad():
+            self._state_buffer.copy_(
+                torch.as_tensor(features, dtype=torch.float32).unsqueeze(0)
+            )
+            q_values = self.online_net(self._state_buffer).cpu().numpy().flatten()
+        action = int(np.argmax(q_values))
+        return action, q_values
+
+    def forward(self, features: np.ndarray) -> np.ndarray:
+        """Q-values (NumPy interface for Striatum compatibility)."""
+        with torch.inference_mode():
+            self._state_buffer.copy_(
+                torch.as_tensor(features, dtype=torch.float32).unsqueeze(0)
+            )
+            return self.online_net(self._state_buffer).cpu().numpy().flatten()
+
+    # ── Transition storage (deque — upstream PER/NStep handle priority logic) ──
+
+    def store_transition(self, state, action, reward, next_state, done,
+                         raw_frames=None, next_raw_frames=None) -> None:
+        """No-op: Striatum._nstep → _replay handle storage."""
+        pass
+
+    # ── Training ──────────────────────────────────────────────────────
+
+    def train_step(
+        self,
+        batch=None,
+        is_weights: Optional[np.ndarray] = None,
+    ) -> Dict[str, float]:
+        """
+        One gradient update.
+
+        If batch is provided (list of (s,a,r,s',done)), uses it directly.
+        Otherwise, this is a no-op (Striatum drives batch construction).
+        """
+        if batch is None or len(batch) == 0:
+            return {"loss": 0.0, "backend": "rainbow"}
+
+        n = len(batch)
+        states     = torch.FloatTensor(np.array([t[0] for t in batch])).to(self.device)
+        actions    = torch.LongTensor([t[1] for t in batch]).to(self.device)
+        rewards    = torch.FloatTensor([t[2] for t in batch]).to(self.device)
+        next_states = torch.FloatTensor(np.array([t[3] for t in batch])).to(self.device)
+        dones      = torch.FloatTensor([float(t[4]) for t in batch]).to(self.device)
+
+        # IS weights (from PER); ones if not provided
+        if is_weights is not None:
+            weights = torch.FloatTensor(is_weights[:n]).to(self.device)
+        else:
+            weights = torch.ones(n, device=self.device)
+
+        # Reset noise before forward
+        self.online_net.reset_noise()
+        self.target_net.reset_noise()
+        self.online_net.train()
+
+        # Double DQN: online selects, target evaluates
+        current_q = self.online_net(states).gather(1, actions.unsqueeze(1)).squeeze(1)
+
+        with torch.no_grad():
+            best_next_actions = self.online_net(next_states).argmax(dim=1)
+            next_q = self.target_net(next_states).gather(
+                1, best_next_actions.unsqueeze(1)
+            ).squeeze(1)
+            target_q = rewards + self.gamma * next_q * (1.0 - dones)
+
+        td_errors = (current_q - target_q).abs().detach()
+
+        # IS-weighted Huber loss
+        elementwise = F.smooth_l1_loss(current_q, target_q, reduction="none")
+        loss = (weights * elementwise).mean()
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        nn.utils.clip_grad_norm_(self.online_net.parameters(), self.grad_clip)
+        self.optimizer.step()
+
+        # Soft update target
+        for t_p, o_p in zip(self.target_net.parameters(), self.online_net.parameters()):
+            t_p.data.copy_(self.tau * o_p.data + (1 - self.tau) * t_p.data)
+
+        self._total_updates += 1
+        loss_val = loss.item()
+        self._losses.append(loss_val)
+
+        return {
+            "loss": loss_val,
+            "td_error": td_errors.mean().item(),
+            "epsilon": 0.0,
+            "backend": "rainbow",
+            "total_updates": self._total_updates,
+            "avg_loss_100": float(np.mean(self._losses)),
+        }, td_errors.cpu().numpy()
+
+    # ── Persistence ───────────────────────────────────────────────────
+
+    def save(self, filepath: str) -> None:
+        torch.save({
+            "online_net": self.online_net.state_dict(),
+            "target_net": self.target_net.state_dict(),
+            "optimizer": self.optimizer.state_dict(),
+            "total_updates": self._total_updates,
+            "total_steps": self._total_steps,
+            "n_features": self.n_features,
+            "n_actions": self.n_actions,
+        }, filepath)
+
+    def load(self, filepath: str) -> None:
+        state = torch.load(filepath, map_location=self.device, weights_only=False)
+        self.online_net.load_state_dict(state["online_net"])
+        self.target_net.load_state_dict(state["target_net"])
+        self.optimizer.load_state_dict(state["optimizer"])
+        self._total_updates = state.get("total_updates", 0)
+        self._total_steps = state.get("total_steps", 0)
+
+    def stats(self) -> Dict[str, Any]:
+        n_params = sum(p.numel() for p in self.online_net.parameters())
+        return {
+            "n_params": n_params,
+            "device": str(self.device),
+            "epsilon": 0.0,
+            "total_updates": self._total_updates,
+            "total_steps": self._total_steps,
+            "architecture": "RainbowDQN (NoisyDueling+DoubleDQN)",
+        }
+
 class CNNEncoder(nn.Module):
     """
     CNN front-end for pixel observations.

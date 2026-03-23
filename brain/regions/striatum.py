@@ -94,22 +94,35 @@ class Striatum(BrainRegion):
         self.batch_size = batch_size
         self.target_update_freq = target_update_freq
 
-        # ── PyTorch Deep DQN (optional) ───────────────────────────────
+        # ── PyTorch Deep DQN (optional) ────────────────────────────────────
+        # Tries RainbowDQN first (NoisyNets+IS-weights+Double+Dueling)
+        # Falls back to TorchDQN, then NumPy DQN.
         self._torch_dqn = None
         if use_torch:
             try:
-                from brain.learning.torch_dqn import TorchDQN
-                self._torch_dqn = TorchDQN(
+                from brain.learning.torch_dqn import RainbowDQN
+                self._torch_dqn = RainbowDQN(
                     n_features=n_features,
                     n_actions=n_actions,
                     hidden_sizes=(256, 256, 128),
                     lr=lr,
                     gamma=gamma,
-                    buffer_size=buffer_size,
                     batch_size=batch_size,
                 )
-            except ImportError:
-                pass  # Fall back to NumPy DQN
+            except Exception:
+                try:
+                    from brain.learning.torch_dqn import TorchDQN
+                    self._torch_dqn = TorchDQN(
+                        n_features=n_features,
+                        n_actions=n_actions,
+                        hidden_sizes=(256, 256, 128),
+                        lr=lr,
+                        gamma=gamma,
+                        buffer_size=buffer_size,
+                        batch_size=batch_size,
+                    )
+                except ImportError:
+                    pass  # Fall back to NumPy DQN
 
         # ── DQN Network (online) ──────────────────────────────────────
         rng = np.random.RandomState(42)
@@ -409,12 +422,25 @@ class Striatum(BrainRegion):
 
     def _backward_dynamic(self, states: np.ndarray, actions: np.ndarray,
                           td_error: np.ndarray, batch_size: int) -> None:
-        """Backward pass supporting variable batch sizes (elite + normal blending)."""
+        """Backward pass supporting variable batch sizes.
+
+        Includes SAC-style entropy regularization (Christodoulou 2019):
+        entropy bonus keeps Q-values spread across actions, preventing
+        premature exploitation collapse even in Rainbow/noisy-net mode.
+        """
         hidden = np.maximum(0, states @ self._W1 + self._b1)
 
         # dL/dQ for selected actions
         dQ = np.zeros((batch_size, self.n_actions))
         dQ[np.arange(batch_size), actions] = -2 * td_error / batch_size
+
+        # SAC entropy bonus: -alpha * sum(pi * log(pi))
+        # nudges Q-values to stay spread; alpha=0.01 is mild
+        q_all = self._forward_batch(states)                         # (bs, n_actions)
+        pi = np.exp(q_all - q_all.max(axis=1, keepdims=True))      # softmax numerically stable
+        pi /= pi.sum(axis=1, keepdims=True) + 1e-8
+        entropy_grad = -0.01 * (1.0 + np.log(pi + 1e-8)) / batch_size   # d(-H)/dQ
+        dQ += entropy_grad
 
         # Layer 2 gradients
         dW2 = hidden.T @ dQ
