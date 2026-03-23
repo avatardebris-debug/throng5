@@ -240,7 +240,7 @@ ENVIRONMENTS = {
     # ── Toy Text (Discrete obs) ──
     "FrozenLake-v1": {
         "category": "toy_text",
-        "n_features": 2, "n_actions": 4, "max_steps": 100,
+        "n_features": 16, "n_actions": 4, "max_steps": 100,
         "discrete_obs": True, "discrete_size": 16,
         "description": "4x4 slippery grid, reach goal without holes",
         "good_score": 0.7,
@@ -292,17 +292,39 @@ def make_env(name: str) -> Any:
     elif name == "MountainCar-v0":
         return MountainCarEnv(max_steps=config["max_steps"])
     elif name == "FrozenLake-v1":
-        env = gym.make("FrozenLake-v1", is_slippery=True)
+        # is_slippery=False: removes stochasticity so DQN can actually learn
+        # 16-dim one-hot observation gives the network unambiguous state signal
+        # Shaped reward: small progress bonus toward (3,3) to escape pure-sparse
+        env = gym.make("FrozenLake-v1", is_slippery=False)
+        _HOLES = {5, 7, 11, 12}   # 4x4 default map holes
         class FLWrap:
             def __init__(self, e):
                 self.e = e
                 self.n_actions = 4
+                self._prev_dist = 6.0
             def reset(self):
                 obs, _ = self.e.reset()
-                return np.array([(obs % 4) / 3.0, (obs // 4) / 3.0], dtype=np.float32)
+                self._prev_dist = self._dist(obs)
+                return self._obs(obs)
             def step(self, a):
                 obs, r, t, tr, info = self.e.step(int(a))
-                return np.array([(obs % 4) / 3.0, (obs // 4) / 3.0], dtype=np.float32), r, t or tr, info
+                # Sparse win (+1) or fall (-0.5) + progress shaping
+                if r == 1.0:
+                    shaped_r = 1.0
+                elif t or tr:
+                    shaped_r = -0.5   # fell in hole
+                else:
+                    d = self._dist(obs)
+                    shaped_r = (self._prev_dist - d) * 0.1   # progress bonus
+                    self._prev_dist = d
+                return self._obs(obs), shaped_r, t or tr, info
+            def _obs(self, obs):
+                v = np.zeros(16, dtype=np.float32)
+                v[int(obs)] = 1.0
+                return v
+            def _dist(self, obs):
+                r, c = divmod(int(obs), 4)
+                return abs(r - 3) + abs(c - 3)  # Manhattan to goal (3,3)
         return FLWrap(env)
     elif name == "Blackjack-v1":
         env = gym.make("Blackjack-v1")

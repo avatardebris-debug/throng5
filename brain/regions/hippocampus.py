@@ -140,7 +140,9 @@ class Hippocampus(BrainRegion):
             # Go-Explore: track every state visit
             try:
                 ep_step = len(self._current_episode_transitions)
-                self.go_explore.add_state(state, reward=reward, step=ep_step)
+                # Lazy GoExplore: skip first 10 steps to reduce hot-path hashing
+                if ep_step >= 10:
+                    self.go_explore.add_state(state, reward=reward, step=ep_step)
             except Exception:
                 pass
 

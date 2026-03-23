@@ -468,7 +468,7 @@ class WholeBrain:
                         self._prev_features, prev_action, features, reward,
                     )
                     # Train every 4 steps (cheap: 64-dim latent ELBO)
-                    if self._step_count % 4 == 0:
+                    if self._step_count % 16 == 0:
                         self.dreamer.train_step()
                 except Exception:
                     pass

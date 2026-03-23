@@ -488,7 +488,7 @@ class DreamerWorldModel:
         """(B, F) -> z, mu, logvar (all (B, L))"""
         h = self._enc_shared(states_t)
         mu = self._enc_mu(h)
-        logvar = torch.clamp(self._enc_logvar(h), -10, 2)
+        logvar = torch.clamp(self._enc_logvar(h), -4, 2)
         eps = torch.randn_like(mu)
         z = mu + eps * torch.exp(0.5 * logvar)
         return z, mu, logvar
@@ -550,7 +550,7 @@ class DreamerWorldModel:
 
         # ELBO
         rec_loss = F.mse_loss(s_pred, states)
-        kl_loss  = -0.5 * torch.mean(1 + lv_t - mu_t.pow(2) - lv_t.exp())
+        kl_loss  = torch.nan_to_num(-0.5 * torch.mean(1 + lv_t - mu_t.pow(2) - lv_t.exp()), nan=0.0, posinf=0.0, neginf=0.0)
         dyn_loss = F.mse_loss(mu_pred, mu_t1.detach())
         rew_loss = F.smooth_l1_loss(r_pred, rewards)
 
