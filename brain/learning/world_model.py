@@ -387,3 +387,270 @@ class WorldModel:
             if "optimizer" in state:
                 self._optimizer.load_state_dict(state["optimizer"])
 
+
+
+# ── DreamerWorldModel — Latent dynamics (Hafner et al 2020) ─────────────────
+
+
+class DreamerWorldModel:
+    """
+    Dreamer-style latent world model.
+
+    Architecture (RSSM-lite)
+    ------------------------
+    Encoder  : state (n_features) -> latent z ~ N(mu, sigma^2)    [stochastic]
+    Dynamics : (z_t, onehot(a_t)) -> h_{t+1} via GRU              [deterministic]
+               h_{t+1} -> z_{t+1}                                 [stochastic proj]
+    Decoder  : z_t -> state_pred                                   [training signal]
+    Reward   : z_t -> reward_scalar
+
+    Training objective (ELBO)
+    -------------------------
+    L = lambda_rec * ||s_pred - s_real||^2
+      + lambda_kl  * KL[q(z|s) || N(0,I)]
+      + dyn_loss   * ||mu_pred - mu_next||^2
+      + lambda_rew * Huber(r_pred - r_real)
+
+    Dreaming in latent space
+    ------------------------
+    1. Encode real start state -> z_0
+    2. Roll GRU forward H steps -> z_1..H in 64-dim latent space
+    3. Decode each z -> predicted state features
+    4. Inject dream transitions into Striatum._nstep
+    """
+
+    def __init__(
+        self,
+        n_features: int = 84,
+        n_actions: int = 18,
+        latent_dim: int = 64,
+        hidden_dim: int = 256,
+        lr: float = 3e-4,
+        kl_weight: float = 0.1,
+        buffer_size: int = 50_000,
+        batch_size: int = 32,
+        device: Optional[str] = None,
+    ):
+        self.n_features = n_features
+        self.n_actions = n_actions
+        self.latent_dim = latent_dim
+        self.hidden_dim = hidden_dim
+        self.kl_weight = kl_weight
+        self.batch_size = batch_size
+
+        self._replay: deque = deque(maxlen=buffer_size)
+        self._total_updates = 0
+        self._losses: deque = deque(maxlen=100)
+        self._ready = False
+
+        if not TORCH_AVAILABLE:
+            return
+
+        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+
+        # Encoder: state -> (mu, logvar)
+        self._enc_shared = nn.Sequential(
+            nn.Linear(n_features, hidden_dim), nn.LayerNorm(hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
+        ).to(self.device)
+        self._enc_mu     = nn.Linear(hidden_dim, latent_dim).to(self.device)
+        self._enc_logvar = nn.Linear(hidden_dim, latent_dim).to(self.device)
+
+        # GRU dynamics: (z_t, a_t) -> h_next -> z_pred mu/logvar
+        self._gru        = nn.GRUCell(latent_dim + n_actions, hidden_dim).to(self.device)
+        self._dyn_mu     = nn.Linear(hidden_dim, latent_dim).to(self.device)
+        self._dyn_logvar = nn.Linear(hidden_dim, latent_dim).to(self.device)
+
+        # Decoder: z -> state
+        self._decoder = nn.Sequential(
+            nn.Linear(latent_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, n_features),
+        ).to(self.device)
+
+        # Reward head: z -> scalar
+        self._reward_head = nn.Sequential(
+            nn.Linear(latent_dim, hidden_dim // 4), nn.ReLU(),
+            nn.Linear(hidden_dim // 4, 1),
+        ).to(self.device)
+
+        # All parameters in one optimizer
+        all_params = (
+            list(self._enc_shared.parameters()) + list(self._enc_mu.parameters())
+            + list(self._enc_logvar.parameters()) + list(self._gru.parameters())
+            + list(self._dyn_mu.parameters()) + list(self._dyn_logvar.parameters())
+            + list(self._decoder.parameters()) + list(self._reward_head.parameters())
+        )
+        self._optimizer = optim.Adam(all_params, lr=lr)
+
+    # -- Encoding -------------------------------------------------------
+
+    def _encode(self, states_t):
+        """(B, F) -> z, mu, logvar (all (B, L))"""
+        h = self._enc_shared(states_t)
+        mu = self._enc_mu(h)
+        logvar = torch.clamp(self._enc_logvar(h), -10, 2)
+        eps = torch.randn_like(mu)
+        z = mu + eps * torch.exp(0.5 * logvar)
+        return z, mu, logvar
+
+    def encode(self, state: np.ndarray) -> np.ndarray:
+        """NumPy: state -> latent mu (deterministic, for policy/planning)."""
+        if not TORCH_AVAILABLE or not self._ready:
+            return np.zeros(self.latent_dim, dtype=np.float32)
+        with torch.inference_mode():
+            s = torch.as_tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
+            h = self._enc_shared(s)
+            return self._enc_mu(h).squeeze(0).cpu().numpy()
+
+    def decode(self, z: np.ndarray) -> np.ndarray:
+        """NumPy: latent -> predicted state features."""
+        if not TORCH_AVAILABLE or not self._ready:
+            return np.zeros(self.n_features, dtype=np.float32)
+        with torch.inference_mode():
+            z_t = torch.as_tensor(z, dtype=torch.float32).unsqueeze(0).to(self.device)
+            return self._decoder(z_t).squeeze(0).cpu().numpy()
+
+    # -- Training -------------------------------------------------------
+
+    def store_transition(self, state, action, next_state, reward):
+        self._replay.append((
+            np.asarray(state, dtype=np.float32), int(action),
+            np.asarray(next_state, dtype=np.float32), float(reward),
+        ))
+
+    def train_step(self) -> Dict[str, float]:
+        """One ELBO update: reconstruction + KL + dynamics consistency + reward."""
+        if not TORCH_AVAILABLE or len(self._replay) < self.batch_size:
+            return {"dwm_loss": 0.0}
+
+        idx = np.random.choice(len(self._replay), self.batch_size, replace=False)
+        batch = [self._replay[i] for i in idx]
+
+        states      = torch.FloatTensor(np.array([b[0] for b in batch])).to(self.device)
+        actions_idx = [b[1] for b in batch]
+        next_states = torch.FloatTensor(np.array([b[2] for b in batch])).to(self.device)
+        rewards     = torch.FloatTensor([b[3] for b in batch]).unsqueeze(1).to(self.device)
+
+        a_oh = torch.zeros(self.batch_size, self.n_actions, device=self.device)
+        for i, a in enumerate(actions_idx):
+            a_oh[i, a] = 1.0
+
+        # Encode
+        z_t, mu_t, lv_t         = self._encode(states)
+        _, mu_t1, _              = self._encode(next_states)
+
+        # GRU dynamics prediction
+        gru_inp = torch.cat([z_t.detach(), a_oh], dim=-1)
+        h_gru   = self._gru(gru_inp, torch.zeros(self.batch_size, self.hidden_dim, device=self.device))
+        mu_pred = self._dyn_mu(h_gru)
+
+        # Decode and reward
+        s_pred = self._decoder(z_t)
+        r_pred = self._reward_head(z_t)
+
+        # ELBO
+        rec_loss = F.mse_loss(s_pred, states)
+        kl_loss  = -0.5 * torch.mean(1 + lv_t - mu_t.pow(2) - lv_t.exp())
+        dyn_loss = F.mse_loss(mu_pred, mu_t1.detach())
+        rew_loss = F.smooth_l1_loss(r_pred, rewards)
+
+        total = rec_loss + self.kl_weight * kl_loss + dyn_loss + 0.1 * rew_loss
+
+        self._optimizer.zero_grad()
+        total.backward()
+        nn.utils.clip_grad_norm_(
+            [p for g in self._optimizer.param_groups for p in g["params"]], 5.0
+        )
+        self._optimizer.step()
+
+        self._total_updates += 1
+        lv = total.item(); self._losses.append(lv)
+        self._ready = self._total_updates >= 10
+
+        return {
+            "dwm_loss": lv, "dwm_rec": rec_loss.item(),
+            "dwm_kl": kl_loss.item(), "dwm_dyn": dyn_loss.item(),
+            "dwm_rew": rew_loss.item(), "dwm_updates": self._total_updates,
+        }
+
+    # -- Latent Dreaming ------------------------------------------------
+
+    def dream_latent(
+        self,
+        start_state: np.ndarray,
+        horizon: int = 15,
+        policy_fn: Optional[Callable] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Roll out H imagined steps in 64-dim latent space.
+        Decode each step for policy & reporting; returns feature-space trajectory.
+        """
+        if not TORCH_AVAILABLE or not self._ready:
+            return []
+
+        self._enc_shared.eval(); self._decoder.eval()
+        self._gru.eval(); self._reward_head.eval()
+
+        trajectory = []
+        with torch.inference_mode():
+            s = torch.as_tensor(start_state, dtype=torch.float32).unsqueeze(0).to(self.device)
+            z = self._enc_mu(self._enc_shared(s))
+            h = torch.zeros(1, self.hidden_dim, device=self.device)
+
+            for step in range(horizon):
+                feat = self._decoder(z).squeeze(0).cpu().numpy()
+
+                if policy_fn is not None:
+                    action, qv = policy_fn(feat, explore=False)
+                    value = float(qv[action]) if qv is not None else 0.0
+                else:
+                    action = int(np.random.randint(self.n_actions))
+                    value = 0.0
+
+                a_oh = torch.zeros(1, self.n_actions, device=self.device)
+                a_oh[0, action] = 1.0
+
+                h = self._gru(torch.cat([z, a_oh], dim=-1), h)
+                pred_r = self._reward_head(z).item()
+
+                trajectory.append({
+                    "features": feat, "latent": z.squeeze(0).cpu().numpy(),
+                    "action": action, "predicted_reward": pred_r,
+                    "predicted_value": value, "step": step,
+                })
+                z = self._dyn_mu(h)
+
+        self._enc_shared.train(); self._decoder.train()
+        self._gru.train(); self._reward_head.train()
+        return trajectory
+
+    # -- Stats / Persistence -------------------------------------------
+
+    @property
+    def is_ready(self) -> bool:
+        return self._ready
+
+    def report(self) -> Dict[str, Any]:
+        return {
+            "dwm_updates": self._total_updates, "dwm_buffer": len(self._replay),
+            "dwm_ready": self._ready,
+            "dwm_avg_loss": round(float(np.mean(self._losses)), 5) if self._losses else 0.0,
+            "latent_dim": self.latent_dim,
+        }
+
+    def save_state(self) -> Dict[str, Any]:
+        if not TORCH_AVAILABLE: return {}
+        return {
+            k: getattr(self, f"_{k}").state_dict()
+            for k in ["enc_shared","enc_mu","enc_logvar","gru","dyn_mu","dyn_logvar","decoder","reward_head"]
+            if hasattr(self, f"_{k}")
+        } | {"optimizer": self._optimizer.state_dict(), "total_updates": self._total_updates}
+
+    def load_state(self, state: Dict[str, Any]) -> None:
+        if not TORCH_AVAILABLE: return
+        for k in ["enc_shared","enc_mu","enc_logvar","gru","dyn_mu","dyn_logvar","decoder","reward_head"]:
+            if k in state and hasattr(self, f"_{k}"):
+                getattr(self, f"_{k}").load_state_dict(state[k])
+        if "optimizer" in state: self._optimizer.load_state_dict(state["optimizer"])
+        self._total_updates = state.get("total_updates", 0)
+        self._ready = self._total_updates >= 10

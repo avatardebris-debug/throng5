@@ -138,6 +138,16 @@ class WholeBrain:
         self.striatum.set_elite_buffer(self.hippocampus.elite)
         # ── Wire HER: hippocampus injects relabelled transitions into striatum._nstep ─
         self.hippocampus.set_striatum_ref(self.striatum)
+        # ── Dreamer Latent World Model (Phase 3C) ─────────────────────────────
+        try:
+            from brain.learning.world_model import DreamerWorldModel
+            self.dreamer = DreamerWorldModel(
+                n_features=n_features, n_actions=n_actions,
+                latent_dim=64, hidden_dim=256,
+            )
+        except Exception as _e:
+            self.dreamer = None
+
 
         # ── State ─────────────────────────────────────────────────────
         self._step_count = 0
@@ -450,6 +460,18 @@ class WholeBrain:
                     "skip_train": (self._step_count % self._wm_train_interval != 0),
                 })
             self.profiler.stop("world_model")
+
+            # -- Dreamer latent WM: store transition + periodic train ------
+            if self.dreamer is not None:
+                try:
+                    self.dreamer.store_transition(
+                        self._prev_features, prev_action, features, reward,
+                    )
+                    # Train every 4 steps (cheap: 64-dim latent ELBO)
+                    if self._step_count % 4 == 0:
+                        self.dreamer.train_step()
+                except Exception:
+                    pass
 
             # [PURGED] Meta-Controller shadow training — wasted compute
 

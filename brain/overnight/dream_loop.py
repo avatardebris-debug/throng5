@@ -244,11 +244,21 @@ class DreamLoop:
                 action = int(np.argmax(q_values))
 
                 # Use real WorldModel if available, otherwise fall back to noise
-                wm = getattr(basal_ganglia, '_world_model', None)
-                if wm is not None and wm.is_ready:
+                # Prefer Dreamer latent WM; fall back to feature-space WM; then noise
+                dreamer_ref = getattr(self.brain, "dreamer", None)
+                wm = getattr(basal_ganglia, "_world_model", None)
+                if dreamer_ref is not None and dreamer_ref.is_ready:
+                    # Full latent dream from this step's state (horizon=1 for inline)
+                    _traj = dreamer_ref.dream_latent(dream_state, horizon=1)
+                    if _traj:
+                        predicted_next = _traj[0]["features"]
+                        predicted_reward = _traj[0]["predicted_reward"]
+                    else:
+                        predicted_next = dream_state.copy()
+                        predicted_reward = 0.0
+                elif wm is not None and wm.is_ready:
                     predicted_next, predicted_reward = wm.predict(dream_state, action)
                 else:
-                    # WorldModel not ready yet — light noise placeholder
                     noise = np.random.randn(len(dream_state)).astype(np.float32) * 0.05
                     predicted_next = dream_state + noise
                     predicted_reward = 0.0
@@ -262,6 +272,26 @@ class DreamLoop:
 
             dream_trajectories.append(trajectory)
             dreams_completed += 1
+
+            # Bonus: run a full latent dream from Go-Explore return state
+            dreamer_ref = getattr(self.brain, "dreamer", None)
+            if dreamer_ref is not None and dreamer_ref.is_ready:
+                ge_start = getattr(hippocampus, "_go_explore_return_state", None)
+                dream_state_latent = ge_start if ge_start is not None else start_state
+                latent_traj = dreamer_ref.dream_latent(
+                    dream_state_latent, horizon=15,
+                    policy_fn=striatum.select_action if hasattr(striatum, "select_action") else None,
+                )
+                if latent_traj:
+                    traj_reward = sum(s["predicted_reward"] for s in latent_traj)
+                    dream_trajectories.append({
+                        "states": [s["features"].tolist() for s in latent_traj],
+                        "actions": [s["action"] for s in latent_traj],
+                        "rewards": [s["predicted_reward"] for s in latent_traj],
+                        "total_reward": traj_reward, "source": "dreamer_latent",
+                    })
+                    self._total_dreams += 1
+
 
             # Store dream in hippocampus
             hippocampus.store_dream(trajectory)
