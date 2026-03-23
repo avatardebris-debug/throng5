@@ -277,6 +277,18 @@ class WholeBrain:
             "epsilon": 0.15, "context_score": 0.0, "action_source": "striatum",
         }
 
+        # ── Near-Death Counterfactual Replayer ────────────────────────
+        # Every N episodes: pick random elite ep, find last near-death state,
+        # inject full run-up + counterfactual escape transition into replay.
+        try:
+            from brain.learning.near_death_replayer import NearDeathReplayer
+            _wm_ref = getattr(self.basal_ganglia, "_world_model", None)
+            self.near_death_replayer = NearDeathReplayer(world_model=_wm_ref)
+            self._nd_trigger_interval = 5   # Trigger every 5 episodes
+        except Exception as e:
+            self.near_death_replayer = None
+            self._init_errors["near_death_replayer"] = str(e)
+
         # ── Inline rehearsal state (env ref for skill/planning lookups) ─
         self._env_ref = None
 
@@ -556,6 +568,24 @@ class WholeBrain:
                 pass
 
         # [PURGED] Rehearsal chain export — no longer exists
+
+        # ── Near-Death Counterfactual Replay (every N episodes) ────────
+        if (self.near_death_replayer is not None
+                and self._episode_count % self._nd_trigger_interval == 0
+                and not self.hippocampus.elite.is_empty):
+            try:
+                injected = self.near_death_replayer.build_replay_batch_direct(
+                    elite_buf=self.hippocampus.elite,
+                    striatum=self.striatum,
+                )
+                if self.logger and injected > 0:
+                    self.logger.event(
+                        "near_death_replay", "trigger",
+                        f"Injected {injected} counterfactual transitions "
+                        f"(ep {self._episode_count})",
+                    )
+            except Exception:
+                pass
 
         # ── Attribution episode summary ───────────────────────────────
         if self.attribution is not None:
