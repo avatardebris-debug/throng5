@@ -394,7 +394,18 @@ class Striatum(BrainRegion):
             if experience.get("skip_train", False):
                 return {"loss": 0.0, "backend": "torch", "buffer_size": len(self._torch_dqn._replay)}
 
-            result = self._torch_dqn.train_step()
+            train_out = self._torch_dqn.train_step()
+            # RainbowDQN returns 3-tuple (stats, td_errors, self_surprises)
+            # TorchDQN returns 2-tuple (stats, td_errors) — handle both
+            if isinstance(train_out, tuple) and len(train_out) == 3:
+                result, _td, _self_surp = train_out
+            elif isinstance(train_out, tuple) and len(train_out) == 2:
+                result, _td = train_out
+                _self_surp = None
+            else:
+                result = train_out
+                _self_surp = None
+
             result["backend"] = "torch"
             return result
 

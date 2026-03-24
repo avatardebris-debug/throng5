@@ -243,6 +243,7 @@ class RainbowDQNNet(nn.Module):
 
     Shared feature extractor uses standard Linear layers (fast).
     Value and advantage streams use NoisyLinear (exploration).
+    Phase 5: self_head predicts the agent's own next option (egocentric).
     """
 
     def __init__(
@@ -251,10 +252,12 @@ class RainbowDQNNet(nn.Module):
         n_actions: int,
         hidden_sizes: Tuple[int, ...] = (256, 256, 128),
         std_init: float = 0.5,
+        n_options: int = 4,
     ):
         super().__init__()
         self.n_features = n_features
         self.n_actions = n_actions
+        self.n_options = n_options
 
         # Shared (deterministic) feature extractor
         layers = []
@@ -272,11 +275,31 @@ class RainbowDQNNet(nn.Module):
         self.adv_1 = NoisyLinear(in_size, hidden_sizes[-1], std_init)
         self.adv_2 = NoisyLinear(hidden_sizes[-1], n_actions, std_init)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # ── Phase 5: Egocentric Self-Model Head ───────────────────
+        # Predicts the agent's own next option choice.
+        # self_head(z_t) ≈ one-hot(option_{t+1})
+        # Loss: cross_entropy(self_logits, actual_option)
+        # Signal: self_surprise = -log P(actual_option | z_t)
+        self.self_head = nn.Sequential(
+            NoisyLinear(in_size, 64, std_init),
+            nn.ReLU(),
+            nn.Linear(64, n_options),
+        )
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        return_self_pred: bool = False,
+    ):
+        """Compute Q-values; optionally also return self-option logits."""
         feat = self.shared(x)
         value = self.value_2(F.relu(self.value_1(feat)))
         adv = self.adv_2(F.relu(self.adv_1(feat)))
-        return value + adv - adv.mean(dim=-1, keepdim=True)
+        q = value + adv - adv.mean(dim=-1, keepdim=True)
+        if return_self_pred:
+            self_logits = self.self_head(feat)
+            return q, self_logits
+        return q
 
     def reset_noise(self) -> None:
         """Refresh all NoisyLinear noise — call once per training step."""
@@ -352,6 +375,25 @@ class RainbowDQN:
         self.spr_head_target = SPRHead(in_dim=_enc_dim, latent_dim=128)
         self.spr_head_target.load_state_dict(self.spr_head.state_dict())
         self.spr_predictor = SPRTransitionPredictor(latent_dim=128, n_actions=n_actions)
+
+        # ── Phase 5: SparseRegrowth (dynamic neurogenesis/pruning) ─────────
+        # Operates on shared layers every 500 train steps.
+        # Pruning: low-magnitude + low-gradient weights → zeroed (dead synapses)
+        # Regrowth: zero weights with strong gradient → random small reinit (birth)
+        try:
+            from brain.learning.sparse_regrowth import SparseRegrowth
+            self._sparse = SparseRegrowth(
+                model=self.online_net,
+                target_layers=["shared"],
+                prune_interval=500,
+                max_sparsity=0.40,
+            )
+        except Exception:
+            self._sparse = None
+
+        # ── Phase 5: self_surprise history (ring buffer) ───────────────
+        # Stores per-step self_surprise for priority blending in hippocampus
+        self._self_surprise_buf: deque = deque(maxlen=1000)
 
 
     # ── Action selection ──────────────────────────────────────────────
@@ -431,6 +473,7 @@ class RainbowDQN:
             target_q = rewards + self.gamma * next_q * (1.0 - dones)
 
         td_errors = (current_q - target_q).abs().detach()
+
         # SPR auxiliary loss: encoder predicts next-state latent
         try:
             shared_feat = self.online_net.shared(states)
@@ -441,10 +484,35 @@ class RainbowDQN:
         except Exception:
             spr_aux = torch.tensor(0.0, device=self.device)
 
+        # ── Phase 5: Egocentric self-model loss ────────────────────────
+        # target_options: the option the agent actually picked at each step.
+        # Passed in via batch metadata slot [5] if available.
+        self_loss = torch.tensor(0.0, device=self.device)
+        batch_self_surprises = np.zeros(n, dtype=np.float32)
+        try:
+            # Extract option targets from batch metadata (slot 5)
+            target_opts = [t[5] if len(t) > 5 else -1 for t in batch]
+            valid = [i for i, o in enumerate(target_opts) if o >= 0]
+            if valid:
+                _, self_logits = self.online_net(states[valid], return_self_pred=True)
+                opt_tensor = torch.LongTensor(
+                    [target_opts[i] for i in valid]
+                ).to(self.device)
+                self_loss_vec = F.cross_entropy(
+                    self_logits, opt_tensor, reduction="none"
+                )
+                self_loss = self_loss_vec.mean()
+                # Per-transition self-surprise for PER priority boost
+                surp = self_loss_vec.detach().cpu().numpy()
+                for ii, vi in enumerate(valid):
+                    batch_self_surprises[vi] = float(surp[ii])
+                self._self_surprise_buf.extend(surp.tolist())
+        except Exception:
+            pass
 
-        # IS-weighted Huber loss
+        # IS-weighted Huber loss + SPR + self-model
         elementwise = F.smooth_l1_loss(current_q, target_q, reduction="none")
-        loss = (weights * elementwise).mean() + 0.1 * spr_aux
+        loss = (weights * elementwise).mean() + 0.1 * spr_aux + 0.05 * self_loss
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -463,6 +531,10 @@ class RainbowDQN:
         loss_val = loss.item()
         self._losses.append(loss_val)
 
+        # ── Phase 5: SparseRegrowth cycle (every 500 steps) ──────────────
+        if self._sparse is not None:
+            self._sparse.maybe_step(self._total_updates)
+
         return {
             "loss": loss_val,
             "td_error": td_errors.mean().item(),
@@ -470,7 +542,31 @@ class RainbowDQN:
             "backend": "rainbow",
             "total_updates": self._total_updates,
             "avg_loss_100": float(np.mean(self._losses)),
-        }, td_errors.cpu().numpy()
+            "self_surprise": float(batch_self_surprises.mean()),
+            "sparsity": self._sparse._last_sparsity if self._sparse else 0.0,
+        }, td_errors.cpu().numpy(), batch_self_surprises
+
+    def self_surprise(self, features: np.ndarray, option: int) -> float:
+        """
+        Compute egocentric self-surprise at current state.
+
+        Returns -log P(option | z_t): higher = agent would not have
+        predicted picking this option. Used for one-step priority query
+        without a full batch.
+        """
+        try:
+            s = torch.as_tensor(features, dtype=torch.float32,
+                                device=self.device).unsqueeze(0)
+            self.online_net.eval()
+            with torch.no_grad():
+                _, logits = self.online_net(s, return_self_pred=True)
+                loss = F.cross_entropy(
+                    logits,
+                    torch.tensor([option], device=self.device),
+                )
+            return float(loss.item())
+        except Exception:
+            return 0.0
 
     # ── Persistence ───────────────────────────────────────────────────
 
