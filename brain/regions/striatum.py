@@ -101,6 +101,10 @@ class Striatum(BrainRegion):
         if use_torch:
             try:
                 from brain.learning.torch_dqn import RainbowDQN
+                # Adaptive NoisyNet std_init: 0.17 baseline for 4-dim envs,
+                # scales up with sqrt(n_features/4) so larger obs spaces get
+                # proportionally louder noise (Acrobot=0.21, MWM=0.24, etc.)
+                _std_init = float(0.17 * (n_features / 4.0) ** 0.5)
                 self._torch_dqn = RainbowDQN(
                     n_features=n_features,
                     n_actions=n_actions,
@@ -108,6 +112,7 @@ class Striatum(BrainRegion):
                     lr=lr,
                     gamma=gamma,
                     batch_size=batch_size,
+                    std_init=_std_init,
                 )
             except Exception:
                 try:
