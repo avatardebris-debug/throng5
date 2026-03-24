@@ -24,6 +24,7 @@ import numpy as np
 from brain.message_bus import MessageBus, Priority
 from brain.regions.base_region import BrainRegion
 from brain.learning.replay_adapters import StratifiedReplayDeque, NStepBuffer
+from brain.learning.option_critic import OptionCritic
 
 # ── Optional Numba JIT for hot forward pass ────────────────────────────
 try:
@@ -168,6 +169,14 @@ class Striatum(BrainRegion):
         # Pre-allocated buffers for zero-alloc forward pass
         self._h_buf = np.zeros(hidden_size, dtype=np.float32)  # reusable hidden layer
 
+        # ── Option-Critic (Phase 4) ──────────────────────────────────
+        # Disabled by default. Enabled by orchestrator via enable_option_critic().
+        # When ready (>=500 updates), replaces ε-greedy with option-guided selection.
+        self._option_critic: Optional[OptionCritic] = None
+        self._oc_last_state: Optional[np.ndarray] = None  # for update() call in learn()
+        self._oc_last_option: Optional[int] = None
+        self._oc_last_action: Optional[int] = None
+
     # ── Elite Buffer wiring ───────────────────────────────────────────
 
     def set_elite_buffer(self, elite) -> None:
@@ -179,6 +188,52 @@ class Striatum(BrainRegion):
         training batch at the decaying fraction elite.elite_fraction(ep).
         """
         self._elite_buf = elite
+
+    def enable_option_critic(self, n_options: int = 4) -> None:
+        """
+        Activate Option-Critic for this Striatum instance.
+
+        Called by the orchestrator after init. Creates an OptionCritic using
+        the same n_features/n_actions already configured on this Striatum.
+        Falls back silently on import failure.
+
+        Args:
+            n_options: Number of options (one per Skill in SkillLibrary).
+        """
+        try:
+            self._option_critic = OptionCritic(
+                n_options=n_options,
+                n_actions=self.n_actions,
+                n_features=self.n_features,
+                gamma=self._gamma,
+            )
+        except Exception:
+            self._option_critic = None
+
+    def oc_observe(
+        self,
+        state: np.ndarray,
+        action: int,
+        reward: float,
+        next_state: np.ndarray,
+        done: bool,
+    ) -> None:
+        """
+        Feed a transition into OptionCritic for training.
+        Called every step by the orchestrator (or learn() path).
+        NO-OP if OC not enabled.
+        """
+        if self._option_critic is None:
+            return
+        option = self._oc_last_option
+        if option is None:
+            return
+        try:
+            self._option_critic.update(state, option, action, reward, next_state, done)
+            # Check termination at next state
+            self._option_critic.should_terminate(next_state, option)
+        except Exception:
+            pass
 
     # ── CNN Integration ───────────────────────────────────────────────
 
@@ -222,6 +277,32 @@ class Striatum(BrainRegion):
             self._process_messages()
 
         features_arr = np.asarray(features, dtype=np.float32)
+
+        # ── Option-Critic override (Phase 4) ────────────────────────
+        # When ready, select action via intra-option policy instead of ε-greedy.
+        if self._option_critic is not None and self._option_critic.is_ready and explore:
+            oc = self._option_critic
+            # Select option if none active
+            if oc.current_option is None:
+                option = oc.select_option(features_arr, explore=True)
+            else:
+                option = oc.current_option
+            action = oc.intra_option_action(features_arr, option, explore=True)
+            self._oc_last_state = features_arr.copy()
+            self._oc_last_option = option
+            self._oc_last_action = action
+            # Still compute Q-values for logging (non-blocking, torch path)
+            if self._torch_dqn is not None:
+                _, q_values = self._torch_dqn.select_action(features_arr, explore=False)
+            else:
+                q_values = self._forward(features_arr)
+            return {
+                "action": action,
+                "q_values": q_values,
+                "epsilon": 0.0,
+                "backend": "option_critic",
+                "option": option,
+            }
 
         # ── Use TorchDQN if available ─────────────────────────────────
         if self._torch_dqn is not None:

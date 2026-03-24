@@ -23,6 +23,7 @@ from brain.overnight.replay_scheduler import ReplayScheduler
 from brain.learning.elite_replay import EliteReplayBuffer
 from brain.learning.her_replay import HERReplayBuffer
 from brain.planning.go_explore import GoExploreArchive
+from brain.learning.successor_repr import SRMatrix
 
 
 class Hippocampus(BrainRegion):
@@ -98,6 +99,54 @@ class Hippocampus(BrainRegion):
         )
         self._go_explore_return_state: Optional[np.ndarray] = None
 
+        # ── Successor Representation (Phase 4) ──────────────────────────
+        # Disabled by default (enabled by orchestrator when use_sr=True).
+        # Provides subgoal distance estimation + goal-transfer Q prediction.
+        self._sr: Optional[SRMatrix] = None
+
+    def enable_sr(self, n_features: int, n_actions: int) -> None:
+        """
+        Activate Successor Representation for this Hippocampus instance.
+
+        Called by the orchestrator after both regions are wired.
+        Creates a SRMatrix and begins updating it every step in process().
+
+        Args:
+            n_features: State feature vector dimensionality.
+            n_actions:  Number of discrete actions.
+        """
+        self._sr = SRMatrix(
+            n_features=n_features,
+            n_actions=n_actions,
+            gamma=0.99,
+            alpha=0.05,
+        )
+
+    def get_sr_subgoal(
+        self,
+        state: np.ndarray,
+        goal: np.ndarray,
+    ) -> Optional[int]:
+        """
+        Return the SR-guided action toward goal from state.
+
+        Returns None if SR is not enabled or not yet ready.
+        Used by SubgoalPlanner.make_plan() as an oracle before Dijkstra.
+        """
+        if self._sr is None or not self._sr.is_ready:
+            return None
+        return self._sr.closest_subgoal(state, goal)
+
+    def get_sr_distance(
+        self,
+        state: np.ndarray,
+        goal: np.ndarray,
+    ) -> Optional[float]:
+        """SR-space distance between state and goal (None if SR not ready)."""
+        if self._sr is None or not self._sr.is_ready:
+            return None
+        return self._sr.sr_distance(state, goal)
+
     def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Store a transition and optionally produce a replay batch.
@@ -145,6 +194,13 @@ class Hippocampus(BrainRegion):
                     self.go_explore.add_state(state, reward=reward, step=ep_step)
             except Exception:
                 pass
+
+            # Successor Representation update (Phase 4)
+            if self._sr is not None:
+                try:
+                    self._sr.update(state, action, next_state, done, reward)
+                except Exception:
+                    pass
 
             # Track current episode for elite buffer
             self._current_episode_transitions.append((

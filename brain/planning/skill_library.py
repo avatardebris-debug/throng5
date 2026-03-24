@@ -470,3 +470,93 @@ class SkillLibrary:
                 for name, s in self._templates.items()
             },
         }
+
+    def register_options(self, option_critic, sr_matrix=None) -> None:
+        """
+        Auto-register options from a trained OptionCritic as OptionSkills.
+
+        Each option becomes a skill named "option_0", "option_1", etc.
+        Once registered, SubgoalPlanner can compose plans using learned options.
+
+        Args:
+            option_critic: OptionCritic instance.
+            sr_matrix: Optional SRMatrix for SR-guided completion check.
+        """
+        for o_idx in range(option_critic.n_options):
+            skill = OptionSkill(
+                name=f"option_{o_idx}",
+                option_idx=o_idx,
+                option_critic=option_critic,
+                sr_matrix=sr_matrix,
+            )
+            self.register_skill(skill)
+
+
+class OptionSkill(Skill):
+    """
+    A Skill backed by a learned OptionCritic option.
+
+    Each option has:
+    - An intra-option policy π_o(a|s) (from OptionCritic)
+    - A learned termination condition β_o(s)
+    - An optional SR-based completion check (sr_distance < threshold)
+
+    Preconditions: none (options are applicable everywhere)
+    Completion: β_o(s) samples true OR SR distance to goal < 0.1
+
+    This bridges the Option-Critic world (trained end-to-end) with the
+    Skill abstraction (composable, parameterised macro-actions).
+    """
+
+    def __init__(
+        self,
+        name: str,
+        option_idx: int,
+        option_critic,
+        sr_matrix=None,
+        max_steps: int = 100,
+        sr_completion_threshold: float = 0.2,
+    ):
+        super().__init__(name, max_steps=max_steps)
+        self._option_idx = option_idx
+        self._option_critic = option_critic
+        self._sr = sr_matrix
+        self._sr_threshold = sr_completion_threshold
+        self._goal_features: Optional[np.ndarray] = None
+
+    def configure(self, **params) -> "OptionSkill":
+        super().configure(**params)
+        # Allow goal features to be passed as a param for SR-based completion
+        if "goal_features" in params:
+            self._goal_features = np.asarray(params["goal_features"], dtype=np.float32)
+        return self
+
+    def check_preconditions(self, game_state: Dict[str, Any]) -> bool:
+        """Options are universally applicable."""
+        return True
+
+    def check_completion(self, game_state: Dict[str, Any]) -> bool:
+        """
+        Completion by learned termination β_o(s).
+        If SR is available and goal features are set, also check SR distance.
+        """
+        features = game_state.get("features")
+        if features is None:
+            return False
+
+        features_arr = np.asarray(features, dtype=np.float32)
+
+        # SR-based completion check (higher priority if available)
+        if self._sr is not None and self._sr.is_ready and self._goal_features is not None:
+            dist = self._sr.sr_distance(features_arr, self._goal_features)
+            if dist < self._sr_threshold:
+                return True
+
+        # Sample from learned termination β_o(s)
+        return self._option_critic.should_terminate(features_arr, self._option_idx)
+
+    def get_action(self, features: np.ndarray, game_state: Dict[str, Any]) -> int:
+        """Get intra-option action from option's policy π_o(a|s)."""
+        return self._option_critic.intra_option_action(
+            features, self._option_idx, explore=self._active,
+        )
