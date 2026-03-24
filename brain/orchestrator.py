@@ -148,6 +148,25 @@ class WholeBrain:
         except Exception as _e:
             self.dreamer = None
 
+        # ── Phase 4: Successor Representation ──────────────────────────────
+        # Enables sr_distance() routing for SubgoalPlanner and OptionSkill.
+        # Zero overhead until hippocampus._sr.is_ready (>=200 updates).
+        try:
+            self.hippocampus.enable_sr(
+                n_features=n_features,
+                n_actions=n_actions,
+            )
+        except Exception as _e:
+            self._init_errors["successor_repr"] = str(_e)
+
+        # ── Phase 4: Option-Critic ──────────────────────────────────────────
+        # Replaces ε-greedy with learned option policies.
+        # Disabled until striatum._option_critic.is_ready (>=500 steps).
+        if use_torch:
+            try:
+                self.striatum.enable_option_critic(n_options=4)
+            except Exception as _e:
+                self._init_errors["option_critic"] = str(_e)
 
         # ── State ─────────────────────────────────────────────────────
         self._step_count = 0
