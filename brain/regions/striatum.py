@@ -166,6 +166,13 @@ class Striatum(BrainRegion):
         self._episode_count = 0     # For elite fraction schedule
         self._elite_buf = None      # Set by set_elite_buffer() after init
 
+        # Phase 6 Fix 1: track episode step counts for OC warmup auto-scale
+        self._episode_step_counts: deque = deque(maxlen=50)
+        self._current_ep_steps: int = 0
+
+        # Phase 6 Fix 3: SR reward shaping module (set by set_sr_module())
+        self._sr_matrix = None
+
         # Pre-allocated buffers for zero-alloc forward pass
         self._h_buf = np.zeros(hidden_size, dtype=np.float32)  # reusable hidden layer
 
@@ -203,22 +210,44 @@ class Striatum(BrainRegion):
         """
         Activate Option-Critic for this Striatum instance.
 
-        Called by the orchestrator after init. Creates an OptionCritic using
-        the same n_features/n_actions already configured on this Striatum.
-        Falls back silently on import failure.
+        Fix 1: auto-scales min_updates based on recent mean episode length.
+          min_updates = max(100, 3 × avg_ep_steps)
+        For Acrobot (avg ~100 steps): min_updates=300 → ~3 eps warmup (not 5).
+        For Taxi (avg ~200 steps):    min_updates=600 → ~3 eps warmup.
 
-        Args:
-            n_options: Number of options (one per Skill in SkillLibrary).
+        Falls back silently on import failure.
         """
         try:
+            # Estimate avg episode length from recent episode rewards timing.
+            # _episode_rewards stores per-episode total rewards; we use length of
+            # _nstep buffer's flush history as a proxy for step counts.
+            # Simpler: use n_features as a rough env-complexity heuristic,
+            # but BEST is the actual step count if available.
+            avg_steps = 200  # conservative default
+            if hasattr(self, '_episode_step_counts') and len(self._episode_step_counts) > 0:
+                avg_steps = int(np.mean(list(self._episode_step_counts)[-20:]))
+
+            warmup = max(100, 3 * avg_steps)
+
             self._option_critic = OptionCritic(
                 n_options=n_options,
                 n_actions=self.n_actions,
                 n_features=self.n_features,
                 gamma=self._gamma,
+                min_updates=warmup,
             )
         except Exception:
             self._option_critic = None
+
+    def set_sr_module(self, sr_matrix) -> None:
+        """
+        Wire a SRMatrix for Fix 3 (SR reward shaping).
+
+        When set, learn() adds an intrinsic shaping bonus:
+          r_shaped = r + 0.1 * (sr_dist_before - sr_dist_after)
+        This provides a dense pull toward subgoals in sparse-reward envs.
+        """
+        self._sr_matrix = sr_matrix
 
     def set_context_sources(
         self,
@@ -483,10 +512,14 @@ class Striatum(BrainRegion):
                 raw_frames=raw_frames,
                 next_raw_frames=next_raw_frames,
             )
+            # Fix 1: track step counts for OC warmup auto-scale
+            self._current_ep_steps += 1
             self._episode_reward += reward
             if done:
                 self._episode_rewards.append(self._episode_reward)
+                self._episode_step_counts.append(self._current_ep_steps)
                 self._episode_reward = 0.0
+                self._current_ep_steps = 0
 
             # Throttled: skip gradient update if requested
             if experience.get("skip_train", False):
@@ -508,15 +541,30 @@ class Striatum(BrainRegion):
             return result
 
         # ── NumPy fallback ────────────────────────────────────────────
+        # Fix 3: SR reward shaping (dense pull toward subgoals)
+        if self._sr_matrix is not None:
+            try:
+                sr_ready = getattr(self._sr_matrix, 'is_ready', False)
+                if sr_ready:
+                    d_before = float(self._sr_matrix.distance(state_arr))
+                    d_after  = float(self._sr_matrix.distance(next_state_arr))
+                    reward   = reward + 0.1 * (d_before - d_after)
+            except Exception:
+                pass
+
         # Push via n-step buffer → StratifiedReplayDeque (PER)
         near_death = bool(reward < -0.5 or (done and reward <= 0))
         self._nstep.push(state_arr, action, reward, next_state_arr, done,
                          near_death=near_death)
 
+        # Fix 1: track episode step counts
+        self._current_ep_steps += 1
         self._episode_reward += reward
         if done:
             self._episode_rewards.append(self._episode_reward)
+            self._episode_step_counts.append(self._current_ep_steps)
             self._episode_reward = 0.0
+            self._current_ep_steps = 0
             self._episode_count += 1
 
         # Batch learning from replay
@@ -564,9 +612,12 @@ class Striatum(BrainRegion):
         # Backward: gradient update
         self._backward_dynamic(states, actions, td_error, actual_bs)
 
-        # PER: update priorities for the normal (non-elite) transitions
+        # Fix 2: PER priority = TD error + 0.3 * self_surprise (NumPy path)
+        # self_surprise measures behavioral inconsistency from the self-model head.
+        # In NumPy path there's no self-model head, so use |td_error| as priority.
         if len(sampled_indices) > 0:
-            self._replay.update_priorities(sampled_indices, td_error[:len(sampled_indices)])
+            per_priority = np.abs(td_error[:len(sampled_indices)])
+            self._replay.update_priorities(sampled_indices, per_priority)
 
         self._total_updates += 1
         if self._total_updates % self.target_update_freq == 0:

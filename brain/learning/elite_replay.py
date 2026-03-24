@@ -305,6 +305,52 @@ class EliteReplayBuffer:
             return float("-inf")
         return max(ep.total_reward for ep in self._archive)
 
+    # ── Context embedding (Phase 5 Part 3) ───────────────────────────
+
+    def summary_embedding(self, dim: int = 8) -> np.ndarray:
+        """
+        Return a fixed-size embedding summarising the elite archive.
+
+        Computed as the mean state vector across all elite transitions,
+        then projected to `dim` via a deterministic random projection
+        (no sklearn or extra dependencies).
+
+        Used by Striatum._build_ctx() to fill the 'past memory' slot
+        of the integrated past+present+future context fed to OptionCritic.
+
+        Returns zeros if archive is empty.
+        """
+        if not self._archive:
+            return np.zeros(dim, dtype=np.float32)
+
+        # Collect mean state from each elite episode
+        state_means = []
+        for ep in self._archive:
+            if not ep.transitions:
+                continue
+            states = np.array([t[0] for t in ep.transitions], dtype=np.float32)
+            state_means.append(states.mean(axis=0))
+
+        if not state_means:
+            return np.zeros(dim, dtype=np.float32)
+
+        # Grand mean across all elite episodes
+        grand_mean = np.mean(state_means, axis=0).astype(np.float32)
+        d = len(grand_mean)
+
+        if d <= dim:
+            # Pad to dim if state is smaller
+            return np.pad(grand_mean, (0, dim - d))
+
+        # Random projection: stable hash-seeded matrix (reproducible, no training)
+        rng = np.random.default_rng(seed=42)
+        proj = rng.standard_normal((d, dim)).astype(np.float32) / np.sqrt(dim)
+        emb = grand_mean @ proj       # (dim,)
+
+        # L2 normalise so magnitude doesn't swamp the other ctx components
+        norm = np.linalg.norm(emb) + 1e-8
+        return (emb / norm).astype(np.float32)
+
     def report(self) -> Dict[str, Any]:
         """Status summary for telemetry."""
         current_frac = self.elite_fraction()

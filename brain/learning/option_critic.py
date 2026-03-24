@@ -420,6 +420,16 @@ class OptionCritic:
         """True once enough data has been observed."""
         return self._total_updates >= self.min_updates
 
+    def set_min_updates(self, n: int) -> None:
+        """
+        Update the warmup threshold.
+
+        Called by Striatum.enable_option_critic() after detecting average
+        episode length. Allows short-episode envs (Acrobot ~100 steps) to
+        unlock OC much sooner than long-episode envs (Taxi ~200 steps).
+        """
+        self.min_updates = max(50, int(n))
+
     @property
     def current_option(self) -> Optional[int]:
         return self._current_option
