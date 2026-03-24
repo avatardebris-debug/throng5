@@ -140,15 +140,56 @@ class OptionCritic:
         self._option_counts: np.ndarray = np.zeros(n_options, dtype=np.int64)
         self._option_terminations: np.ndarray = np.zeros(n_options, dtype=np.int64)
 
+        # ── Part 3: Integrated Context (Past + Present + Future) ────────────
+        # ctx_dim is set by set_context_mode().
+        # When active, W_omega and W_pi are expanded to ctx_dim.
+        # W_beta stays on n_features (termination = where I AM, not full history).
+        self._ctx_dim: int = n_features     # starts same as n_features
+        self._ctx_mode: bool = False        # False = standard features only
+
+    # ── Context mode (Part 3 — Integrated Past+Present+Future) ──────────────
+
+    def set_context_mode(self, ctx_dim: int) -> None:
+        """
+        Expand Manager and Worker weights to accept a richer context vector:
+          ctx = concat([elite_embedding, features, dream_features])
+
+        W_omega and W_pi expand to ctx_dim.
+        W_beta stays at n_features (termination = where agent IS, not history).
+
+        Safe to call multiple times; existing weights preserved in first columns.
+        """
+        if ctx_dim <= self._ctx_dim:
+            return
+
+        old_dim = self._ctx_dim
+        self._ctx_dim = ctx_dim
+        self._ctx_mode = True
+
+        # Expand W_omega: (n_options, old_dim) -> (n_options, ctx_dim)
+        new_omega = np.zeros((self.n_options, ctx_dim), dtype=np.float32)
+        new_omega[:, :old_dim] = self._W_omega
+        self._W_omega = new_omega
+
+        # Expand W_pi: (n_options, n_actions, old_dim) -> (n_options, n_actions, ctx_dim)
+        new_pi = np.zeros((self.n_options, self.n_actions, ctx_dim), dtype=np.float32)
+        new_pi[:, :, :old_dim] = self._W_pi
+        self._W_pi = new_pi
+
+        # Expand Welford normalizer buffers to ctx_dim
+        self._feat_mean = np.pad(self._feat_mean, (0, ctx_dim - old_dim))
+        self._feat_m2   = np.pad(self._feat_m2,   (0, ctx_dim - old_dim))
+
     # ── Feature normalisation ─────────────────────────────────────────
 
     def _normalise(self, vec: np.ndarray) -> np.ndarray:
-        """Welford online normalisation."""
+        """Welford online normalisation. Uses _ctx_dim (may be > n_features in ctx mode)."""
+        target_dim = self._ctx_dim
         v = np.asarray(vec, dtype=np.float32).flatten()
-        if len(v) < self.n_features:
-            v = np.pad(v, (0, self.n_features - len(v)))
-        elif len(v) > self.n_features:
-            v = v[: self.n_features]
+        if len(v) < target_dim:
+            v = np.pad(v, (0, target_dim - len(v)))
+        elif len(v) > target_dim:
+            v = v[:target_dim]
 
         self._feat_n += 1
         delta = v.astype(np.float64) - self._feat_mean
@@ -157,6 +198,15 @@ class OptionCritic:
         self._feat_m2 += delta * delta2
         std = np.sqrt(self._feat_m2 / max(self._feat_n, 1)) + 1e-8
         return ((v.astype(np.float64) - self._feat_mean) / std).astype(np.float32)
+
+    def _normalise_raw(self, vec: np.ndarray) -> np.ndarray:
+        """Normalise to n_features only — used by W_beta terminator."""
+        v = np.asarray(vec, dtype=np.float32).flatten()
+        if len(v) < self.n_features:
+            v = np.pad(v, (0, self.n_features - len(v)))
+        elif len(v) > self.n_features:
+            v = v[:self.n_features]
+        return v
 
     # ── Option values ─────────────────────────────────────────────────
 
@@ -168,8 +218,15 @@ class OptionCritic:
         """Logits for all actions within option o. Shape: (n_actions,)"""
         return (self._W_pi[option] @ phi).astype(np.float32)
 
-    def _termination_prob(self, phi: np.ndarray, option: int) -> float:
-        """β_o(s) — probability of terminating option o at state s."""
+    def _termination_prob(self, phi_raw: np.ndarray, option: int) -> float:
+        """β_o(s) — probability of terminating option o at state s.
+
+        Uses _normalise_raw (n_features only) since W_beta never expands
+        in ctx mode — termination depends on WHERE the agent is, not history.
+        """
+        phi = self._normalise_raw(phi_raw)
+        if len(phi) != self._W_beta.shape[1]:
+            phi = phi[:self._W_beta.shape[1]]
         logit = float(self._W_beta[option] @ phi)
         return _sigmoid(logit)
 

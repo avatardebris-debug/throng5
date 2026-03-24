@@ -177,6 +177,16 @@ class Striatum(BrainRegion):
         self._oc_last_option: Optional[int] = None
         self._oc_last_action: Optional[int] = None
 
+        # ── Phase 5 Part 3: Integrated Context (Past+Present+Future) ────────
+        # When set, OptionCritic.select_option() receives a wider ctx vector:
+        #   ctx = concat([elite_embedding, features, dream_features])
+        # Rebuilt every 4 steps (oc_ctx_interval) to amortize dreamer cost.
+        self._ctx_elite_buf = None    # EliteReplayBuffer ref
+        self._ctx_dreamer = None      # DreamerWorldModel ref
+        self._ctx_cache: Optional[np.ndarray] = None  # most recent ctx vector
+        self._ctx_step: int = 0
+        self._oc_ctx_interval: int = 4  # rebuild ctx every N steps
+
     # ── Elite Buffer wiring ───────────────────────────────────────────
 
     def set_elite_buffer(self, elite) -> None:
@@ -209,6 +219,89 @@ class Striatum(BrainRegion):
             )
         except Exception:
             self._option_critic = None
+
+    def set_context_sources(
+        self,
+        elite_buf,
+        dreamer,
+        elite_embed_dim: int = 8,
+        dream_dim: int = 8,
+    ) -> None:
+        """
+        Wire past+future context sources for integrated prediction input (Part 3).
+
+        When set, OptionCritic's Manager receives:
+          ctx = concat([elite_embedding(elite_embed_dim), features, dream_features(dream_dim)])
+
+        Calls set_context_mode() on the OptionCritic to expand its weight
+        matrices to ctx_dim = elite_embed_dim + n_features + dream_dim.
+
+        Args:
+            elite_buf: EliteReplayBuffer with .summary_embedding(dim) method.
+            dreamer:   DreamerWorldModel with .dream_latent(features) method.
+            elite_embed_dim: dimension of the elite embedding (default 8).
+            dream_dim: dimension used from the dream latent (default 8).
+        """
+        self._ctx_elite_buf = elite_buf
+        self._ctx_dreamer = dreamer
+        self._ctx_embed_dim = elite_embed_dim
+        self._ctx_dream_dim = dream_dim
+
+        if self._option_critic is not None:
+            ctx_dim = elite_embed_dim + self.n_features + dream_dim
+            try:
+                self._option_critic.set_context_mode(ctx_dim)
+            except Exception:
+                pass
+
+    def _build_ctx(self, features: np.ndarray) -> np.ndarray:
+        """
+        Build the integrated context vector: [elite_embedding | features | dream_features].
+
+        Falls back gracefully to features-only if sources aren't set or fail.
+        Rebuilds every _oc_ctx_interval steps; caches between rebuilds.
+        """
+        self._ctx_step += 1
+
+        # Cache: only rebuild ctx every 4 steps
+        if self._ctx_cache is not None and self._ctx_step % self._oc_ctx_interval != 0:
+            # Splice in the fresh current features (position elite_embed_dim)
+            ed = getattr(self, "_ctx_embed_dim", 0)
+            self._ctx_cache[ed: ed + self.n_features] = features
+            return self._ctx_cache
+
+        parts = []
+        # 1. Past: elite buffer summary embedding
+        try:
+            ed = getattr(self, "_ctx_embed_dim", 8)
+            if self._ctx_elite_buf is not None and hasattr(self._ctx_elite_buf, "summary_embedding"):
+                elite_emb = self._ctx_elite_buf.summary_embedding(ed)
+            else:
+                elite_emb = np.zeros(ed, dtype=np.float32)
+            parts.append(elite_emb.astype(np.float32))
+        except Exception:
+            ed = getattr(self, "_ctx_embed_dim", 8)
+            parts.append(np.zeros(ed, dtype=np.float32))
+
+        # 2. Present: current features
+        parts.append(features.astype(np.float32))
+
+        # 3. Future: dreamer latent rollout
+        try:
+            dd = getattr(self, "_ctx_dream_dim", 8)
+            if self._ctx_dreamer is not None and hasattr(self._ctx_dreamer, "dream_latent"):
+                dream = np.asarray(self._ctx_dreamer.dream_latent(features), dtype=np.float32)
+                dream = dream[:dd] if len(dream) >= dd else np.pad(dream, (0, dd - len(dream)))
+            else:
+                dream = np.zeros(dd, dtype=np.float32)
+            parts.append(dream)
+        except Exception:
+            dd = getattr(self, "_ctx_dream_dim", 8)
+            parts.append(np.zeros(dd, dtype=np.float32))
+
+        ctx = np.concatenate(parts, axis=0)
+        self._ctx_cache = ctx
+        return ctx
 
     def oc_observe(
         self,
@@ -278,13 +371,18 @@ class Striatum(BrainRegion):
 
         features_arr = np.asarray(features, dtype=np.float32)
 
-        # ── Option-Critic override (Phase 4) ────────────────────────
-        # When ready, select action via intra-option policy instead of ε-greedy.
+        # ── Option-Critic override with integrated ctx (Phase 4+5) ───────
+        # When ready, use ctx = concat([elite, features, dream]) for option selection.
         if self._option_critic is not None and self._option_critic.is_ready and explore:
             oc = self._option_critic
+            # Build context: features-only when no ctx sources set, else full ctx
+            if self._ctx_elite_buf is not None or self._ctx_dreamer is not None:
+                oc_input = self._build_ctx(features_arr)
+            else:
+                oc_input = features_arr
             # Select option if none active
             if oc.current_option is None:
-                option = oc.select_option(features_arr, explore=True)
+                option = oc.select_option(oc_input, explore=True)
             else:
                 option = oc.current_option
             action = oc.intra_option_action(features_arr, option, explore=True)
