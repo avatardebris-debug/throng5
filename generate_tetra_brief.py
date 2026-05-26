@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 Generate a fresh tetra_brief.json for sending to an LLM.
 

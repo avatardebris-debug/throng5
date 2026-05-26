@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 log_session_history.py — Record all Throng 5 work done so far.
 

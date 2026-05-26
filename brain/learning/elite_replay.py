@@ -315,7 +315,7 @@ class EliteReplayBuffer:
         then projected to `dim` via a deterministic random projection
         (no sklearn or extra dependencies).
 
-        Used by Striatum._build_ctx() to fill the 'past memory' slot
+        Used by OptionCriticContext.build_ctx() to fill the 'past memory' slot
         of the integrated past+present+future context fed to OptionCritic.
 
         Returns zeros if archive is empty.

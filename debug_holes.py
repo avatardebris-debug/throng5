@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """Debug hole detection: inspect the actual board cell values after an episode."""
 import sys
 sys.path.insert(0, '.')

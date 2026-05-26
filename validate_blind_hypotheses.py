@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 validate_blind_hypotheses.py — One-command gate for blind hypothesis JSON.
 

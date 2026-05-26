@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 Baseline experiment runner for meta-learning validation.
 

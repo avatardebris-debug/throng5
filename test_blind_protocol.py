@@ -21,6 +21,17 @@ import tempfile
 import numpy as np
 from pathlib import Path
 
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 # ---------------------------------------------------------------------------
 # 1. Blindness leak detection
 # ---------------------------------------------------------------------------

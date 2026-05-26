@@ -1,3 +1,17 @@
+perception layer (what it "sees"... NOT REALITY! ASCII)
+Decision layer (decision)
+Action
+
+SNN
+world model
+Action selector (PPO)
+Basal ganglia [ASCII simulating action]
+
+hidden world[game itself]. interface/perception dynamics [ascii simulating]
+agent/policy dynamics.
+policy->actions->world
+optimize for fitness 
+====================
 # Cloud Training Guide — vast.ai
 
 ## What You Need
@@ -22,7 +36,7 @@
 ssh -p PORT root@HOST
 
 # Download and run setup
-git clone https://github.com/YOUR_USERNAME/throng5.git
+git clone pip install numpy torch gym-super-mario-bros nes-py
 cd throng5
 bash cloud/setup_cloud.sh
 ```

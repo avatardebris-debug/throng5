@@ -292,8 +292,7 @@ class OptionCritic:
         Also forces termination if option has run for too many steps
         (prevents stuck options).
         """
-        phi = self._normalise(state)
-        beta = self._termination_prob(phi, option)
+        beta = self._termination_prob(state, option)
         terminated = bool(np.random.random() < beta)
         if terminated:
             self._option_terminations[option] += 1
@@ -327,13 +326,14 @@ class OptionCritic:
         """
         phi_s = self._normalise(state)
         phi_s2 = self._normalise(next_state)
+        phi_s2_term = self._normalise_raw(next_state)
 
         q_opts_s2 = self._option_values(phi_s2)
         v_s2 = float(np.max(q_opts_s2))         # V(s') = max_o Q_Ω(s', o)
         u_s2 = float(q_opts_s2[option])          # Q_Ω(s', o) — continuing value
 
-        # Termination probability at s'
-        beta_s2 = self._termination_prob(phi_s2, option)
+        # Termination probability at s' (raw features — W_beta uses n_features only)
+        beta_s2 = self._termination_prob(next_state, option)
 
         # ── Intra-option Q target ──────────────────────────────────────
         # U(s, o, a) ≈ r + γ[(1−β)·Q_Ω(s',o) + β·V(s')]
@@ -368,9 +368,9 @@ class OptionCritic:
         # If Q(s',o) > V(s'), option is above average → decrease β (don't terminate)
         # If Q(s',o) < V(s'), option is below average → increase β (terminate sooner)
         a_term = u_s2 - v_s2  # negative when option is below average → terminate more
-        logit_beta = float(self._W_beta[option] @ phi_s2)
+        logit_beta = float(self._W_beta[option] @ phi_s2_term)
         beta_grad = _sigmoid(logit_beta) * (1 - _sigmoid(logit_beta))  # sigmoid'
-        self._W_beta[option] += self.lr_term * (-a_term) * beta_grad * phi_s2
+        self._W_beta[option] += self.lr_term * (-a_term) * beta_grad * phi_s2_term
 
         self._total_updates += 1
         # Gradually decrease temperature for annealing
@@ -433,6 +433,12 @@ class OptionCritic:
     @property
     def current_option(self) -> Optional[int]:
         return self._current_option
+
+    def reset_episode(self) -> None:
+        """Clear active option so a new episode does not inherit the previous one."""
+        self._current_option = None
+        self._option_start_state = None
+        self._steps_in_option = 0
 
     # ── Diagnostics ───────────────────────────────────────────────────
 

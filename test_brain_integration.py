@@ -10,64 +10,50 @@ Verifies:
 6. Brain report aggregates all region states
 """
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+from __future__ import annotations
 
 import numpy as np
-from brain.orchestrator import WholeBrain
 
-print("=" * 60)
-print("Throng 5 WholeBrain Integration Test")
-print("=" * 60)
 
-# Create brain with logging
-brain = WholeBrain(n_features=84, n_actions=18, session_name="integration_test")
-print(f"[PASS] WholeBrain created: {brain}")
+def test_wholebrain_100_steps(brain):
+    actions_taken = []
+    modes_seen = set()
+    episode_count = 0
+    rng = np.random.RandomState(42)
 
-# Run 100 steps with random observations
-actions_taken = []
-modes_seen = set()
-episode_count = 0
-rng = np.random.RandomState(42)
+    for i in range(100):
+        obs = rng.randn(84).astype(np.float32)
+        reward = rng.randn() * 0.1
+        done = (i > 0 and i % 25 == 0)
 
-for i in range(100):
-    obs = rng.randn(84).astype(np.float32)
-    reward = rng.randn() * 0.1
-    done = (i > 0 and i % 25 == 0)  # Episode every 25 steps
+        result = brain.step(
+            obs,
+            prev_action=actions_taken[-1] if actions_taken else 0,
+            reward=reward,
+            done=done,
+        )
 
-    result = brain.step(obs, prev_action=actions_taken[-1] if actions_taken else 0, reward=reward, done=done)
+        action = result["action"]
+        assert isinstance(action, int)
+        assert 0 <= action < brain.n_actions
+        actions_taken.append(action)
+        modes_seen.add(result["operating_mode"])
 
-    action = result["action"]
-    assert isinstance(action, int), f"Action should be int, got {type(action)}"
-    assert 0 <= action < 18, f"Action {action} out of range"
-    actions_taken.append(action)
-    modes_seen.add(result["operating_mode"])
+        if done:
+            episode_count += 1
 
-    if done:
-        episode_count += 1
+    assert episode_count > 0
+    assert len(set(actions_taken)) > 1
+    assert modes_seen
 
-print(f"[PASS] 100 steps completed, {episode_count} episodes")
-print(f"[PASS] {len(set(actions_taken))} unique actions taken")
-print(f"[PASS] Modes seen: {modes_seen}")
+    report = brain.report()
+    assert len(report) >= 7
+    core_regions = [n for n, r in report.items() if "step_count" in r]
+    assert len(core_regions) == 7, f"Expected 7 core regions, got {core_regions}: {core_regions}"
 
-# Check brain report
-report = brain.report()
-assert len(report) >= 7, f"Expected at least 7 sections in report, got {len(report)}"
-# Core 7 regions have 'name' and 'step_count'; extra sections (causal, counterfactual, etc.) don't
-core_regions = [n for n, r in report.items() if "step_count" in r]
-assert len(core_regions) == 7, f"Expected 7 core regions, got {len(core_regions)}: {core_regions}"
-print(f"[PASS] Brain report has {len(report)} sections ({len(core_regions)} core regions)")
 
-# Verify each region processed
-for name, r in report.items():
-    print(f"  {name}: steps={r.get('step_count', '?')}, active={r.get('is_active', '?')}")
-
-# Close and verify log was written
-brain.close()
-print(f"[PASS] Brain closed, log written")
-
-print()
-print("=" * 60)
-print("ALL INTEGRATION TESTS PASSED")
-print("=" * 60)
+def test_wholebrain_report_sections(brain):
+    report = brain.report()
+    for name, r in report.items():
+        if "step_count" in r:
+            assert r.get("step_count", 0) >= 0, f"{name} step_count invalid"

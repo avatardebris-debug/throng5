@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 ingest_tetra_inbox.py — Standalone Tetra inbox ingestor.
 

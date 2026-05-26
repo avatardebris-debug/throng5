@@ -49,6 +49,9 @@ Room 1 FULL layout — 3 ladders, skull, key, return trip, door:
 """
 
 from __future__ import annotations
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
 
 import hashlib
 from dataclasses import dataclass, field

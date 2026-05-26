@@ -45,12 +45,14 @@ class SubgoalPlanner:
         causal_model: CausalModel,
         subgoal_timeout: int = 200,     # Steps before declaring subgoal failed
         replan_on_failure: bool = True,
+        enable_trap_checks: bool = False,
     ):
         self.brain = brain
         self.graph = graph
         self.regressor = regressor
         self.dead_end_detector = dead_end_detector
         self.causal_model = causal_model
+        self.enable_trap_checks = enable_trap_checks
         self.subgoal_timeout = subgoal_timeout
         self.replan_on_failure = replan_on_failure
 
@@ -287,6 +289,8 @@ class SubgoalPlanner:
 
     def _check_dead_end(self, features: np.ndarray) -> Dict[str, Any]:
         """Periodic dead-end check during subgoal execution."""
+        if self.dead_end_detector is None:
+            return {"is_dead_end": False}
         return {"is_dead_end": self.dead_end_detector.check(features, n_trials=100)}
 
     def _worker_action(self, features: np.ndarray, safe_actions: List[int]) -> int:
@@ -326,8 +330,11 @@ class SubgoalPlanner:
         is_dead = done and reward < 0
         self.causal_model.observe(features_before, action, features_after, reward, is_dead)
 
-        # Check for traps
-        if reward > 0 and self.dead_end_detector.is_trap(features_before, action, reward):
+        # Check for traps (puzzle mode only — avoids rollout cost on every +reward step)
+        if (self.enable_trap_checks
+                and self.dead_end_detector is not None
+                and reward > 0
+                and self.dead_end_detector.is_trap(features_before, action, reward)):
             self._traps_caught += 1
             current_hash = self.graph._hash_state(features_after)
             self.graph.mark_trap(current_hash)

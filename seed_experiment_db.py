@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 Seed ExperimentDB with recovered training data from previous sessions.
 

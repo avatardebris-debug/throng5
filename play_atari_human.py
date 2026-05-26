@@ -39,6 +39,9 @@ Key bindings that are missing map to NOOP (action 0).
 """
 
 from __future__ import annotations
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
 
 import argparse
 import json

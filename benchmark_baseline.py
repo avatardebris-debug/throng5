@@ -18,6 +18,9 @@ Usage
 """
 
 from __future__ import annotations
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
 
 import argparse
 import json

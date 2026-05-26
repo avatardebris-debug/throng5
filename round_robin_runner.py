@@ -16,6 +16,9 @@ Output per game:
     benchmark_results/<slug>_rr_weights.npz    -- agent weights
 """
 from __future__ import annotations
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
 
 import argparse
 import json

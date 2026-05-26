@@ -42,11 +42,13 @@ class DeadEndDetector:
         default_trials: int = 500,
         rollout_length: int = 200,
         reward_threshold: float = 0.0,
+        trap_check_trials: int = 20,
     ):
         self.brain = brain
         self.default_trials = default_trials
         self.rollout_length = rollout_length
         self.reward_threshold = reward_threshold
+        self.trap_check_trials = min(trap_check_trials, default_trials)
 
         self._checked: Dict[int, bool] = {}  # hash → is_dead_end
         self._checks_run: int = 0
@@ -73,8 +75,6 @@ class DeadEndDetector:
         n_trials = n_trials or self.default_trials
         self._checks_run += 1
 
-        successes = 0
-
         for trial in range(n_trials):
             sim_features = features.copy()
             total_reward = 0.0
@@ -99,14 +99,9 @@ class DeadEndDetector:
                 sim_features = next_features
 
             if reached_goal:
-                successes += 1
-                # Early exit: not a dead end if any rollout succeeds
-                if successes > 0:
-                    return False
+                return False
 
-        # Zero successes in N trials → dead end
-        is_dead = (successes == 0)
-        return is_dead
+        return True
 
     def check_after_action(
         self,
@@ -153,10 +148,8 @@ class DeadEndDetector:
         # Simulate the action
         next_features, _ = self._predict_next(features, action)
 
-        # Check if the reward-giving state is a dead end
-        is_dead = self.check(next_features, n_trials=300)
-
-        return is_dead
+        # Check if the reward-giving state is a dead end (cheap trials for hot path)
+        return self.check(next_features, n_trials=self.trap_check_trials)
 
     def _get_action(self, features: np.ndarray, explore: bool = True) -> int:
         """Get action from brain's policy."""

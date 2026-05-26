@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 generate_blind_logs.py — Runs short multi-environment episodes and writes
 blind trajectory JSON files that offline_generator.py can consume.

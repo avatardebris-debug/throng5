@@ -1,3 +1,7 @@
+from bootstrap_paths import ensure_throng_paths
+
+ensure_throng_paths()
+
 """
 Full-Stack Atari Runner — Uses REAL Meta^N Architecture
 

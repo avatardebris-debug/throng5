@@ -18,12 +18,14 @@ Usage:
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Dict, Optional
 
 import numpy as np
 
 from brain.config import VERSION
-from brain.message_bus import MessageBus
+from brain.telemetry.decision_trace import DecisionTrace
+from brain.message_bus import FastSlotBus, MessageBus
 from brain.telemetry.session_logger import SessionLogger
 from brain.regions.sensory_cortex import SensoryCortex
 from brain.regions.basal_ganglia import BasalGanglia
@@ -34,14 +36,9 @@ from brain.regions.prefrontal_cortex import PrefrontalCortex
 from brain.regions.motor_cortex import MotorCortex
 from brain.environments.curiosity import CuriosityModule  # noqa: F401 — referenced by gauntlet
 from brain.telemetry.step_profiler import StepProfiler
+from brain.orchestrator_wiring import wire_subsystems
 
-
-def _get_counterfactual():
-    try:
-        from brain.planning.counterfactual import CounterfactualReasoner
-        return CounterfactualReasoner
-    except ImportError:
-        return None
+_log = logging.getLogger(__name__)
 
 
 class WholeBrain:
@@ -68,32 +65,14 @@ class WholeBrain:
         self.n_features = n_features
         self.n_actions = n_actions
         self._game_mode = game_mode
-
-        # ── Subsystem enable/disable flags (for ablation testing) ─────
-        # NOTE: 7 poisonous subsystems purged after ablation testing:
-        #   curiosity, meta_controller, rehearsal, dead_end_detector,
-        #   surprise_tracker, entropy_monitor, dream_action_bias
-        _defaults = {
-            "world_model": True,
-            "dreams": True,
-            "causal_model": True,
-            "skill_library": True,
-            "attribution": True,
-            "stage_classifier": True,
-            "counterfactual": True,
-            "hippocampus_store": True,
-            "threat_gating": True,
-            "probe_runner": True,
-        }
-        self._enabled = {**_defaults, **(enabled_systems or {})}
-        self._init_errors: Dict[str, str] = {}  # Track init failures
+        self._enabled: Dict[str, bool] = {}
+        self._init_errors: Dict[str, str] = {}
 
         # ── Message Bus ───────────────────────────────────────────────
         # history disabled by default: was appending every BrainMessage every step
         self.bus = MessageBus(history_size=1000, enable_history=False)
 
         # FastSlotBus: zero-allocation signalling for hot-path inter-region data
-        from brain.message_bus import FastSlotBus
         self.fast_bus = FastSlotBus()
         self.fast_bus.register("amygdala", {
             "threat_score": 0.0, "operating_mode": "execute", "epsilon": 0.15,
@@ -138,35 +117,7 @@ class WholeBrain:
         self.striatum.set_elite_buffer(self.hippocampus.elite)
         # ── Wire HER: hippocampus injects relabelled transitions into striatum._nstep ─
         self.hippocampus.set_striatum_ref(self.striatum)
-        # ── Dreamer Latent World Model (Phase 3C) ─────────────────────────────
-        try:
-            from brain.learning.world_model import DreamerWorldModel
-            self.dreamer = DreamerWorldModel(
-                n_features=n_features, n_actions=n_actions,
-                latent_dim=64, hidden_dim=256,
-            )
-        except Exception as _e:
-            self.dreamer = None
-
-        # ── Phase 4: Successor Representation ──────────────────────────────
-        # Enables sr_distance() routing for SubgoalPlanner and OptionSkill.
-        # Zero overhead until hippocampus._sr.is_ready (>=200 updates).
-        try:
-            self.hippocampus.enable_sr(
-                n_features=n_features,
-                n_actions=n_actions,
-            )
-        except Exception as _e:
-            self._init_errors["successor_repr"] = str(_e)
-
-        # ── Phase 4: Option-Critic ──────────────────────────────────────────
-        # Replaces ε-greedy with learned option policies.
-        # Disabled until striatum._option_critic.is_ready (>=500 steps).
-        if use_torch:
-            try:
-                self.striatum.enable_option_critic(n_options=4)
-            except Exception as _e:
-                self._init_errors["option_critic"] = str(_e)
+        self._last_action = 0
 
         # ── State ─────────────────────────────────────────────────────
         self._step_count = 0
@@ -185,122 +136,19 @@ class WholeBrain:
         self._wm_train_interval = 4     # World model train every 4th step
         self._causal_interval = 2       # Causal model observe every 2nd step
 
-        # ── Wire CNN encoder to Striatum for end-to-end learning ──────
-        if use_cnn and use_torch and self.sensory._use_cnn:
-            cnn_params = self.sensory.get_cnn_parameters()
-            if cnn_params:
-                self.striatum.wire_cnn_encoder(
-                    self.sensory.encode_for_training,
-                    cnn_params,
-                )
-
-        # ── Wire DQN policy to dreamer so dreams use learned Q-values ──
-        if use_torch and self.striatum._torch_dqn is not None:
-            self.basal_ganglia.set_policy_fn(
-                self.striatum._torch_dqn.select_action
-            )
-
-        # [PURGED] Curiosity module — intrinsic reward confused simple envs
-        # [PURGED] Meta-Controller — shadow-trained 2 DQNs, wasted compute
-
-        # ── Probe Runner (short empirical algorithm trials) ──────────
-        self.probe_runner = None
-        if self._enabled["probe_runner"]:
-            try:
-                from brain.learning.probe_runner import ProbeRunner
-                self.probe_runner = ProbeRunner(self, probe_steps=500)
-            except Exception as e:
-                self._init_errors["probe_runner"] = str(e)
-
-        # ── Stage Classifier (per-area learner specialization) ───────
-        self.stage_classifier = None
-        if self._enabled["stage_classifier"]:
-            try:
-                from brain.learning.stage_classifier import StageClassifier
-                self.stage_classifier = StageClassifier(n_features=n_features)
-            except Exception as e:
-                self._init_errors["stage_classifier"] = str(e)
-
-        # ── Plateau detection for LLM re-evaluation ─────────────────
-        self._plateau_window = 200        # Episodes to check for plateau
-        self._plateau_threshold = 0.02    # <2% improvement = plateau
+        self._plateau_window = 200
+        self._plateau_threshold = 0.02
         self._last_plateau_check = 0
 
-        # [PURGED] Rehearsal Loop — inline rollouts mutated replay buffer
-
-        # ── Planning Layer (long-term reasoning) ────────────────────────
-        self.planner = None
-        self._causal_model = None
-        self._dead_end_detector = None
-        if self._enabled["causal_model"]:
-            try:
-                from brain.planning.landmark_graph import LandmarkGraph
-                from brain.planning.dead_end_detector import DeadEndDetector
-                from brain.planning.causal_model import CausalModel
-                from brain.planning.goal_regression import GoalRegression
-                from brain.planning.subgoal_planner import SubgoalPlanner
-
-                graph = LandmarkGraph()
-                causal = CausalModel()
-                detector = None  # [PURGED] DeadEndDetector — 200-trial forward sim per step
-                regressor = GoalRegression(graph, causal_model=causal)
-                self.planner = SubgoalPlanner(
-                    self, graph, regressor, detector, causal,
-                )
-                self._causal_model = causal
-                self._dead_end_detector = detector
-            except Exception as e:
-                self._init_errors["causal_model"] = str(e)
-
-        # ── Skill Library (macro-skills for puzzle solving) ─────────────
-        self.skill_library = None
-        self._active_skill = None    # Currently executing skill
-        self._skill_game_state = {}  # Game state for skill preconditions
-        if self._enabled["skill_library"]:
-            try:
-                from brain.planning.skill_library import SkillLibrary
-                self.skill_library = SkillLibrary()
-            except Exception as e:
-                self._init_errors["skill_library"] = str(e)
-
-        # ── Counterfactual Reasoner (regret analysis on death) ─────────
-        self.counterfactual = None
-        if self._enabled["counterfactual"]:
-            try:
-                CFClass = _get_counterfactual()
-                if CFClass is not None:
-                    self.counterfactual = CFClass(self)
-            except Exception as e:
-                self._init_errors["counterfactual"] = str(e)
-
-        # ── Overnight Dream Loop ──────────────────────────────────────
-        self._dream_loop = None
-        if self._enabled["dreams"]:
-            try:
-                from brain.overnight.dream_loop import DreamLoop
-                self._dream_loop = DreamLoop(self, logger=self.logger)
-            except Exception as e:
-                self._init_errors["dreams"] = str(e)
-
-        # [PURGED] Surprise Tracker — positive feedback loop with bad WM data
-
-        # ── Decision Attribution ──────────────────────────────────────
-        self.attribution = None
-        if self._enabled["attribution"]:
-            try:
-                from brain.telemetry.attribution_logger import AttributionLogger
-                log_dir = f"logs/telemetry/{session_name}"
-                self.attribution = AttributionLogger(log_dir=log_dir)
-            except Exception as e:
-                self._init_errors["attribution"] = str(e)
-
-        # [PURGED] Entropy Monitor — overrode epsilon AND injected WM noise
-
-        # ── Throttle intervals for remaining systems ───────────────────
-        self._causal_observe_interval = self._causal_interval  # kept for compat
-        # Bool cache: avoid dict lookup on every hot-path step
-        self._wm_enabled = self._enabled["world_model"]
-        self._causal_enabled = (self.planner is not None)
+        wire_subsystems(
+            self,
+            session_name=session_name,
+            n_features=n_features,
+            n_actions=n_actions,
+            use_cnn=use_cnn,
+            use_torch=use_torch,
+            enabled_systems=enabled_systems,
+        )
 
         # ── Pre-allocated step return dict (updated in-place each step) ─
         self._step_result: Dict[str, Any] = {
@@ -308,38 +156,25 @@ class WholeBrain:
             "epsilon": 0.15, "context_score": 0.0, "action_source": "striatum",
         }
 
-        # ── Near-Death Counterfactual Replayer ────────────────────────
-        # Every N episodes: pick random elite ep, find last near-death state,
-        # inject full run-up + counterfactual escape transition into replay.
-        try:
-            from brain.learning.near_death_replayer import NearDeathReplayer
-            _wm_ref = getattr(self.basal_ganglia, "_world_model", None)
-            self.near_death_replayer = NearDeathReplayer(world_model=_wm_ref)
-            self._nd_trigger_interval = 5   # Trigger every 5 episodes
-        except Exception as e:
-            self.near_death_replayer = None
-            self._init_errors["near_death_replayer"] = str(e)
-        # ── Adaptive Knob Self-Tuner ───────────────────────────────────
-        try:
-            from brain.learning.adaptive_knobs import AdaptiveKnobController
-            self.knob_tuner = AdaptiveKnobController(
-                window=20, tune_every=3, step_size=0.10, explore_every=10,
-            )
-            if self.near_death_replayer is not None:
-                self.knob_tuner.attach(
-                    self.near_death_replayer,
-                    self.hippocampus.elite,
-                    self,
-                )
-        except Exception as e:
-            self.knob_tuner = None
-            self._init_errors["knob_tuner"] = str(e)
-
-        # ── Inline rehearsal state (env ref for skill/planning lookups) ─
-        self._env_ref = None
-
         if self.logger:
             self.logger.milestone("init", f"WholeBrain v{VERSION} initialized with {len(self._regions)} regions, mode={self._game_mode}")
+
+    def _wire_striatum_learning(self) -> None:
+        """Connect SR, Option-Critic context, and hippocampus → striatum."""
+        if self.hippocampus._sr is not None:
+            try:
+                self.striatum.set_sr_module(self.hippocampus._sr)
+            except Exception as e:
+                self._init_errors["striatum_sr"] = str(e)
+
+        if self.striatum.option_critic is not None:
+            try:
+                self.striatum.set_context_sources(
+                    elite_buf=self.hippocampus.elite,
+                    dreamer=self.dreamer,
+                )
+            except Exception as e:
+                self._init_errors["striatum_oc_context"] = str(e)
 
     def set_adapter(self, adapter) -> None:
         """Set the environment adapter."""
@@ -350,8 +185,10 @@ class WholeBrain:
         self._env_ref = env
 
     def set_game_mode(self, mode: str) -> None:
-        """Set game mode: 'action' (default) or 'puzzle' (enables dead-end checks)."""
+        """Set game mode: 'action' (default) or 'puzzle' (enables trap rollouts)."""
         self._game_mode = mode
+        if self.planner is not None:
+            self.planner.enable_trap_checks = (mode == "puzzle")
         if self.logger:
             self.logger.event("config", "game_mode", f"Mode set to {mode}")
 
@@ -393,6 +230,7 @@ class WholeBrain:
         """
         self._step_count += 1
         self._episode_reward += reward
+        self._last_action = prev_action
         self.profiler.step_start()
 
         # ── 1. Sensory Cortex ─────────────────────────────────────────
@@ -445,8 +283,6 @@ class WholeBrain:
             self.profiler.stop("hippocampus")
 
         # ── 5. Striatum — action selection ────────────────────────────
-        # [PURGED] dream_action_bias injection — uncalibrated dream values biased DQN
-
         self.profiler.start("striatum_select")
         striatum_output = self.striatum.step({"features": features})
         striatum_action = striatum_output.get("action", 0)
@@ -454,8 +290,6 @@ class WholeBrain:
 
         # ── 6. Learning ──────────────────────────────────────────────
         if self._prev_features is not None:
-            # [PURGED] Curiosity intrinsic reward — confused simple envs
-
             self.profiler.start("striatum_learn")
             self.striatum.learn({
                 "state": self._prev_features,
@@ -489,10 +323,8 @@ class WholeBrain:
                     # Train every 4 steps (cheap: 64-dim latent ELBO)
                     if self._step_count % 16 == 0:
                         self.dreamer.train_step()
-                except Exception:
-                    pass
-
-            # [PURGED] Meta-Controller shadow training — wasted compute
+                except Exception as e:
+                    _log.debug("dreamer step failed: %s", e)
 
         # ── 6.5 Causal model + subgoal tracking ─────────────────────
         if (self.planner is not None
@@ -503,19 +335,16 @@ class WholeBrain:
                 self.planner.observe_transition(
                     self._prev_features, prev_action, features, reward, done,
                 )
-            except Exception:
-                pass
+            except AttributeError as e:
+                _log.warning("causal observe missing dependency: %s", e)
+            except Exception as e:
+                _log.debug("causal observe failed: %s", e)
             self.profiler.stop("causal_observe")
-
-        # [PURGED] Dead-end check — 200-trial forward simulation per step
-        # [PURGED] Rehearsal trigger — inline rollouts mutated replay buffer
 
         # Track features and raw frames for next step
         self._prev_features = features
         self._prev_raw_frames = raw_frames
         self._last_features = features
-
-        # [PURGED] Surprise tracking — positive feedback loop with bad WM data
 
         # ── 7. Skill Library Override ─────────────────────────────────
         skill_override = None
@@ -539,9 +368,9 @@ class WholeBrain:
             "striatum_halted": self.bus.is_halted("striatum"),
         })
         action = motor_output.get("action", 0)
+        self._last_action = action
         self.profiler.stop("motor")
 
-        # [PURGED] Entropy monitoring — epsilon override + WM noise injection
         epsilon_used = striatum_output.get("epsilon", 0.15)
 
         self.profiler.step_end()
@@ -549,7 +378,6 @@ class WholeBrain:
         # ── 9. Decision trace ────────────────────────────────────────
         if self.attribution is not None:
             try:
-                from brain.telemetry.decision_trace import DecisionTrace
                 trace = DecisionTrace(
                     step=self._step_count,
                     action_taken=action,
@@ -569,8 +397,8 @@ class WholeBrain:
                     region_times=self.profiler.report(),
                 )
                 self.attribution.record(trace)
-            except Exception:
-                pass
+            except Exception as e:
+                _log.debug("attribution record failed: %s", e)
 
         # ── Episode boundary ──────────────────────────────────────────
         if done:
@@ -589,16 +417,12 @@ class WholeBrain:
         """Handle episode completion."""
         self._episode_count += 1
 
-        # [PURGED] MetaController report — no longer exists
-
         # ── Feed stage classifier with per-episode learner performance ──
         if self.stage_classifier is not None and self._last_features is not None:
             stage_id = self.stage_classifier.classify(self._last_features)
             self.stage_classifier.record(
                 stage_id, "default", self._episode_reward,
             )
-
-        # [PURGED] Rehearsal bottleneck tracker — no longer exists
 
         # ── Counterfactual regret analysis on death ───────────────────
         if (self.counterfactual is not None
@@ -608,7 +432,7 @@ class WholeBrain:
             try:
                 regret = self.counterfactual.find_regret(
                     self._prev_features,
-                    actual_action=0,  # Last action before death
+                    actual_action=self._last_action,
                     actual_reward=self._episode_reward,
                     n_alternatives=min(self.n_actions, 6),
                     n_steps=30,
@@ -622,10 +446,8 @@ class WholeBrain:
                         reward=self._episode_reward,
                         is_dead_end=True,
                     )
-            except Exception:
-                pass
-
-        # [PURGED] Rehearsal chain export — no longer exists
+            except Exception as e:
+                _log.debug("counterfactual regret failed: %s", e)
 
         # ── Near-Death Counterfactual Replay (every N episodes) ────────
         if (self.near_death_replayer is not None
@@ -644,8 +466,8 @@ class WholeBrain:
                         f"Injected {injected} counterfactual transitions "
                         f"(ep {self._episode_count})",
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                _log.debug("near_death replay failed: %s", e)
 
         # ── Attribution episode summary ───────────────────────────────
         if self.attribution is not None:
@@ -653,8 +475,8 @@ class WholeBrain:
                 self.attribution.episode_summary(
                     self._episode_count, self._episode_reward,
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                _log.debug("attribution episode summary failed: %s", e)
 
         if self.logger:
             self.logger.training_step(
@@ -671,8 +493,8 @@ class WholeBrain:
         if self.knob_tuner is not None:
             try:
                 self.knob_tuner.record_episode(self._episode_reward)
-            except Exception:
-                pass
+            except Exception as e:
+                _log.debug("knob tuner record failed: %s", e)
         self._episode_reward = 0.0
 
     # ── Probe & Plateau API ──────────────────────────────────────────
@@ -700,8 +522,52 @@ class WholeBrain:
         return None
 
     def rehearse(self, **kwargs):
-        """[PURGED] Rehearsal loop was removed. Returns not_available."""
-        return {"status": "not_available"}
+        """
+        Run RehearsalLoop when wired via orchestrator_wiring.
+
+        Without env/features, returns not_available (smoke-safe).
+        Montezuma mode_rehearse passes mode, env, and features.
+        """
+        loop = getattr(self, "_rehearsal_loop", None)
+        if loop is None:
+            return {"status": "not_available"}
+
+        mode = kwargs.get("mode", "advance")
+        env = kwargs.get("env")
+        features = kwargs.get("features")
+
+        try:
+            if mode == "advance":
+                if env is None or features is None:
+                    return {
+                        "status": "not_available",
+                        "reason": "advance requires env and features",
+                    }
+                result = loop.run_advance(features, env)
+            elif mode == "frontier":
+                if env is None:
+                    return {"status": "not_available", "reason": "frontier requires env"}
+                result = loop.run_frontier(env)
+            elif mode == "stuck":
+                if env is None or features is None:
+                    return {
+                        "status": "not_available",
+                        "reason": "stuck requires env and features",
+                    }
+                result = loop.run_stuck(features, env)
+            elif mode in ("free", "free_run"):
+                if env is None:
+                    return {"status": "not_available", "reason": "free requires env"}
+                result = loop.run_free(
+                    env, max_episodes=kwargs.get("max_episodes", 100),
+                )
+            else:
+                return {"status": "not_available", "reason": f"unknown mode: {mode}"}
+
+            return {"status": "ok", "mode": mode, **result}
+        except Exception as exc:
+            _log.warning("rehearse(%s) failed: %s", mode, exc)
+            return {"status": "error", "mode": mode, "message": str(exc)}
 
     def plan(self, goal_features=None, goal_hash=None, goal_label="goal"):
         """
@@ -771,7 +637,7 @@ class WholeBrain:
                 "stage_classifier": self.stage_classifier is not None,
                 "planner": self.planner is not None,
                 "causal_model": self._causal_model is not None,
-                "dead_end_detector": self._dead_end_detector is not None,
+                "dead_end_detector": False,  # purged from hot path
                 "skill_library": self.skill_library is not None,
                 "counterfactual": self.counterfactual is not None,
                 "dream_loop": self._dream_loop is not None,

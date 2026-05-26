@@ -414,6 +414,30 @@ class RainbowDQN:
         action = int(np.argmax(q_values))
         return action, q_values
 
+    def select_actions_batch(
+        self,
+        features_batch: np.ndarray,
+        explore: bool = True,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Select actions for a batch of observations (N, n_features)."""
+        batch = np.asarray(features_batch, dtype=np.float32)
+        n = batch.shape[0]
+        self._total_steps += n
+        self.online_net.train(explore)
+        with torch.no_grad():
+            states = torch.as_tensor(batch, dtype=torch.float32, device=self.device)
+            q_values = self.online_net(states).cpu().numpy()
+        actions = np.argmax(q_values, axis=1).astype(np.int64)
+        return actions, q_values
+
+    def load_state_dict(self, state: Dict[str, Any]) -> None:
+        """Load weights from an already-loaded checkpoint dict."""
+        self.online_net.load_state_dict(state["online_net"])
+        self.target_net.load_state_dict(state["target_net"])
+        self.optimizer.load_state_dict(state["optimizer"])
+        self._total_updates = state.get("total_updates", 0)
+        self._total_steps = state.get("total_steps", 0)
+
     def forward(self, features: np.ndarray) -> np.ndarray:
         """Q-values (NumPy interface for Striatum compatibility)."""
         with torch.inference_mode():
@@ -583,11 +607,7 @@ class RainbowDQN:
 
     def load(self, filepath: str) -> None:
         state = torch.load(filepath, map_location=self.device, weights_only=False)
-        self.online_net.load_state_dict(state["online_net"])
-        self.target_net.load_state_dict(state["target_net"])
-        self.optimizer.load_state_dict(state["optimizer"])
-        self._total_updates = state.get("total_updates", 0)
-        self._total_steps = state.get("total_steps", 0)
+        self.load_state_dict(state)
 
     def stats(self) -> Dict[str, Any]:
         n_params = sum(p.numel() for p in self.online_net.parameters())

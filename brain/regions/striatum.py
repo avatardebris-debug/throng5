@@ -16,15 +16,18 @@ In Phase 3, the learner becomes swappable via RLZoo integration.
 
 from __future__ import annotations
 
+import logging
 from collections import deque
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
+_log = logging.getLogger(__name__)
+
 from brain.message_bus import MessageBus, Priority
 from brain.regions.base_region import BrainRegion
+from brain.regions.oc_context import OptionCriticContext
 from brain.learning.replay_adapters import StratifiedReplayDeque, NStepBuffer
-from brain.learning.option_critic import OptionCritic
 
 # ── Optional Numba JIT for hot forward pass ────────────────────────────
 try:
@@ -130,23 +133,12 @@ class Striatum(BrainRegion):
                 except ImportError:
                     pass  # Fall back to NumPy DQN
 
-        # ── DQN Network (online) ──────────────────────────────────────
-        rng = np.random.RandomState(42)
-        scale1 = np.sqrt(2.0 / n_features)
-        scale2 = np.sqrt(2.0 / hidden_size)
+        # NumPy DQN weights — allocated lazily only when torch is unavailable
+        self._numpy_ready = False
+        self._W1 = self._b1 = self._W2 = self._b2 = None
+        self._tW1 = self._tb1 = self._tW2 = self._tb2 = None
 
-        self._W1 = rng.randn(n_features, hidden_size).astype(np.float32) * scale1
-        self._b1 = np.zeros(hidden_size, dtype=np.float32)
-        self._W2 = rng.randn(hidden_size, n_actions).astype(np.float32) * scale2
-        self._b2 = np.zeros(n_actions, dtype=np.float32)
-
-        # ── DQN Network (target — frozen copy) ───────────────────────
-        self._tW1 = self._W1.copy()
-        self._tb1 = self._b1.copy()
-        self._tW2 = self._W2.copy()
-        self._tb2 = self._b2.copy()
-
-        # ── Replay Buffer (PER-stratified) ──────────────────────────────
+        # ── Replay Buffer (PER-stratified) — shared by NumPy path ───────
         # StratifiedReplayDeque: 30% near-death / 70% normal, TD-error weighted
         self._replay: StratifiedReplayDeque = StratifiedReplayDeque(capacity=buffer_size)
         # NStepBuffer: accumulates n=4 steps, flushes G_t discounted returns
@@ -176,23 +168,59 @@ class Striatum(BrainRegion):
         # Pre-allocated buffers for zero-alloc forward pass
         self._h_buf = np.zeros(hidden_size, dtype=np.float32)  # reusable hidden layer
 
-        # ── Option-Critic (Phase 4) ──────────────────────────────────
-        # Disabled by default. Enabled by orchestrator via enable_option_critic().
-        # When ready (>=500 updates), replaces ε-greedy with option-guided selection.
-        self._option_critic: Optional[OptionCritic] = None
-        self._oc_last_state: Optional[np.ndarray] = None  # for update() call in learn()
-        self._oc_last_option: Optional[int] = None
-        self._oc_last_action: Optional[int] = None
+        # Option-Critic + integrated context (see oc_context.py)
+        self._oc = OptionCriticContext(self)
 
-        # ── Phase 5 Part 3: Integrated Context (Past+Present+Future) ────────
-        # When set, OptionCritic.select_option() receives a wider ctx vector:
-        #   ctx = concat([elite_embedding, features, dream_features])
-        # Rebuilt every 4 steps (oc_ctx_interval) to amortize dreamer cost.
-        self._ctx_elite_buf = None    # EliteReplayBuffer ref
-        self._ctx_dreamer = None      # DreamerWorldModel ref
-        self._ctx_cache: Optional[np.ndarray] = None  # most recent ctx vector
-        self._ctx_step: int = 0
-        self._oc_ctx_interval: int = 4  # rebuild ctx every N steps
+        if self._torch_dqn is None:
+            self._init_numpy_dqn()
+
+    def _init_numpy_dqn(self) -> None:
+        """Allocate NumPy DQN weights (only when Torch backend is not used)."""
+        if self._numpy_ready:
+            return
+        rng = np.random.RandomState(42)
+        scale1 = np.sqrt(2.0 / self.n_features)
+        scale2 = np.sqrt(2.0 / self.hidden_size)
+
+        self._W1 = rng.randn(self.n_features, self.hidden_size).astype(np.float32) * scale1
+        self._b1 = np.zeros(self.hidden_size, dtype=np.float32)
+        self._W2 = rng.randn(self.hidden_size, self.n_actions).astype(np.float32) * scale2
+        self._b2 = np.zeros(self.n_actions, dtype=np.float32)
+
+        self._tW1 = self._W1.copy()
+        self._tb1 = self._b1.copy()
+        self._tW2 = self._W2.copy()
+        self._tb2 = self._b2.copy()
+        self._numpy_ready = True
+
+    def _shape_reward(
+        self,
+        state: np.ndarray,
+        next_state: np.ndarray,
+        reward: float,
+    ) -> float:
+        """SR distance shaping when module is wired and ready."""
+        if self._sr_matrix is None:
+            return reward
+        try:
+            if getattr(self._sr_matrix, "is_ready", False):
+                d_before = float(self._sr_matrix.distance(state))
+                d_after = float(self._sr_matrix.distance(next_state))
+                return reward + 0.1 * (d_before - d_after)
+        except Exception:
+            pass
+        return reward
+
+    def _track_episode_step(self, reward: float, done: bool) -> None:
+        """Shared episode counters for OC warmup and reporting."""
+        self._current_ep_steps += 1
+        self._episode_reward += reward
+        if done:
+            self._episode_rewards.append(self._episode_reward)
+            self._episode_step_counts.append(self._current_ep_steps)
+            self._episode_reward = 0.0
+            self._current_ep_steps = 0
+            self._episode_count += 1
 
     # ── Elite Buffer wiring ───────────────────────────────────────────
 
@@ -207,37 +235,21 @@ class Striatum(BrainRegion):
         self._elite_buf = elite
 
     def enable_option_critic(self, n_options: int = 4) -> None:
-        """
-        Activate Option-Critic for this Striatum instance.
+        """Activate Option-Critic (delegates to OptionCriticContext)."""
+        self._oc.enable(n_options)
 
-        Fix 1: auto-scales min_updates based on recent mean episode length.
-          min_updates = max(100, 3 × avg_ep_steps)
-        For Acrobot (avg ~100 steps): min_updates=300 → ~3 eps warmup (not 5).
-        For Taxi (avg ~200 steps):    min_updates=600 → ~3 eps warmup.
+    @property
+    def option_critic(self):
+        """Active OptionCritic instance, or None if disabled."""
+        return self._oc.option_critic
 
-        Falls back silently on import failure.
-        """
-        try:
-            # Estimate avg episode length from recent episode rewards timing.
-            # _episode_rewards stores per-episode total rewards; we use length of
-            # _nstep buffer's flush history as a proxy for step counts.
-            # Simpler: use n_features as a rough env-complexity heuristic,
-            # but BEST is the actual step count if available.
-            avg_steps = 200  # conservative default
-            if hasattr(self, '_episode_step_counts') and len(self._episode_step_counts) > 0:
-                avg_steps = int(np.mean(list(self._episode_step_counts)[-20:]))
+    def oc_input(self, features: np.ndarray) -> np.ndarray:
+        """Unified Option-Critic state vector for train and inference."""
+        return self._oc.oc_input(features)
 
-            warmup = max(100, 3 * avg_steps)
-
-            self._option_critic = OptionCritic(
-                n_options=n_options,
-                n_actions=self.n_actions,
-                n_features=self.n_features,
-                gamma=self._gamma,
-                min_updates=warmup,
-            )
-        except Exception:
-            self._option_critic = None
+    def reset_oc_context_cache(self) -> None:
+        """Clear integrated OC context cache (tests / parity checks)."""
+        self._oc.reset_cache()
 
     def set_sr_module(self, sr_matrix) -> None:
         """
@@ -249,113 +261,8 @@ class Striatum(BrainRegion):
         """
         self._sr_matrix = sr_matrix
 
-    def set_context_sources(
-        self,
-        elite_buf,
-        dreamer,
-        elite_embed_dim: int = 8,
-        dream_dim: int = 8,
-    ) -> None:
-        """
-        Wire past+future context sources for integrated prediction input (Part 3).
-
-        When set, OptionCritic's Manager receives:
-          ctx = concat([elite_embedding(elite_embed_dim), features, dream_features(dream_dim)])
-
-        Calls set_context_mode() on the OptionCritic to expand its weight
-        matrices to ctx_dim = elite_embed_dim + n_features + dream_dim.
-
-        Args:
-            elite_buf: EliteReplayBuffer with .summary_embedding(dim) method.
-            dreamer:   DreamerWorldModel with .dream_latent(features) method.
-            elite_embed_dim: dimension of the elite embedding (default 8).
-            dream_dim: dimension used from the dream latent (default 8).
-        """
-        self._ctx_elite_buf = elite_buf
-        self._ctx_dreamer = dreamer
-        self._ctx_embed_dim = elite_embed_dim
-        self._ctx_dream_dim = dream_dim
-
-        if self._option_critic is not None:
-            ctx_dim = elite_embed_dim + self.n_features + dream_dim
-            try:
-                self._option_critic.set_context_mode(ctx_dim)
-            except Exception:
-                pass
-
-    def _build_ctx(self, features: np.ndarray) -> np.ndarray:
-        """
-        Build the integrated context vector: [elite_embedding | features | dream_features].
-
-        Falls back gracefully to features-only if sources aren't set or fail.
-        Rebuilds every _oc_ctx_interval steps; caches between rebuilds.
-        """
-        self._ctx_step += 1
-
-        # Cache: only rebuild ctx every 4 steps
-        if self._ctx_cache is not None and self._ctx_step % self._oc_ctx_interval != 0:
-            # Splice in the fresh current features (position elite_embed_dim)
-            ed = getattr(self, "_ctx_embed_dim", 0)
-            self._ctx_cache[ed: ed + self.n_features] = features
-            return self._ctx_cache
-
-        parts = []
-        # 1. Past: elite buffer summary embedding
-        try:
-            ed = getattr(self, "_ctx_embed_dim", 8)
-            if self._ctx_elite_buf is not None and hasattr(self._ctx_elite_buf, "summary_embedding"):
-                elite_emb = self._ctx_elite_buf.summary_embedding(ed)
-            else:
-                elite_emb = np.zeros(ed, dtype=np.float32)
-            parts.append(elite_emb.astype(np.float32))
-        except Exception:
-            ed = getattr(self, "_ctx_embed_dim", 8)
-            parts.append(np.zeros(ed, dtype=np.float32))
-
-        # 2. Present: current features
-        parts.append(features.astype(np.float32))
-
-        # 3. Future: dreamer latent rollout
-        try:
-            dd = getattr(self, "_ctx_dream_dim", 8)
-            if self._ctx_dreamer is not None and hasattr(self._ctx_dreamer, "dream_latent"):
-                dream = np.asarray(self._ctx_dreamer.dream_latent(features), dtype=np.float32)
-                dream = dream[:dd] if len(dream) >= dd else np.pad(dream, (0, dd - len(dream)))
-            else:
-                dream = np.zeros(dd, dtype=np.float32)
-            parts.append(dream)
-        except Exception:
-            dd = getattr(self, "_ctx_dream_dim", 8)
-            parts.append(np.zeros(dd, dtype=np.float32))
-
-        ctx = np.concatenate(parts, axis=0)
-        self._ctx_cache = ctx
-        return ctx
-
-    def oc_observe(
-        self,
-        state: np.ndarray,
-        action: int,
-        reward: float,
-        next_state: np.ndarray,
-        done: bool,
-    ) -> None:
-        """
-        Feed a transition into OptionCritic for training.
-        Called every step by the orchestrator (or learn() path).
-        NO-OP if OC not enabled.
-        """
-        if self._option_critic is None:
-            return
-        option = self._oc_last_option
-        if option is None:
-            return
-        try:
-            self._option_critic.update(state, option, action, reward, next_state, done)
-            # Check termination at next state
-            self._option_critic.should_terminate(next_state, option)
-        except Exception:
-            pass
+    def set_context_sources(self, elite_buf, dreamer, elite_embed_dim: int = 8, dream_dim: int = 8) -> None:
+        self._oc.set_context_sources(elite_buf, dreamer, elite_embed_dim, dream_dim)
 
     # ── CNN Integration ───────────────────────────────────────────────
 
@@ -400,36 +307,9 @@ class Striatum(BrainRegion):
 
         features_arr = np.asarray(features, dtype=np.float32)
 
-        # ── Option-Critic override with integrated ctx (Phase 4+5) ───────
-        # When ready, use ctx = concat([elite, features, dream]) for option selection.
-        if self._option_critic is not None and self._option_critic.is_ready and explore:
-            oc = self._option_critic
-            # Build context: features-only when no ctx sources set, else full ctx
-            if self._ctx_elite_buf is not None or self._ctx_dreamer is not None:
-                oc_input = self._build_ctx(features_arr)
-            else:
-                oc_input = features_arr
-            # Select option if none active
-            if oc.current_option is None:
-                option = oc.select_option(oc_input, explore=True)
-            else:
-                option = oc.current_option
-            action = oc.intra_option_action(features_arr, option, explore=True)
-            self._oc_last_state = features_arr.copy()
-            self._oc_last_option = option
-            self._oc_last_action = action
-            # Still compute Q-values for logging (non-blocking, torch path)
-            if self._torch_dqn is not None:
-                _, q_values = self._torch_dqn.select_action(features_arr, explore=False)
-            else:
-                q_values = self._forward(features_arr)
-            return {
-                "action": action,
-                "q_values": q_values,
-                "epsilon": 0.0,
-                "backend": "option_critic",
-                "option": option,
-            }
+        oc_result = self._oc.select_action(features_arr, explore, self._forward)
+        if oc_result is not None:
+            return oc_result
 
         # ── Use TorchDQN if available ─────────────────────────────────
         if self._torch_dqn is not None:
@@ -504,6 +384,10 @@ class Striatum(BrainRegion):
 
         state_arr = np.asarray(state, dtype=np.float32)
         next_state_arr = np.asarray(next_state, dtype=np.float32)
+        reward = self._shape_reward(state_arr, next_state_arr, float(reward))
+
+        self._track_episode_step(reward, done)
+        self._oc.observe(state_arr, action, reward, next_state_arr, done)
 
         # ── Use TorchDQN if available ─────────────────────────────────
         if self._torch_dqn is not None:
@@ -512,60 +396,40 @@ class Striatum(BrainRegion):
                 raw_frames=raw_frames,
                 next_raw_frames=next_raw_frames,
             )
-            # Fix 1: track step counts for OC warmup auto-scale
-            self._current_ep_steps += 1
-            self._episode_reward += reward
-            if done:
-                self._episode_rewards.append(self._episode_reward)
-                self._episode_step_counts.append(self._current_ep_steps)
-                self._episode_reward = 0.0
-                self._current_ep_steps = 0
 
-            # Throttled: skip gradient update if requested
             if experience.get("skip_train", False):
-                return {"loss": 0.0, "backend": "torch", "buffer_size": len(self._torch_dqn._replay)}
+                buf_size = self._torch_dqn.stats().get("buffer_size", len(self._replay))
+                return {
+                    "loss": 0.0,
+                    "backend": "torch",
+                    "buffer_size": buf_size,
+                    "oc_updates": (
+                        self.option_critic._total_updates
+                        if self.option_critic is not None else 0
+                    ),
+                }
 
             train_out = self._torch_dqn.train_step()
-            # RainbowDQN returns 3-tuple (stats, td_errors, self_surprises)
-            # TorchDQN returns 2-tuple (stats, td_errors) — handle both
             if isinstance(train_out, tuple) and len(train_out) == 3:
                 result, _td, _self_surp = train_out
             elif isinstance(train_out, tuple) and len(train_out) == 2:
                 result, _td = train_out
-                _self_surp = None
             else:
                 result = train_out
-                _self_surp = None
 
             result["backend"] = "torch"
+            oc = self.option_critic
+            if oc is not None:
+                result["oc_ready"] = oc.is_ready
+                result["oc_updates"] = oc._total_updates
             return result
 
         # ── NumPy fallback ────────────────────────────────────────────
-        # Fix 3: SR reward shaping (dense pull toward subgoals)
-        if self._sr_matrix is not None:
-            try:
-                sr_ready = getattr(self._sr_matrix, 'is_ready', False)
-                if sr_ready:
-                    d_before = float(self._sr_matrix.distance(state_arr))
-                    d_after  = float(self._sr_matrix.distance(next_state_arr))
-                    reward   = reward + 0.1 * (d_before - d_after)
-            except Exception:
-                pass
+        self._init_numpy_dqn()
 
-        # Push via n-step buffer → StratifiedReplayDeque (PER)
         near_death = bool(reward < -0.5 or (done and reward <= 0))
         self._nstep.push(state_arr, action, reward, next_state_arr, done,
                          near_death=near_death)
-
-        # Fix 1: track episode step counts
-        self._current_ep_steps += 1
-        self._episode_reward += reward
-        if done:
-            self._episode_rewards.append(self._episode_reward)
-            self._episode_step_counts.append(self._current_ep_steps)
-            self._episode_reward = 0.0
-            self._current_ep_steps = 0
-            self._episode_count += 1
 
         # Batch learning from replay
         if len(self._replay) < self.batch_size:
@@ -653,8 +517,23 @@ class Striatum(BrainRegion):
 
     def _forward(self, x: np.ndarray) -> np.ndarray:
         """One-sample forward pass. Uses Numba JIT when available."""
+        if self._torch_dqn is not None:
+            _, q = self._torch_dqn.select_action(
+                np.asarray(x, dtype=np.float32), explore=False,
+            )
+            return q
+        self._init_numpy_dqn()
+        if not self._numpy_ready:
+            return np.zeros(self.n_actions, dtype=np.float32)
+        xf = np.asarray(x, dtype=np.float32)
         if _NUMBA:
-            return _dqn_forward_nb(x, self._W1, self._b1, self._W2, self._b2)
+            return _dqn_forward_nb(
+                xf,
+                np.ascontiguousarray(self._W1, dtype=np.float32),
+                np.ascontiguousarray(self._b1, dtype=np.float32),
+                np.ascontiguousarray(self._W2, dtype=np.float32),
+                np.ascontiguousarray(self._b2, dtype=np.float32),
+            )
         # Numpy fallback with pre-allocated buffer
         np.dot(x, self._W1, out=self._h_buf)
         self._h_buf += self._b1
@@ -662,10 +541,14 @@ class Striatum(BrainRegion):
         return self._h_buf @ self._W2 + self._b2
 
     def _forward_batch(self, X: np.ndarray) -> np.ndarray:
+        if not self._numpy_ready:
+            return np.zeros((len(X), self.n_actions), dtype=np.float32)
         hidden = np.maximum(0, X @ self._W1 + self._b1)
         return hidden @ self._W2 + self._b2
 
     def _forward_target_batch(self, X: np.ndarray) -> np.ndarray:
+        if not self._numpy_ready:
+            return np.zeros((len(X), self.n_actions), dtype=np.float32)
         hidden = np.maximum(0, X @ self._tW1 + self._tb1)
         return hidden @ self._tW2 + self._tb2
 
@@ -739,11 +622,14 @@ class Striatum(BrainRegion):
     def reset_episode(self) -> None:
         self._action_bias = None
         self._episode_reward = 0.0
+        self._oc.reset_episode()
 
     def save_weights(self) -> Dict[str, np.ndarray]:
+        self._init_numpy_dqn()
         return {"W1": self._W1, "b1": self._b1, "W2": self._W2, "b2": self._b2}
 
     def load_weights(self, weights: Dict[str, np.ndarray]) -> None:
+        self._init_numpy_dqn()
         self._W1 = weights["W1"]
         self._b1 = weights["b1"]
         self._W2 = weights["W2"]
