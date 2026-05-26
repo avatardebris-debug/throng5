@@ -3,19 +3,14 @@
 from __future__ import annotations
 
 import json
-
 import logging
-
 from dataclasses import dataclass
-
 from typing import Any, Callable, Dict, Optional, Tuple
 
 import numpy as np
 
 from brain.games.montezuma.runner.constants import RESULTS_DIR, ensure_results_dirs
-
 from brain.games.montezuma.runner.setup import get_game_state
-
 from brain.games.montezuma.runner.action_policy import (
     ActionStepContext,
     ActionFilterChain,

@@ -9,15 +9,18 @@ Critical for puzzle games (Adventures of Lolo) where wrong block placement
 makes the level unwinnable — but the game never tells you.
 
 Usage:
-    detector = DeadEndDetector(brain)
-    is_dead = detector.check(features, n_trials=500)
+    detector = DeadEndDetector(brain, default_trials=500, trap_check_trials=20)
+    is_dead = detector.check(features)  # uses default_trials
+    if detector.is_trap(features, action, reward):  # uses trap_check_trials (hot path)
+        ...
     if is_dead:
         env.load_state(saved_state)  # Undo the bad action
 """
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional
+import hashlib
+from typing import Any, Callable, Dict, Optional
 
 import numpy as np
 
@@ -32,7 +35,7 @@ class DeadEndDetector:
     - Items collected in wrong order (traps)
     - Paths permanently closed
 
-    False positive rate is managed by requiring N=500+ trials with
+    False positive rate is managed by requiring high trial counts with
     zero successes — very unlikely for solvable states.
     """
 
@@ -43,15 +46,25 @@ class DeadEndDetector:
         rollout_length: int = 200,
         reward_threshold: float = 0.0,
         trap_check_trials: int = 20,
+        pre_action_trials: Optional[int] = None,
     ):
         self.brain = brain
         self.default_trials = default_trials
         self.rollout_length = rollout_length
         self.reward_threshold = reward_threshold
+        # Hot-path trap check uses fewer trials than full dead-end checks.
         self.trap_check_trials = min(trap_check_trials, default_trials)
+        # Before/after action checks use a policy-bound baseline trial count.
+        self.pre_action_trials = (
+            min(200, self.default_trials)
+            if pre_action_trials is None
+            else min(pre_action_trials, self.default_trials)
+        )
 
-        self._checked: Dict[int, bool] = {}  # hash → is_dead_end
+        self._checked: Dict[str, bool] = {}  # cache key -> is_dead_end
         self._checks_run: int = 0
+        self._cache_hits: int = 0
+        self._cache_misses: int = 0
 
     def check(
         self,
@@ -63,10 +76,11 @@ class DeadEndDetector:
         Check if the current state is a dead end.
 
         Runs n_trials compressed rollouts. If ZERO succeed, marks as dead end.
+        Results are cached by state bytes + rollout policy.
 
         Args:
             features: Current state features
-            n_trials: Number of rollouts (default: 500)
+            n_trials: Number of rollouts (default: ``default_trials``)
             custom_success_fn: Custom success checker
 
         Returns:
@@ -74,6 +88,11 @@ class DeadEndDetector:
         """
         n_trials = n_trials or self.default_trials
         self._checks_run += 1
+        cache_key = self._cache_key(features, n_trials, custom_success_fn)
+        if cache_key in self._checked:
+            self._cache_hits += 1
+            return self._checked[cache_key]
+        self._cache_misses += 1
 
         for trial in range(n_trials):
             sim_features = features.copy()
@@ -99,8 +118,10 @@ class DeadEndDetector:
                 sim_features = next_features
 
             if reached_goal:
+                self._checked[cache_key] = False
                 return False
 
+        self._checked[cache_key] = True
         return True
 
     def check_after_action(
@@ -115,12 +136,14 @@ class DeadEndDetector:
 
         Compares solvability before and after the action.
         If the state was solvable before but not after, the action
-        caused the dead end.
+        caused the dead end. Baseline (before-action) checks use
+        ``pre_action_trials`` and after-action checks use ``default_trials``.
 
         Returns:
             {"is_dead_end": bool, "caused_by_action": bool, "action": int}
         """
-        was_solvable_before = not self.check(features_before, n_trials=200)
+        before_trials = self.pre_action_trials
+        was_solvable_before = not self.check(features_before, n_trials=before_trials)
         is_dead_after = self.check(features_after, n_trials=self.default_trials)
 
         return {
@@ -163,7 +186,7 @@ class DeadEndDetector:
             if explore and np.random.rand() < 0.3:
                 return np.random.randint(len(q_vals))
             return int(np.argmax(q_vals))
-        except Exception:
+        except (AttributeError, IndexError, TypeError, ValueError):
             return np.random.randint(
                 getattr(self.brain.striatum, '_n_actions', 4)
             )
@@ -176,7 +199,7 @@ class DeadEndDetector:
             wm = self.brain.basal_ganglia._world_model
             if wm is not None:
                 return wm.predict(features, action)
-        except Exception:
+        except (AttributeError, TypeError, ValueError, RuntimeError):
             pass
 
         # Fallback: noisy perturbation
@@ -187,5 +210,28 @@ class DeadEndDetector:
         return {
             "checks_run": self._checks_run,
             "dead_ends_found": sum(1 for v in self._checked.values() if v),
-            "total_cached": len(self._checked),
+            "cache_entries": len(self._checked),
+            "cache_hits": self._cache_hits,
+            "cache_misses": self._cache_misses,
+            "default_trials": self.default_trials,
+            "trap_check_trials": self.trap_check_trials,
+            "pre_action_trials": self.pre_action_trials,
         }
+
+    def _cache_key(
+        self,
+        features: np.ndarray,
+        n_trials: int,
+        custom_success_fn: Optional[Callable],
+    ) -> str:
+        """Build deterministic cache key for one check policy."""
+        success_key = (
+            f"custom:{id(custom_success_fn)}"
+            if custom_success_fn is not None
+            else "reward"
+        )
+        feature_hash = hashlib.sha1(features.tobytes()).hexdigest()
+        return (
+            f"{features.dtype}:{features.shape}:{n_trials}:{self.rollout_length}:"
+            f"{self.reward_threshold}:{success_key}:{feature_hash}"
+        )

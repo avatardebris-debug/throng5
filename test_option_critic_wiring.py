@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
+
 from brain.orchestrator import WholeBrain
 
 
+@pytest.mark.slow
 def test_oc_trains_and_sr_wired():
     brain = WholeBrain(
         n_features=84,

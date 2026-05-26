@@ -233,6 +233,28 @@ def test_planning_dead_end_detector(brain):
     assert isinstance(result, bool)
 
 
+def test_dead_end_trap_uses_trap_check_trials(brain, monkeypatch):
+    """Trap checks should use the detector's configured trap_check_trials budget."""
+    from brain.planning.dead_end_detector import DeadEndDetector
+
+    detector = DeadEndDetector(
+        brain,
+        default_trials=50,
+        rollout_length=5,
+        trap_check_trials=7,
+    )
+    features = np.random.randn(84).astype(np.float32)
+    captured = {"n_trials": None}
+
+    def _fake_check(_features, n_trials=None, custom_success_fn=None):
+        captured["n_trials"] = n_trials
+        return False
+
+    monkeypatch.setattr(detector, "check", _fake_check)
+    detector.is_trap(features, action=1, immediate_reward=1.0)
+    assert captured["n_trials"] == 7
+
+
 def test_planning_causal_model():
     """Test causal model observes and predicts."""
     from brain.planning.causal_model import CausalModel

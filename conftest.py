@@ -8,11 +8,18 @@ from bootstrap_paths import ensure_throng_paths
 
 ensure_throng_paths()
 
+# Script-style modules that execute side effects at import time.
+collect_ignore = ["test_tetra_dialogue.py"]
+
 
 def pytest_configure(config):
     config.addinivalue_line(
         "markers",
         "integration: tests requiring external services (OpenClaw gateway, etc.)",
+    )
+    config.addinivalue_line(
+        "markers",
+        "slow: longer-running integration/pretrain checks",
     )
 
 

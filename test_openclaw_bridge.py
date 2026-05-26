@@ -7,21 +7,10 @@ Run with gateway live: pytest test_openclaw_bridge.py -m integration
 """
 from __future__ import annotations
 
-import os
-import sys
-from pathlib import Path
-
 import pytest
+from bootstrap_paths import ensure_throng_paths
 
-# Optional throng4 package (legacy tree under repo)
-_ROOT = Path(__file__).resolve().parent
-for _candidate in (
-    _ROOT / "throng4_new",
-    _ROOT / "throng3 - Copy",
-):
-    if (_candidate / "throng4").is_dir():
-        sys.path.insert(0, str(_candidate))
-        break
+ensure_throng_paths()
 
 try:
     from throng4.llm_policy.openclaw_bridge import OpenClawBridge

@@ -134,7 +134,7 @@ class WholeBrain:
         # Using plain int counters: cheaper than self._enabled["x"] dict lookup
         self._dqn_train_interval = 2    # DQN gradient update every 2nd step
         self._wm_train_interval = 4     # World model train every 4th step
-        self._causal_interval = 2       # Causal model observe every 2nd step
+        self._causal_observe_interval = 2  # Causal model observe every 2nd step
 
         self._plateau_window = 200
         self._plateau_threshold = 0.02
@@ -216,6 +216,159 @@ class WholeBrain:
             self.logger.event("skill", "activate", f"{skill_name}: {params}")
         return True
 
+    def _step_sensory(
+        self,
+        obs: Any,
+        prev_action: int,
+        reward: float,
+        done: bool,
+    ) -> tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        """Run sensory phase and return features + optional raw frames."""
+        self.profiler.start("sensory")
+        perception = self.sensory.step({
+            "obs": obs,
+            "action": prev_action,
+            "reward": reward,
+            "done": done,
+        })
+        features = perception.get("features")
+        if features is None and obs is not None:
+            features = np.asarray(obs, dtype=np.float32).flatten()[:self.n_features]
+            if len(features) < self.n_features:
+                features = np.pad(features, (0, self.n_features - len(features)))
+        raw_frames = self.sensory.get_last_preprocessed() if self.sensory._use_cnn else None
+        self.profiler.stop("sensory")
+        return features, raw_frames
+
+    def _step_regions(self, features: Optional[np.ndarray], reward: float) -> tuple[Dict[str, Any], Dict[str, Any]]:
+        """Run basal ganglia and amygdala phases."""
+        self.profiler.start("basal_ganglia")
+        bg_output = self.basal_ganglia.step({
+            "features": features,
+            "reward": reward,
+            "step": self._step_count,
+        })
+        self.profiler.stop("basal_ganglia")
+
+        self.profiler.start("amygdala")
+        threat_output = self.amygdala.step({
+            "features": features,
+            "dream_results": bg_output.get("dream_results"),
+            "surprise_level": 0.0,
+            "step": self._step_count,
+        })
+        self.profiler.stop("amygdala")
+        return bg_output, threat_output
+
+    def _step_dreamer(self, prev_action: int, features: Optional[np.ndarray], reward: float) -> None:
+        """Store/train Dreamer model on schedule."""
+        if self.dreamer is None:
+            return
+        try:
+            self.dreamer.store_transition(
+                self._prev_features, prev_action, features, reward,
+            )
+            if self._step_count % 16 == 0:
+                self.dreamer.train_step()
+        except (AttributeError, RuntimeError, TypeError, ValueError) as exc:
+            _log.debug("dreamer step failed: %s", exc)
+
+    def _step_planner_observe(
+        self,
+        prev_action: int,
+        features: Optional[np.ndarray],
+        reward: float,
+        done: bool,
+    ) -> None:
+        """Feed transition into planner causal observer."""
+        if (
+            self.planner is None
+            or self._prev_features is None
+            or self._step_count % self._causal_observe_interval != 0
+        ):
+            return
+        self.profiler.start("causal_observe")
+        try:
+            self.planner.observe_transition(
+                self._prev_features, prev_action, features, reward, done,
+            )
+        except AttributeError as exc:
+            _log.warning("causal observe missing dependency: %s", exc)
+        except (RuntimeError, TypeError, ValueError) as exc:
+            _log.debug("causal observe failed: %s", exc)
+        self.profiler.stop("causal_observe")
+
+    def _step_skill(self, features: Optional[np.ndarray], reward: float) -> Optional[int]:
+        """Run active skill override (if any)."""
+        if self._active_skill is None or features is None:
+            return None
+        try:
+            skill_result = self._active_skill.step(
+                features, self._skill_game_state, reward,
+            )
+            status = skill_result.get("status")
+            if status == "active":
+                return skill_result.get("action")
+            if status in ("complete", "timeout", "failed"):
+                self._active_skill = None
+                return None
+            return None
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            _log.debug("skill step failed; disabling skill: %s", exc)
+            self._active_skill = None
+            return None
+
+    def _step_motor(
+        self,
+        features: Optional[np.ndarray],
+        striatum_action: int,
+        skill_override: Optional[int],
+    ) -> Dict[str, Any]:
+        """Run motor cortex arbitration/action."""
+        self.profiler.start("motor")
+        motor_output = self.motor.step({
+            "striatum_action": skill_override if skill_override is not None else striatum_action,
+            "features": features,
+            "striatum_halted": self.bus.is_halted("striatum"),
+        })
+        self._last_action = motor_output.get("action", 0)
+        self.profiler.stop("motor")
+        return motor_output
+
+    def _step_attribution(
+        self,
+        action: int,
+        striatum_action: int,
+        striatum_output: Dict[str, Any],
+        threat_output: Dict[str, Any],
+        reward: float,
+        epsilon_used: float,
+        motor_output: Dict[str, Any],
+    ) -> None:
+        """Record per-step decision trace."""
+        if self.attribution is None:
+            return
+        try:
+            trace = DecisionTrace(
+                step=self._step_count,
+                action_taken=action,
+                action_source=motor_output.get("source", "unknown"),
+                striatum_action=striatum_action or 0,
+                striatum_q_values=striatum_output.get("q_values", []),
+                threat_score=threat_output.get("threat_score", 0.0),
+                curiosity_bonus=0.0,
+                surprise=0.0,
+                reward=reward,
+                episode_reward_so_far=self._episode_reward,
+                epsilon=epsilon_used,
+                dead_end_detected=False,
+                entropy_override=False,
+                region_times=self.profiler.report(),
+            )
+            self.attribution.record(trace)
+        except (AttributeError, TypeError, ValueError) as exc:
+            _log.debug("attribution record failed: %s", exc)
+
     def step(
         self,
         obs: Any,
@@ -233,40 +386,8 @@ class WholeBrain:
         self._last_action = prev_action
         self.profiler.step_start()
 
-        # ── 1. Sensory Cortex ─────────────────────────────────────────
-        self.profiler.start("sensory")
-        perception = self.sensory.step({
-            "obs": obs,
-            "action": prev_action,
-            "reward": reward,
-            "done": done,
-        })
-        features = perception.get("features")
-        if features is None and obs is not None:
-            features = np.asarray(obs, dtype=np.float32).flatten()[:self.n_features]
-            if len(features) < self.n_features:
-                features = np.pad(features, (0, self.n_features - len(features)))
-        raw_frames = self.sensory.get_last_preprocessed() if self.sensory._use_cnn else None
-        self.profiler.stop("sensory")
-
-        # ── 2. Basal Ganglia ──────────────────────────────────────────
-        self.profiler.start("basal_ganglia")
-        bg_output = self.basal_ganglia.step({
-            "features": features,
-            "reward": reward,
-            "step": self._step_count,
-        })
-        self.profiler.stop("basal_ganglia")
-
-        # ── 3. Amygdala/Thalamus ──────────────────────────────────────
-        self.profiler.start("amygdala")
-        threat_output = self.amygdala.step({
-            "features": features,
-            "dream_results": bg_output.get("dream_results"),
-            "surprise_level": 0.0,
-            "step": self._step_count,
-        })
-        self.profiler.stop("amygdala")
+        features, raw_frames = self._step_sensory(obs, prev_action, reward, done)
+        bg_output, threat_output = self._step_regions(features, reward)
 
         # ── 4. Hippocampus ────────────────────────────────────────────
         if self._enabled["hippocampus_store"]:
@@ -314,32 +435,9 @@ class WholeBrain:
                 })
             self.profiler.stop("world_model")
 
-            # -- Dreamer latent WM: store transition + periodic train ------
-            if self.dreamer is not None:
-                try:
-                    self.dreamer.store_transition(
-                        self._prev_features, prev_action, features, reward,
-                    )
-                    # Train every 4 steps (cheap: 64-dim latent ELBO)
-                    if self._step_count % 16 == 0:
-                        self.dreamer.train_step()
-                except Exception as e:
-                    _log.debug("dreamer step failed: %s", e)
+            self._step_dreamer(prev_action, features, reward)
 
-        # ── 6.5 Causal model + subgoal tracking ─────────────────────
-        if (self.planner is not None
-                and self._prev_features is not None
-                and self._step_count % self._causal_observe_interval == 0):
-            self.profiler.start("causal_observe")
-            try:
-                self.planner.observe_transition(
-                    self._prev_features, prev_action, features, reward, done,
-                )
-            except AttributeError as e:
-                _log.warning("causal observe missing dependency: %s", e)
-            except Exception as e:
-                _log.debug("causal observe failed: %s", e)
-            self.profiler.stop("causal_observe")
+        self._step_planner_observe(prev_action, features, reward, done)
 
         # Track features and raw frames for next step
         self._prev_features = features
@@ -347,58 +445,23 @@ class WholeBrain:
         self._last_features = features
 
         # ── 7. Skill Library Override ─────────────────────────────────
-        skill_override = None
-        if self._active_skill is not None and features is not None:
-            try:
-                skill_result = self._active_skill.step(
-                    features, self._skill_game_state, reward,
-                )
-                if skill_result["status"] == "active":
-                    skill_override = skill_result["action"]
-                elif skill_result["status"] in ("complete", "timeout", "failed"):
-                    self._active_skill = None  # Skill finished
-            except Exception:
-                self._active_skill = None
-
-        # ── 8. Motor Cortex ───────────────────────────────────────────
-        self.profiler.start("motor")
-        motor_output = self.motor.step({
-            "striatum_action": skill_override if skill_override is not None else striatum_action,
-            "features": features,
-            "striatum_halted": self.bus.is_halted("striatum"),
-        })
+        skill_override = self._step_skill(features, reward)
+        motor_output = self._step_motor(features, striatum_action, skill_override)
         action = motor_output.get("action", 0)
-        self._last_action = action
-        self.profiler.stop("motor")
 
         epsilon_used = striatum_output.get("epsilon", 0.15)
 
         self.profiler.step_end()
 
-        # ── 9. Decision trace ────────────────────────────────────────
-        if self.attribution is not None:
-            try:
-                trace = DecisionTrace(
-                    step=self._step_count,
-                    action_taken=action,
-                    action_source=motor_output.get("source", "unknown"),
-                    striatum_action=striatum_action or 0,
-                    striatum_q_values=(
-                        striatum_output.get("q_values", [])
-                    ),
-                    threat_score=threat_output.get("threat_score", 0.0),
-                    curiosity_bonus=0.0,
-                    surprise=0.0,
-                    reward=reward,
-                    episode_reward_so_far=self._episode_reward,
-                    epsilon=epsilon_used,
-                    dead_end_detected=False,
-                    entropy_override=False,
-                    region_times=self.profiler.report(),
-                )
-                self.attribution.record(trace)
-            except Exception as e:
-                _log.debug("attribution record failed: %s", e)
+        self._step_attribution(
+            action=action,
+            striatum_action=striatum_action,
+            striatum_output=striatum_output,
+            threat_output=threat_output,
+            reward=reward,
+            epsilon_used=epsilon_used,
+            motor_output=motor_output,
+        )
 
         # ── Episode boundary ──────────────────────────────────────────
         if done:

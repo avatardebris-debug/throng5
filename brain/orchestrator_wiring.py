@@ -216,7 +216,6 @@ def wire_subsystems(
         enabled=brain._enabled["attribution"],
     )
 
-    brain._causal_observe_interval = brain._causal_interval
     brain._wm_enabled = brain._enabled["world_model"]
     brain._causal_enabled = brain.planner is not None
 

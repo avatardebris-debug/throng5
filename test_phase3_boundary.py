@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT))
 
 from bootstrap_paths import ensure_throng_paths
 

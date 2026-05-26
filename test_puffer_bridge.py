@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT))
 
 from bootstrap_paths import ensure_throng_paths
 
 ensure_throng_paths()
 
+ROOT = Path(__file__).resolve().parent
+
 import numpy as np
+import pytest
 
 from brain.bridge import TrainConfig, load_into_brain
 from brain.bridge.puffer_dqn_trainer import PufferDQNTrainer
@@ -39,6 +38,7 @@ def test_feature_env_reset_single_adapter_call():
     env.close()
 
 
+@pytest.mark.slow
 def test_serial_pretrain_and_load():
     ckpt = ROOT / "checkpoints" / "test_puffer_bridge.pt"
     cfg = TrainConfig(
